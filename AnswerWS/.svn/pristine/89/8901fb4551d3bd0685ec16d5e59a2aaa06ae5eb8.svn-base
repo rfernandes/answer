@@ -1,0 +1,45 @@
+#ifndef _COMPLEX_SERVICE_HH_
+#define _COMPLEX_SERVICE_HH_
+#include <anubis/webservice/Invoker.hh>
+#include <anubis/webservice/WebMethod.hh>
+#include <string>
+#include <set>
+
+#include "ComplexServiceTypes.hh"
+
+#include "ComplexServiceAuthorization.hh"
+
+/*
+ * To create a WebService simply define request and response types, template the inheritance of WebMethod
+ * and implement the process(const requestType&) function
+ * 
+ * On build this project uses the CPP_WSDL tool to parse the header file. This will generate the following files:
+ *  service.xml, the axis2c apache module service description
+ *  PROJECT_NAME.wsdl the SOAP (1.0/1.1) Service description, complete with this documentation information
+ *  PROJECT_NAME.json with the json payloads of the service (Used in the WebGUI generation)
+ * 
+ * As a further example this webservice uses the RBAC-Based Authorization and Authentication Module (consult ComplexServiceAuthorization.hh)
+ */
+class ComplexService:
+	public anubis::webservice::WebMethod< ComplexTypeRequest, ComplexTypeResponse>{
+
+	public:
+		//The default constructor means default success and error messages
+		//ComplexTypeOperation(){}
+	void ComplexService::process(const ComplexTypeRequest &request, ComplexTypeResponse& response){
+		std::cout << "Process : "<< request.username << std::endl;
+		response.name = request.username;
+		response.number = 2;
+		response.vec.push_back(42);
+		response.vec.push_back(1911);
+		response.vec.push_back(42);
+		
+		if (false){ //There is a proper exception handling hierarchy; USE IT!
+			anubis::webservice::WebMethodException("Something blew up!");
+		}
+	}
+};
+
+anubis::webservice::RegisterWebMethod<ComplexService> complexService("complex_service", anubis::webservice::Invoker::SINGLECALL);
+
+#endif //_COMPLEX_SERVICE_HH_

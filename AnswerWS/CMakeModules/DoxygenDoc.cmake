@@ -1,0 +1,17 @@
+MACRO (MACRO_ADD_DOXYGEN_DOC)
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    find_file(DOXYFILE_FOUND name Doxyfile PATHS ./doc)
+#    message(STATUS "Doxygen found")
+    if (DOXYFILE_FOUND)
+	message(STATUS "make doc => [ Creates documentation for this project  ] ")
+        add_custom_target(doc PROJECT_NAME=${PROJECT_NAME} DESCRIPTION=${DESCRIPTION} ${DOXYGEN_EXECUTABLE} ${DOXYFILE} WORKING_DIRECTORY ../doc)
+
+    else (DOXYFILE_FOUND)
+#        message(WARNING " - Doxygen definition file not found")
+    endif (DOXYFILE_FOUND)
+else (DOXYGEN_FOUND)
+#    message(WARNING " - Doxygen not found")
+endif (DOXYGEN_FOUND)
+
+ENDMACRO(MACRO_ADD_DOXYGEN_DOC)

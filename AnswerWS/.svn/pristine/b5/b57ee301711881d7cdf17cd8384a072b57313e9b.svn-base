@@ -1,0 +1,30 @@
+#include "../include/Fortune.h"
+
+#include <string>
+#include <iostream>
+#include <stdio.h>
+
+using namespace anubis::webservice;
+
+std::string exec(const char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result;
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
+void Fortune::process(){
+	_response = exec("fortune");
+}
+
+void FortuneWithState::process(){
+	static std::string prevFortune;
+	_response.previousFortune = prevFortune;
+	prevFortune = _response.fortune = exec("fortune");
+}

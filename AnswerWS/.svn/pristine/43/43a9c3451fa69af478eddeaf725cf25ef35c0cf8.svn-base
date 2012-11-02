@@ -1,0 +1,51 @@
+#include "anubis/webservice/webmodule/I18n.hh"
+
+#include <libanubis-logger/AnubisLogger.hh>
+#include <libanubis-exceptions/AnubisExceptions.hh>
+
+#include <boost/locale.hpp>
+
+using namespace std;
+using namespace anubis::webservice;
+
+namespace anubis {
+namespace webservice {
+namespace webmodule{
+	
+	I18n::I18n() {
+		
+	}
+	
+	
+	anubis::webservice::WebModule::FlowStatus I18n::inFlow(InFlowContext &context) {
+		try {
+			boost::locale::generator gen;
+			gen.add_messages_path("/usr/axis2c/config/i18n");
+			gen.add_messages_domain("WPS");
+			std::string cookie_lang = context.getCookies().at("lang");
+			locale::global(gen(cookie_lang));
+		}
+		catch(std::exception &ex) {
+			LOGANUBIS_WARN("Couldn't set locale. Using default.");
+		}
+		
+		return OK;
+	}
+	
+	
+	anubis::webservice::WebModule::FlowStatus I18n::outFlow(OutFlowContext &/*context*/) {
+		//We currently have no outFlow handling
+		return OK;
+	}
+	
+	
+	anubis::webservice::WebModule::FlowStatus I18n::outFlowFault(OutFlowContext &/*context*/) {
+		//We currently have no outFlow Fault handling
+		return OK;
+	}
+	
+	static RegisterWebModule<I18n> _register("I18n");
+
+}
+}
+}

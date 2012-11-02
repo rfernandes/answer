@@ -1,0 +1,325 @@
+#include "anubis/webservice/OperationStore.hh"
+#include "AxisEnvironmentWrapper.hh"
+#include "anubis/webservice/Environment.hh"
+#include "anubis/webservice/Context.hh"
+
+#include <stdio.h>
+#include <iostream>
+#include <set>
+
+//////////////////////////FUNCTION TYPES
+
+using namespace std;
+
+#include <libgen.h>
+#include <axis2_op.h>
+#include <axis2_msg_ctx.h>
+#include <axis2_msg_info_headers.h>
+#include <axutil_property.h>
+#include <axutil_properties.h>
+#include <axutil_array_list.h>
+#include <axutil_utils_defines.h>
+#include <axis2_http_accept_record.h>
+#include <axiom_data_source.h>
+#include <axiom_element.h>
+#include <axis2_http_header.h>
+#include <axis2_http_transport.h>
+
+#include <rbac/PDP.hh>
+
+/**
+ * axis2_svc_skel_anubis_webservices.cpp
+ */
+
+#include <axis2_svc_skeleton.h>
+#include <axis2_svc.h>
+
+/**
+ * functions prototypes
+ */
+
+#include <iostream>
+#include <fstream>
+#include <dlfcn.h>
+#include <glob.h>
+
+using namespace anubis::webservice;
+using namespace std;
+
+
+std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_node )
+{
+	string xmlString;
+	if ( content_node != NULL ) {
+		// Request Node preparation
+		//TODO : namespace can be static
+		axiom_namespace_t *		anub_ns = axiom_namespace_create ( axis_env, "http://www.w3.org/2001/12/soap-envelope","soapenv" );
+		if ( anub_ns == NULL )
+			throw std::runtime_error ( "Failed to create request namespace." );
+		// Get the element
+		axiom_element_t *content_node_element = ( axiom_element_t * ) axiom_node_get_data_element ( content_node, axis_env );
+		if ( content_node_element == NULL )
+			throw std::runtime_error ( "Bad request content" );
+
+		// Namespace declaration for this node
+		axiom_element_declare_namespace ( content_node_element, axis_env, content_node, anub_ns );
+		axiom_element_declare_namespace_assume_param_ownership ( content_node_element, axis_env, anub_ns );
+
+		// Request to string
+
+		// 		axis2_char_t* request = axiom_element_to_string(content_node_element, axis_env, content_node);
+		axis2_char_t* request = axiom_node_to_string ( content_node, axis_env );
+		if ( request != NULL )
+			xmlString.append ( request );
+
+		axiom_namespace_free ( anub_ns, axis_env );
+	}
+	return xmlString;
+}
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+	axiom_node_t* AXIS2_CALL toAxiomNode ( const axutil_env_t *env, const string& operationName, axiom_node_t *content_node, axis2_msg_ctx_t *msg_ctx )
+	{
+		axiom_node_t *parent = NULL;
+		try {
+
+			/* Get the string */
+			string params ( getRequest ( env, content_node ) );
+			//DEBUG
+			// 			cerr << "String params: " << params << endl;
+
+			//remove the xml header
+
+			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
+			ResponseContext& response_context = anubis::webservice::Context::getInstance().response();
+			response_context.reset();
+			
+			string xmlResponse = oper_ref.invoke ( params );
+
+			// Response Node preparation
+			axiom_element_t *parent_element = NULL;
+			axiom_namespace_t *ns1 = NULL;
+			ns1 = axiom_namespace_create ( env,"http://anubis","n" );
+			parent_element = axiom_element_create ( env, NULL, operationName.c_str(), ns1 , &parent );
+
+			axiom_element_set_namespace ( parent_element, env, ns1, parent );
+
+			axiom_node_t *current_node = NULL;
+			axiom_data_source_t *data_source = axiom_data_source_create ( env, parent, &current_node );
+			axutil_stream_t *stream = axiom_data_source_get_stream ( data_source, env );
+
+			// Response Modifier
+#ifdef AXIS2_RAW_RESPONSE			
+			axis2_msg_ctx_set_doing_raw ( msg_ctx, env, response_context.useRaw() );
+#endif
+			axutil_array_list_t* header_list = axis2_msg_ctx_get_http_output_headers ( msg_ctx, env );
+			if ( !header_list ) {
+				// +1 for content-type
+				header_list = axutil_array_list_create ( env, response_context.getAdditionalHeaders().size() +1 ); 
+			}
+			//AXIS2_LOG_ERROR(env->log, AXIS2_LOG_SI, "headers");
+			
+			for ( list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it ) {
+				axis2_http_header_t* new_header = axis2_http_header_create ( env, it->first.c_str(), it->second.c_str() );
+				//AXIS2_LOG_ERROR(env->log, AXIS2_LOG_SI, "header - %s:%s", it->first.c_str(), it->second.c_str());
+				axutil_array_list_add ( header_list, env, new_header );
+#ifdef AXIS2_HTTP_RESPONSE_MOVED_TEMPORARILY_CODE_VAL
+				// if it's a location response, return code must change to 302
+				if ( response_context.isLocationResponse() ) {
+					axis2_msg_ctx_set_status_code ( msg_ctx, env, AXIS2_HTTP_RESPONSE_MOVED_TEMPORARILY_CODE_VAL );
+				}
+#endif
+			}
+			axutil_array_list_add ( header_list, env, axis2_http_header_create ( env, "Content-Type", response_context.getContentType().c_str() ) );
+			
+			axis2_msg_ctx_set_http_output_headers ( msg_ctx, env, header_list );
+			int written = axutil_stream_write ( stream, env, xmlResponse.c_str(), xmlResponse.size() );
+			AXIS2_LOG_DEBUG(env->log, AXIS2_LOG_SI, "Bytes written: %d", written);
+		} catch ( exception &ex ) {
+
+			AXIS2_ERROR_SET ( env->error, AXIS2_ERROR_DATA_ELEMENT_IS_NULL, AXIS2_FAILURE );
+			AXIS2_LOG_ERROR ( env->log, AXIS2_LOG_SI, ex.what() );
+			return NULL;
+		}
+		return parent;
+	}
+
+	/* On fault, handle the fault */
+	axiom_node_t* AXIS2_CALL
+	axis2_svc_skel_anubis_webservices_on_fault ( axis2_svc_skeleton_t */*svc_skeleton*/,
+			const axutil_env_t *env, axiom_node_t *node )
+	{
+		axiom_node_t *error_node = NULL;
+		axiom_element_t *error_ele = NULL;
+		error_ele = axiom_element_create ( env, node, "fault", NULL,
+										   &error_node );
+		axiom_element_set_text ( error_ele, env, "anubis_webservices|http://anubis failed",
+								 error_node );
+		return error_node;
+	}
+
+	/* Free the service */
+	int AXIS2_CALL
+	axis2_svc_skel_anubis_webservices_free ( axis2_svc_skeleton_t *svc_skeleton,
+			const axutil_env_t *env )
+	{
+		/* Free the service skeleton */
+		if ( svc_skeleton ) {
+			AXIS2_FREE ( env->allocator, svc_skeleton );
+			svc_skeleton = NULL;
+		}
+		return AXIS2_SUCCESS;
+	}
+
+	/* This method invokes the right service method */
+	axiom_node_t* AXIS2_CALL
+	axis2_svc_skel_anubis_webservices_invoke ( axis2_svc_skeleton_t */*svc_skeleton*/,
+			const axutil_env_t *env,
+			axiom_node_t *content_node,
+			axis2_msg_ctx_t *msg_ctx )
+	{
+		/* depending on the function name invoke the corresponding  method */
+
+		axiom_node_t *ret_node = NULL;
+		axis2_op_ctx_t *operation_ctx = axis2_msg_ctx_get_op_ctx ( msg_ctx, env );
+		axis2_op_t *operation = axis2_op_ctx_get_op ( operation_ctx, env );
+		axutil_qname_t *op_qname = ( axutil_qname_t * ) axis2_op_get_qname ( operation, env );
+		axis2_char_t *op_name = axutil_qname_get_localpart ( op_qname, env );
+		// unused
+		// 		axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
+
+		RequestContext& request_context = anubis::webservice::Context::getInstance().request();
+		request_context.reset();
+		axutil_array_list_t * accept_record_list_aux = axis2_msg_ctx_get_http_accept_record_list ( msg_ctx, env );
+		if ( accept_record_list_aux ) {
+			for ( int i =0; i< axutil_array_list_size ( accept_record_list_aux, env ); ++i ) {
+				axis2_http_accept_record_t* record = ( axis2_http_accept_record_t * ) axutil_array_list_get ( accept_record_list_aux, env, i );
+				char * name = axis2_http_accept_record_get_name ( record, env );
+				request_context.addAccept(name);
+			}
+		}
+		
+		if (msg_ctx) {
+			axis2_endpoint_ref_t* endpoint  = axis2_msg_ctx_get_from (msg_ctx, env);
+			if (endpoint) {
+				const axis2_char_t *url = axis2_endpoint_ref_get_address(endpoint, env);
+				if (url) {
+					request_context.setEndPointURL(url);
+				}
+			}
+			
+		}
+
+		// 		cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
+		// 		string operationName(op_prefix);
+		// 		operationName += "::";
+		// 		operationName += op_name;
+
+		try {
+			ret_node = toAxiomNode ( env, op_name, content_node, msg_ctx );
+		} catch ( exception &ex ) {
+			cout << ex.what() << endl;
+		}
+
+		return ret_node;
+	}
+
+	/* Initializing the environment  */
+	int AXIS2_CALL
+	axis2_svc_skel_anubis_webservices_init ( axis2_svc_skeleton_t */*svc_skeleton*/,
+			const axutil_env_t */*env*/ )
+	{
+		/* Any initialization stuff of axis2_skel_anubis_webservices goes here */
+		return AXIS2_SUCCESS;
+	}
+
+	static const axis2_svc_skeleton_ops_t axis2_svc_skel_anubis_webservices_svc_skeleton_ops_var = {
+		axis2_svc_skel_anubis_webservices_init,
+		axis2_svc_skel_anubis_webservices_invoke,
+		axis2_svc_skel_anubis_webservices_on_fault,
+		axis2_svc_skel_anubis_webservices_free,
+		NULL //‘axis2_svc_skeleton_ops::init_with_conf’
+	};
+
+	/**
+	 * Implementations for the functions
+	 */
+
+	void myfunc()
+	{
+
+	}
+
+	axis2_svc_skeleton_t* AXIS2_CALL
+	axis2_svc_skel_anubis_webservices_create ( const axutil_env_t *env )
+	{
+		char *error = NULL;
+		axis2_svc_skeleton_t *svc_skeleton = NULL;
+		/* Allocate memory for the structs */
+
+		Dl_info dl_info;
+		dladdr ( ( void * ) myfunc, &dl_info );
+		if ( ( error = dlerror() ) != NULL )  {
+			cerr << "module '" << dl_info.dli_fname << "' could not be loaded: " << error << endl;
+			return NULL;
+		}
+
+		// 		char
+		const unsigned MAX_PATH ( 2048 );
+		char soPath[MAX_PATH];
+		strcpy ( soPath, dl_info.dli_fname );
+
+		string wsSo ( dirname ( soPath ) );
+		wsSo.append ( "/service.so" );
+
+		dlopen ( wsSo.c_str(), RTLD_LAZY );
+		if ( ( error = dlerror() ) != NULL )  {
+			cerr << "module '" << wsSo << "' could not be loaded: " << error << endl;
+			return NULL;
+		}
+
+		// 		cerr << "module loaded: " << dl_info.dli_fname << endl;
+
+		svc_skeleton = ( axis2_svc_skeleton_t * ) AXIS2_MALLOC ( env->allocator,
+					   sizeof ( axis2_svc_skeleton_t ) );
+
+		svc_skeleton->ops = &axis2_svc_skel_anubis_webservices_svc_skeleton_ops_var;
+		return svc_skeleton;
+	}
+
+	/**
+	 * Following block distinguish the exposed part of the dll.
+	 */
+
+	AXIS2_EXTERN int
+	axis2_get_instance ( struct axis2_svc_skeleton **inst,
+						 const axutil_env_t *env )
+	{
+		*inst = axis2_svc_skel_anubis_webservices_create ( env );
+
+		if ( ! ( *inst ) ) {
+			return AXIS2_FAILURE;
+		}
+
+		return AXIS2_SUCCESS;
+	}
+
+	AXIS2_EXTERN int
+	axis2_remove_instance ( axis2_svc_skeleton_t *inst,
+							const axutil_env_t *env )
+	{
+		axis2_status_t status = AXIS2_FAILURE;
+		if ( inst ) {
+			status = AXIS2_SVC_SKELETON_FREE ( inst, env );
+		}
+		return status;
+	}
+
+#ifdef __cplusplus
+}
+#endif
+

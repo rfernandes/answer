@@ -1,0 +1,121 @@
+cmake_minimum_required(VERSION 2.6)
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/")
+include(CMakeVersion)
+MACRO_CMAKE_VERSION_CHECKS()
+
+include(AnubisProject)
+
+if ( NOT PROJECT_ROOT )
+	set (PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../..")
+endif()
+
+if (NOT LIBS_PATH )
+	set (LIBS_PATH "${PROJECT_ROOT}/libs")
+endif()
+
+MACRO_ANUBIS_PROJECT(${PROJECT_ROOT}  "TRUE")
+get_property(PROJECT_VERSION GLOBAL PROPERTY ANUBIS_PROJECT_VERSION)
+
+
+###########################################################
+# PROJECT SPECIFIC INFO
+###########################################################
+project (wps_module_i18n)
+set (PROJECT_VERSION 0.1)
+set (DESCRIPTION "Anubisnetworks WPS webservices i18n webmodule")
+set (DESCRIPTION_SUMMARY "Anubisnetworks WPS webservices i18n webmodule")
+set (MANDATORY_LIBRARIES rbac wps-users anubis-webservice-module)
+set (OPTIONAL_LIBRARIES )
+set (OPTIONAL_LIBRARIES_WITHOUT_INCLUDES)
+set (MANDATORY_PACKAGES libxml++-2.6)
+set (BOOST_COMPONENTS locale)
+set (POCO_COMPONENTS )
+set (MANDATORY_INCLUDE_CHECKS )
+set (OPTIONAL_INCLUDE_CHECKS )
+
+set (LIBRARY_NAME ${PROJECT_NAME})
+set (CMAKE_INSTALL_PREFIX /opt/wps/modules/)
+
+###########################################################
+# INCLUDES, SOURCE FILES AND CMAKE MODULES
+###########################################################
+
+set (LIBWPS_USERS_BASE         ${LIBS_PATH}/libwps-users${LIBS_PATH_SUFFIX})
+set (LIBRBAC_BASE              ${LIBS_PATH}/librbac${LIBS_PATH_SUFFIX})
+set (LIBWPS_MODEL_BASE         ${LIBS_PATH}/libwps-model${LIBS_PATH_SUFFIX})
+set (LIBANUBIS_WEBSERVICE_BASE ${LIBS_PATH}/libanubis-webservice${LIBS_PATH_SUFFIX})
+
+include_directories("./include/" 
+	${LIBANUBIS_WEBSERVICE_BASE}/include 
+	${LIBWPS_MODEL_BASE}/include 
+	${LIBWPS_USERS_BASE}/include 
+	${LIBRBAC_BASE}/include
+)
+
+file ( GLOB SRC_FILES src/*.cpp src/*.c)
+file ( GLOB_RECURSE headersHH . *.hh )
+file ( GLOB_RECURSE headersH . *.h )
+
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/")
+
+###########################################################
+# LIB DEPENDENCY CHECK
+###########################################################
+include(DependencyCheck)
+MACRO_CHECK_DEPENDENCIES(
+	${LIBANUBIS_WEBSERVICE_BASE}/build
+	/opt/wps/lib
+)
+
+###########################################################
+# TARGET GENERATION
+###########################################################
+add_library (${LIBRARY_NAME} SHARED ${SRC_FILES})
+set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
+target_link_libraries (	${LIBRARY_NAME} 
+	${Boost_LIBRARIES} 
+	${MANDATORY_LIBRARIES_LOCATION} 
+	${MANDATORY_PACKAGES_LIBRARIES} 
+	${OPTIONAL_LIBRARIES_LOCATION}
+	wps-model
+	wps-users
+)
+
+# install (TARGETS ${LIBRARY_NAME}-noaxis DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT library)
+install (TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT library)
+install (FILES ${headersHH} DESTINATION include/anubis/webservice/webmodule COMPONENT headers)
+###########################################################
+# DOXYGEN, CPPCHECK AND DEBUG/RELEASE FLAGS
+###########################################################
+include(DoxygenDoc)
+MACRO_ADD_DOXYGEN_DOC()
+ 
+include(CPPCheck)
+MACRO_ADD_CPPCHECK()
+ 
+include(AnubisDebug)
+MACRO_ADD_ANUBISDEBUG()
+
+#################################################################################################
+# DEBIAN PACKAGE
+#################################################################################################
+
+include(ArchlinuxPkg)
+include(DEBHelper)
+
+set(PACKAGE_NAME "wps-module-i18n")
+set(PACKAGE_VERSION ${ANUBIS_PROJECT_VERSION_REVISION})
+set(PACKAGE_RELEASE 0)
+set(PACKAGE_MAINTAINER_NAME "Anubisnetworks")
+set(DEBIAN_ARCHITECTURE amd64)
+set(ARCH_ARCHITECTURE x86_64)
+set(PACKAGE_SECTION libs)
+set(PACKAGE_MAINTAINER_EMAIL "devel@anubisnetworks.com")
+set(PACKAGE_DESCRIPTION_SUMMARY ${DESCRIPTION})
+set(PACKAGE_DESCRIPTION ${DESCRIPTION_SUMMARY})
+set(PACKAGE_INSTALL_FILES "opt/wps/")
+
+MACRO_MAKE_DEBIAN_PACKAGE(library ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/)
+
+
+

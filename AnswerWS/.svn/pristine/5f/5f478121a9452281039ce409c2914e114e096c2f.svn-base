@@ -1,0 +1,12 @@
+#include "examples/include/ComplexService.h"
+
+using namespace anubis::webservice;
+
+void ComplexService::process(const ComplexTypeRequest &request){
+	std::cout << "Process : "<< request.username << std::endl;
+	_response.name = request.username;
+	_response.number = 2;
+	_response.vec.push_back(42);
+	_response.vec.push_back(1911);
+	_response.vec.push_back(42);
+}

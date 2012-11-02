@@ -1,0 +1,17 @@
+#include "../include/BasicService.h"
+
+using namespace anubis::webservice;
+
+BasicService::BasicService(): WebMethod(_("Users retrieved successfully."),_("Failed to list users.")){}
+
+void BasicService::process(){
+	std::set<std::string> data;
+
+	data.insert("Ennie");
+	data.insert("Meenie");
+	data.insert("Miney");
+	data.insert("Moe");
+
+	_response.setData(data);
+	_response.setElementName("list");
+}

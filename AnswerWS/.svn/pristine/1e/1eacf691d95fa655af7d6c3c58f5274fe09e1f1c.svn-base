@@ -1,0 +1,23 @@
+#ifndef _BASIC_SERVICE_HH_
+#define _BASIC_SERVICE_HH_
+#include <anubis/webservice/Invoker.hh>
+#include <anubis/webservice/WebMethod.hh>
+
+#include <string>
+#include <set>
+
+///Basic type service testing
+class BasicService:
+	public anubis::webservice::WebMethod<void, anubis::webservice::STLContainerWrapper<std::set<std::string> > >{
+
+public:
+	BasicService();
+	//If we change to return the response as oposed to define it via template in the 
+	// parent it will be harder to implement reading of partial responses in case of
+	// PARTIAL SUCESS exceptions
+	void process();
+};
+
+REGISTER_WEBMETHOD(BasicService, "simple_service")
+
+#endif //_BASIC_SERVICE_HH_
