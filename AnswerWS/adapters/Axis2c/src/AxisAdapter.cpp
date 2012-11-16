@@ -25,8 +25,6 @@ using namespace std;
 #include <axis2_http_header.h>
 #include <axis2_http_transport.h>
 
-#include <rbac/PDP.hh>
-
 /**
  * axis2_svc_skel_anubis_webservices.cpp
  */

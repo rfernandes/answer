@@ -10,8 +10,6 @@
 #include <axis2_http_header.h>
 #include <axiom_element.h>
 
-#include <rbac/PDP.hh>
-
 using namespace answer::adapter::axis;
 
 void axis2_single_type_free(void *obj_to_be_freed, const axutil_env_t *env)

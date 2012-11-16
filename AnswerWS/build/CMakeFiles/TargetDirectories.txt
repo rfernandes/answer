@@ -1,0 +1,6 @@
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/CMakeFiles/answer.dir
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/adapters/Axis2c/CMakeFiles/answer-axis.dir
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/adapters/Axis2c/CMakeFiles/answer-axismodule.dir
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/adapters/FCGI/CMakeFiles/answer-fcgi.dir
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/CMakeFiles/answer-module.dir
+/home/c/Project/Code/AnswerWS2/AnswerWS/build/adapters/ApacheModule/CMakeFiles/mod_anubiswebservices.dir
