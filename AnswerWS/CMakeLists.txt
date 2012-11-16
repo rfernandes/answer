@@ -28,7 +28,7 @@ set (BOOST_COMPONENTS serialization date_time)
 
 set (LIBRBAC_BASE ${LIBS_PATH}/librbac${LIBS_PATH_SUFFIX})
 set (AXIS2C_BASE  /usr/axis2c/ )
-set (CMAKE_INSTALL_PREFIX /opt/wps)
+set (CMAKE_INSTALL_PREFIX /usr/)
 
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES

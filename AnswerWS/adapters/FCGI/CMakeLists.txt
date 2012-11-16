@@ -2,8 +2,8 @@ set (FCGI_ADAPTER_SRC_FILES "src/FCGIAdapter.cpp")
 
 set (FCGI_LIBRARIES "dl" "boost_thread" "fastcgipp")
 
-add_executable (${PROJECT_NAME}-fcgi ${FCGI_ADAPTER_SRC_FILES})
-target_link_libraries (${PROJECT_NAME}-fcgi
+add_executable (${PROJECT_NAME}.fcgi ${FCGI_ADAPTER_SRC_FILES})
+target_link_libraries (${PROJECT_NAME}.fcgi
 	${PROJECT_NAME}
 	${PROJECT_NAME}-module
 	${FCGI_LIBRARIES}
@@ -15,7 +15,7 @@ target_link_libraries (${PROJECT_NAME}-fcgi
 	                                #    for linking against the WS modules
 )
 
-install (TARGETS ${PROJECT_NAME}-fcgi DESTINATION /opt/wps/lib/cgi-bin)
+install (TARGETS ${PROJECT_NAME}.fcgi DESTINATION /usr/lib/${PROJECT_NAME}/)
 
 # cmake_minimum_required (VERSION 2.6)
 # cmake_policy(SET CMP0009 NEW) # suppress FOLLOW_SYMLINKS warning for GLOB_RECURSE
