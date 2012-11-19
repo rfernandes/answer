@@ -1,6 +1,6 @@
 #include "answer/WebModule.hh"
 #include "answer/Environment.hh"
-#include "answer/XmlParams.hh"
+#include "XmlParams.hh"
 #include "AxisCookieWrapper.hh"
 #include "AxisEnvironmentWrapper.hh"
 #include "AxisProviderStore.hh"

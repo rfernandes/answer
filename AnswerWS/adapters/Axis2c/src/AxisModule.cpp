@@ -13,7 +13,7 @@
 #include "answer/WebModule.hh"
 #include "AxisEnvironmentWrapper.hh"
 #include "AxisCookieWrapper.hh"
-#include "answer/XmlParams.hh"
+#include "XmlParams.hh"
 
 #include "AxisInFlowContext.hh"
 #include "AxisOutFlowContext.hh"

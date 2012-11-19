@@ -1,4 +1,4 @@
-#include "answer/XmlParams.hh"
+#include "XmlParams.hh"
 #include "answer/Exception.hh"
 #include <stdexcept>
 #include <iostream>
