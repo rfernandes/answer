@@ -1,0 +1,34 @@
+# Maintainer: Rodrigo Fernandes <rfernandes@gmx.com>
+pkgname=answer
+pkgver=20121119
+pkgrel=1
+pkgdesc='C++ webservices framework'
+arch=('i686' 'x86_64')
+url="https://github.com/rfernandes/answer/tree/master/AnswerWS"
+license=('LGPL')
+depends=('doxygen' 'boost' 'axis2c' 'fastcgi++' 'perl-libapreq2')
+_gitroot=https://github.com/rfernandes/answer
+_gitname=master
+
+build() {
+  cd "$srcdir"
+  msg "Connecting to GIT server...."
+
+  if [[ -d "$_gitname" ]]; then
+    cd "$_gitname" && git pull origin
+    msg "The local files are updated."
+  else
+    git clone "$_gitroot" "$_gitname"
+  fi
+
+  msg "GIT checkout done or server timeout"
+  msg "Starting build..."
+  if [[ ! -d "AnswerWS/build" ]]; then
+    mkdir "AnswerWS/build"
+  fi
+  cd "AnswerWS/build"
+  
+  cmake ..
+  make
+  make DESTDIR=$startdir/pkg install
+}

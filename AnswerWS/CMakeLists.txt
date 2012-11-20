@@ -38,7 +38,7 @@ file ( GLOB headersSerializationHH
 # LIB DEPENDENCY CHECK
 ###########################################################
 include(DependencyCheck)
-MACRO_CHECK_DEPENDENCIES(/usr/axis2c/lib /opt/wps/lib)
+MACRO_CHECK_DEPENDENCIES(/usr/axis2c/lib)
 
 # message(STATUS "ONE : ${MANDATORY_PACKAGES_LIBRARIES}")
 ###########################################################
