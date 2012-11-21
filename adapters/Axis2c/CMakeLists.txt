@@ -13,6 +13,7 @@ include_directories (include  ${AXIS2C_BASE}/include/axis2-1.5.0)
 add_library (${PROJECT_NAME}-axismodule SHARED ${AXIS_MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-axismodule PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-axismodule
+	${PROJECT_NAME}
 	${PROJECT_NAME}-module
 )
 
@@ -21,7 +22,6 @@ set_target_properties(${PROJECT_NAME}-axis PROPERTIES VERSION ${PROJECT_VERSION}
 target_link_libraries (${PROJECT_NAME}-axis
 	${PROJECT_NAME}
 	/usr/axis2c/lib/libmod_axis2.so
-# 	${PROJECT_NAME}-module
 	${Boost_LIBRARIES}
   boost_system
 )
