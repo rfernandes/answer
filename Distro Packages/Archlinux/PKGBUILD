@@ -23,11 +23,7 @@ build() {
 
   msg "GIT checkout done or server timeout"
   msg "Starting build..."
-  if [[ ! -d "AnswerWS/build" ]]; then
-    mkdir "AnswerWS/build"
-  fi
-  cd "AnswerWS/build"
-  
+  cd "build"
   cmake ..
   make
   make DESTDIR=$startdir/pkg install
