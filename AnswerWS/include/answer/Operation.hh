@@ -11,7 +11,6 @@
 #include "Codec.hh"
 #include "Context.hh"
 #include <boost/algorithm/string.hpp>
-#include <apr-1/apr_poll.h>
 
 namespace answer {
 	

@@ -1,19 +1,19 @@
 <!-- install to /usr/axis2c/modules/module/module.xml -->
-<module name="module" class="anubis-webservice-axismodule">
+<module name="module" class="answer-axismodule">
     <inflow>
-        <handler name="ModuleInHandler" class="anubis-webservice-axismodule">
-            <order phase="AnubisWebservicesModuleIn"/>
+        <handler name="ModuleInHandler" class="answer-axismodule">
+            <order phase="AnswerModuleIn"/>
         </handler>
     </inflow>
 
     <outflow>
-        <handler name="ModuleOutHandler" class="anubis-webservice-axismodule">
-            <order phase="AnubisWebservicesModuleOut"/>
+        <handler name="ModuleOutHandler" class="answer-axismodule">
+            <order phase="AnswerModuleOut"/>
         </handler>
     </outflow>
     <Outfaultflow>
-        <handler name="ModuleOutFaultHandler" class="axis2_mod_authentication">
-            <order phase="AnubisWebservicesModuleOutFault"/>
+        <handler name="ModuleOutFaultHandler" class="answer-axismodule">
+            <order phase="AnswerModuleOutFault"/>
         </handler>
     </Outfaultflow>
 </module>
