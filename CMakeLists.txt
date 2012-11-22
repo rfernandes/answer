@@ -49,8 +49,6 @@ add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-module
 # 	${Boost_LIBRARIES}
-	axutil axis2_axiom axis2_engine axis2_parser axis2_http_sender axis2_http_receiver anubis-axis2c-shared
-	boost_serialization boost_date_time
 	${MANDATORY_PACKAGES_LIBRARIES}
 )
 

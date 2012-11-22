@@ -2,8 +2,7 @@
 
 using namespace std;
 
-namespace anubis {
-namespace webservice {
+namespace answer {
 
 std::string getResponseXml(int status_code, const std::string &status, const std::string& response){
 	std::stringstream ret;
@@ -17,5 +16,4 @@ std::string getResponseXml(int status_code, const std::string &status, const std
 	return ret.str();
 }
 
-}
 }

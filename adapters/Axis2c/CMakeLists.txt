@@ -3,7 +3,7 @@
 set (AXIS_ADAPTER_FILES "src/AxisAdapter.cpp" "src/XmlParams.cpp" "src/AxisProviderStore.cpp")
 
 #Axis module adapter
-set (AXIS_MODULE_SRC_FILES  "src/AxisModule.cpp" "src/XmlParams.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp")
+set (AXIS_MODULE_SRC_FILES  "src/AxisModule.cpp" "src/XmlParams.cpp" "src/AxisProviderStore.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp")
 # set (AXIS_MODULE_LIBRARIES "")
 
 set (AXIS2C_BASE  /usr/axis2c/ )
@@ -21,6 +21,8 @@ add_library (${PROJECT_NAME}-axis SHARED ${AXIS_ADAPTER_FILES})
 set_target_properties(${PROJECT_NAME}-axis PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-axis
 	${PROJECT_NAME}
+	axutil axis2_axiom axis2_engine axis2_parser axis2_http_sender axis2_http_receiver anubis-axis2c-shared
+	boost_serialization boost_date_time
 	/usr/axis2c/lib/libmod_axis2.so
 	${Boost_LIBRARIES}
   boost_system
