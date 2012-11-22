@@ -21,7 +21,7 @@ add_library (${PROJECT_NAME}-axis SHARED ${AXIS_ADAPTER_FILES})
 set_target_properties(${PROJECT_NAME}-axis PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-axis
 	${PROJECT_NAME}
-	axutil axis2_axiom axis2_engine axis2_parser axis2_http_sender axis2_http_receiver anubis-axis2c-shared
+	axutil axis2_axiom axis2_engine axis2_parser axis2_http_sender axis2_http_receiver
 	boost_serialization boost_date_time
 	/usr/axis2c/lib/libmod_axis2.so
 	${Boost_LIBRARIES}

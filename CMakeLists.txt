@@ -12,7 +12,7 @@ set (PROJECT_VERSION 0.1)
 # set (DESCRIPTION_SUMMARY "ANSWER C++ WebService framework")
 set (MANDATORY_LIBRARIES )
 set (MANDATORY_PACKAGES libxml++-2.6)
-set (CMAKE_INSTALL_PREFIX /usr/)
+# set (CMAKE_INSTALL_PREFIX /usr/)
 
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES

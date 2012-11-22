@@ -24,7 +24,7 @@ build() {
   msg "GIT checkout done or server timeout"
   msg "Starting build..."
   cd "build"
-  cmake ..
+  cmake -DCMAKE_INSTALL_PREFIX=/usr ..
   make
   make DESTDIR=$startdir/pkg install
 }
