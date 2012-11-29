@@ -14,18 +14,18 @@ namespace answer{
 	class InFlowContext{
 	public:
 // 		virtual ~InFlowContext(){};
-		virtual Environment& getCookies() = 0;
-		virtual Environment& getEnvironment() = 0;
-		virtual ProviderStore& getProviderStore() = 0;
-		virtual OperationInfo& getOperation() = 0;
-		virtual Params& getParams() = 0;
+		virtual CookieJar& cookieJar() = 0;
+		virtual Environment& environment() = 0;
+		virtual ProviderStore& providerStore() = 0;
+		virtual OperationInfo& operationInfo() = 0;
+		virtual Params& params() = 0;
 	};
 
 	class OutFlowContext{
 	public:
-		virtual Environment& getEnvironment() = 0;
-		virtual ProviderStore& getProviderStore() = 0;
-		virtual OperationInfo& getOperation() = 0;
+		virtual Environment& environment() = 0;
+		virtual ProviderStore& providerStore() = 0;
+		virtual OperationInfo& operationInfo() = 0;
 	};
 
 	class ModuleException: public std::runtime_error{

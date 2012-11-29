@@ -1,23 +1,29 @@
-#ifndef _COOKIEWRAPPER_HH_
-#define _COOKIEWRAPPER_HH_
+#ifndef _AXISCOOKIEJARWRAPPER_HH_
+#define _AXISCOOKIEJARWRAPPER_HH_
 
 #include "answer/Environment.hh"
+#include "answer/Cookie.hh"
 #include <axis2_conf_ctx.h>
 #include <map>
 
 
 namespace answer{
+	namespace adapter{
+		namespace axis{
 
-	class AxisCookieWrapper: public Environment{
-		std::map<std::string, std::string> _cookies;
+	class AxisCookieJarWrapper: public CookieJar{
+		std::map<std::string, Cookie> _cookies;
 	public:
-		AxisCookieWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx);
-    virtual std::string at(const std::string& key) const;
-		//TODO: we have no support for creating cookies. Either define an empty base, split r/w interfaces or throw exception
-    virtual void insert(const std::string& key, const std::string& value);
-    virtual bool contains(const std::string& key) const;
+		AxisCookieJarWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx);
+    virtual bool contains(const std::string& cookieName) const;
+    virtual const Cookie& getCookie(const std::string& cookieName) const;
+    virtual void insert(const Cookie& cookie);
+    virtual std::list< Cookie > list() const;
+    virtual void remove(const std::string& cookieName);
 	};
 
+		}
+	}
 }
 
-#endif // COOKIEWRAPPER_H
+#endif // _AXISCOOKIEJARWRAPPER_HH_

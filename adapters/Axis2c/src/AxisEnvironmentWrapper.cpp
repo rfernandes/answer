@@ -10,13 +10,20 @@
 #include <axis2_http_header.h>
 #include <axiom_element.h>
 
-using namespace answer::adapter::axis;
+
 
 void axis2_single_type_free(void *obj_to_be_freed, const axutil_env_t *env)
 {
 	AXIS2_FREE(env->allocator, obj_to_be_freed);
 }
 void axis2_no_free(void */*obj_to_be_freed*/, const axutil_env_t */*env*/){}
+
+#define AXIS2_MALLOC(allocator, size) \
+      ((allocator)->malloc_fn(allocator, size))
+
+namespace answer{
+	namespace adapter{
+		namespace axis{
 
 AxisEnvironmentWrapper::AxisEnvironmentWrapper(const axutil_env_t * env, axis2_msg_ctx * msg_ctx):_env(env){
 	axis2_op_ctx* op_ctx = axis2_msg_ctx_get_op_ctx (msg_ctx, env);
@@ -32,8 +39,6 @@ AxisEnvironmentWrapper::AxisEnvironmentWrapper(const axutil_env_t * env, axis2_m
 	}
 }
 
-#define AXIS2_MALLOC(allocator, size) \
-      ((allocator)->malloc_fn(allocator, size))
 
 void AxisEnvironmentWrapper::insert(const std::string&key, const std::string &value){
 	//Copy the value;
@@ -66,4 +71,8 @@ std::string AxisEnvironmentWrapper::at(const std::string &key) const{
 bool AxisEnvironmentWrapper::contains(const std::string& key) const
 {
 	return axis2_ctx_get_property(_ctx, _env, key.c_str());
+}
+
+		}
+	}
 }

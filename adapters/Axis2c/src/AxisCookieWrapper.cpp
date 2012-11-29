@@ -8,16 +8,20 @@
 #include <axutil_hash.h>
 #include <axis2_http_header.h>
 #include <axiom_element.h>
+#include <axis2_msg_ctx.h>
+#include <axis2_http_transport_utils.h>
 
 namespace answer{
+	namespace adapter{
+		namespace axis{
 
-	AxisCookieWrapper::AxisCookieWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx){
+	AxisCookieJarWrapper::AxisCookieJarWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx){
 		axutil_hash_t* request_headers = axis2_msg_ctx_get_transport_headers(msg_ctx, env);
 		if (!request_headers){
 			//TODO: provide a diferent
-// 			std::cerr << "No request headers found :(" << std::endl;
 			return;
 		}
+
 		axis2_http_header_t* cookie_http_header = (axis2_http_header_t *) axutil_hash_get(request_headers, "Cookie", AXIS2_HASH_KEY_STRING);
 		if (cookie_http_header)
 		{
@@ -28,25 +32,44 @@ namespace answer{
 				std::size_t pos = keyValuePair.find('=',2);
 				if (pos != std::string::npos){
 					//TODO: url unescape these values
-					_cookies[keyValuePair.substr(1,pos-1)] = keyValuePair.substr(pos + 1);
+					Cookie cookie(keyValuePair.substr(1,pos-1), keyValuePair.substr(pos + 1));
+					std::cerr << "Cookie found: " << cookie.toString() << std::endl;
+					insert(cookie);
 				}
 			}
 		}
 	}
 
-	void AxisCookieWrapper::insert(const std::string& /*key*/, const std::string& /*value*/)
+	void AxisCookieJarWrapper::insert(const answer::Cookie& cookie)
 	{
-
+		_cookies.insert(make_pair(cookie.getName(),cookie));
 	}
 
-	std::string AxisCookieWrapper::at(const std::string& key) const
+	const Cookie& AxisCookieJarWrapper::getCookie(const std::string& cookieName) const
 	{
-		return _cookies.at(key);
+		return _cookies.at(cookieName);
 	}
 
-	bool AxisCookieWrapper::contains(const std::string& key) const
+	std::list< Cookie > AxisCookieJarWrapper::list() const
+	{
+		std::list< Cookie > lst;
+		for (std::map< std::string, Cookie >::const_iterator it = _cookies.begin(); it != _cookies.end(); ++it){
+			lst.push_back(it->second);
+		}
+		return lst;
+	}
+
+	void AxisCookieJarWrapper::remove(const std::string& cookieName)
+	{
+		_cookies.erase(cookieName);
+	}
+
+	bool AxisCookieJarWrapper::contains(const std::string& key) const
 	{
 		return _cookies.count(key);
 	}
 
+//Namespaces
+		}
+	}
 }

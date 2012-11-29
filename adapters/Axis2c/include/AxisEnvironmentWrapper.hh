@@ -22,7 +22,6 @@ public:
 	virtual bool contains(const std::string& key) const;
 };
 
-
 		}
 	}
 }

@@ -20,7 +20,7 @@ using namespace Fastcgipp;
 
 class Echo: public Fastcgipp::Request<char>
 {
-	
+	/*
 	bool debug(const std::string& serviceRequest, const std::string& serviceResponse, const ResponseContext& response_context)
 	{
 		out << "Content-Type: text/html; charset=utf-8\r\n\r\n";
@@ -136,7 +136,7 @@ class Echo: public Fastcgipp::Request<char>
 		
 		return true;
 	}
-	
+	*/
 	string xmlFromAxisXml(const string &service, const string &operation, const string& parameters) const{
 		
 		
@@ -248,24 +248,25 @@ class Echo: public Fastcgipp::Request<char>
 			if (pos != string::npos)
 				*itr = itr->substr(0,pos);
 		}
-		Context& anubis_context = answer::Context::getInstance();
-		anubis_context.reset();
-		anubis_context.request().setAcceptList(aux);
+// 		Context& anubis_context = answer::Context::getInstance();
+// 		anubis_context.reset();
+// 		anubis_context.request().setAcceptList(aux);
 		
 		cerr << "request :" << serviceRequest << endl;
 		Operation& oper_ref = OperationStore::getInstance().getOperation(operation);
 		
 		string serviceResponse =  oper_ref.invoke(serviceRequest);
 		
-		const ResponseContext& response_context = answer::Context::getInstance().response();
+			//TODO: when context if refactores reinstate the Codecs, for now XML conly
+// 		const ResponseContext& response_context = answer::Context::getInstance().response();
 		if (environment().gets.count("debug"))
 		{
-			debug(serviceRequest, serviceResponse, response_context);
+// 			debug(serviceRequest, serviceResponse, response_context);
 		}else{
-			out << "Content-Type: " << response_context.getContentType() << "\r\n";
-			for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
-				out << it->first << ": " << it->second << "\r\n";
-			}
+// 			out << "Content-Type: " << response_context.getContentType() << "\r\n";
+// 			for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
+// 				out << it->first << ": " << it->second << "\r\n";
+// 			}
 			out << "\r\n";
 			out << serviceResponse;
 		}

@@ -13,7 +13,7 @@ namespace axis{
 
 
 class AxisInFlowContext: public InFlowContext {
-    AxisCookieWrapper _cookies;
+    AxisCookieJarWrapper _cookies;
     AxisEnvironmentWrapper _environment;
     AxisProviderStoreFacility _providerStore;
     AxisOperation _operation;
@@ -28,19 +28,19 @@ public:
         _operation ( axis_env,msg_ctx ),
         _params ( axis_env,msg_ctx ) {}
 
-    virtual Environment& getCookies() {
+    virtual CookieJar& cookieJar() {
         return _cookies;
     }
-    virtual Environment& getEnvironment() {
+    virtual Environment& environment() {
         return _environment;
     }
-    virtual ProviderStore& getProviderStore() {
+    virtual ProviderStore& providerStore() {
         return _providerStore;
     }
-    virtual OperationInfo& getOperation() {
+    virtual OperationInfo& operationInfo() {
         return _operation;
     }
-    virtual answer::Params& getParams() {
+    virtual answer::Params& params() {
         return _params;
     };
 };

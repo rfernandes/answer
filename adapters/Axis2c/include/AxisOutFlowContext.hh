@@ -8,9 +8,9 @@
 
 
 namespace answer{
-	 namespace adapter{
-	 namespace axis{
-		 
+	namespace adapter{
+		namespace axis{
+
 class AxisOutFlowContext: public OutFlowContext {
     AxisEnvironmentWrapper _environment;
     AxisProviderStoreFacility _providerStore;
@@ -22,13 +22,13 @@ public:
         _providerStore ( axis_env, msg_ctx ),
         _operation ( axis_env,msg_ctx ) {}
 
-    virtual Environment& getEnvironment() {
+    virtual Environment& environment() {
         return _environment;
     }
-    virtual ProviderStore& getProviderStore() {
+    virtual ProviderStore& providerStore() {
         return _providerStore;
     }
-    virtual OperationInfo& getOperation() {
+    virtual OperationInfo& operationInfo() {
         return _operation;
     }
 };

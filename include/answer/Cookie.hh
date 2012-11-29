@@ -36,6 +36,8 @@ public:
 	Cookie(const std::string& name, const std::string& value, const std::string& path = "/", const Expires& expires = Expires(), bool secure = false);
 	const std::string toString() const;
 	std::string operator()() const;
+	const std::string& getName() const;
+	const std::string& getValue() const;
 
 private:
 	std::string	_name;

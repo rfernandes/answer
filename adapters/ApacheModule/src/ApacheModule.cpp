@@ -1,34 +1,3 @@
-/* To install:
- *
- * apxs -cia mod_anubiswebservices.c
- *
- * Note that apxs might be called something else on your system if you
- * are Debian-encumbered.
- * 
- * Configure with:
- *
- * LoadModule anubiswebservices_module        modules/mod_anubiswebservices.so
- * <Location /anubiswebservices>
- *   SetHandler anubiswebservices
- * </Location>
- *
- * You can apparently configure this in a .htaccess file (not sure why
- * you'd want to) by creating a file named anubiswebservices (it's fine if it's
- * empty) then putting this in your .htaccess file:
- *
- * <Files anubiswebservices>
- * SetHandler anubiswebservices
- * </Files>
- *
- * This module is licensed under the HJTI license 
- * (http://drbacchus.com/hjti) which is 100% compatible with 
- * the Apache Software License.
- *
- * More details about the reasons for this inanity here:
- * http://drbacchus.com/mod_anubiswebservices
- *
- */
-
 #include "answer/OperationStore.hh"
 #include "answer/WebModule.hh"
 #include "answer/Context.hh"
@@ -53,7 +22,7 @@ string xmlFromAxisXml(const string &service, const string &operation, const stri
 	parser.parse_file(file);
 
 // 		cerr << xmlpp::Element*(parser.get_document()->get_root_node()->find("//operation/parameter").front())->get_child_text()->get_content;
-	
+
 	xmlpp::NodeSet nodeSet = parser.get_document()->get_root_node()->find("//operation[@name='"+operation+"']/parameter[@name='RESTLocation']");
 	
 	cerr << nodeSet.size() << endl;
@@ -152,18 +121,19 @@ class Request{
 // 		cout << "Flag is :" << _service << ' ' << _operation << ' ' << _params  << endl;
 	}
 	
-	void fillAcceptList(request_rec* r){
-		const char * accepts = apr_table_get(r->headers_in, "Accept");
-		std::list<std::string> aux;
-		boost::split(aux, accepts, boost::is_any_of(","), boost::token_compress_on);
-		// remove "quality"
-		for (list< string >::iterator itr = aux.begin(); itr != aux.end(); ++itr) {
-			std::size_t pos = itr->find(";");
-			if (pos != string::npos)
-				*itr = itr->substr(0,pos);
-		}
-		answer::Context::getInstance().request().setAcceptList(aux);
-	}
+	
+// 	void fillAcceptList(request_rec* r){
+// 		const char * accepts = apr_table_get(r->headers_in, "Accept");
+// 		std::list<std::string> aux;
+// 		boost::split(aux, accepts, boost::is_any_of(","), boost::token_compress_on);
+// 		// remove "quality"
+// 		for (list< string >::iterator itr = aux.begin(); itr != aux.end(); ++itr) {
+// 			std::size_t pos = itr->find(";");
+// 			if (pos != string::npos)
+// 				*itr = itr->substr(0,pos);
+// 		}
+// 		answer::Context::getInstance().request().setAcceptList(aux);
+// 	}
 	
 // 	static int bodyEntryCallback(void *rec, const char *key, const char *value){
 // 		Request * that = static_cast<Request*>(rec);
@@ -184,8 +154,8 @@ public:
 			queryRequestFormat(apreq_handle);
 		}
 		
-		answer::Context::getInstance().request().reset();
-		fillAcceptList(r);
+// 		answer::Context::getInstance().request().reset();
+// 		fillAcceptList(r);
 		
 		switch (r->method_number){
 			case M_GET:
@@ -239,18 +209,20 @@ static int anubiswebservices_handler(request_rec* r) {
 		
 		Operation& oper_ref = OperationStore::getInstance().getOperation(req.getOperation());
 		
-		ResponseContext& response_context = answer::Context::getInstance().response();
-		response_context.reset();
+
+			//TODO: when context if refactores reinstate the Codecs, for now XML conly
+// 		ResponseContext& response_context = answer::Context::getInstance().response();
+// 		response_context.reset();
 		string serviceResponse =  oper_ref.invoke(req.getServiceRequest());
 		
-		ap_set_content_type(r, response_context.getContentType().c_str());
-		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
-			apr_table_add (r->headers_out, it->first.c_str(), it->second.c_str());
-		}
-		// if it's a location response, return code must change to 302
-		if ( response_context.isLocationResponse() ) {
-			r->status = HTTP_MOVED_TEMPORARILY;
-		}
+// 		ap_set_content_type(r, response_context.getContentType().c_str());
+// 		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
+// 			apr_table_add (r->headers_out, it->first.c_str(), it->second.c_str());
+// 		}
+// 		// if it's a location response, return code must change to 302
+// 		if ( response_context.isLocationResponse() ) {
+// 			r->status = HTTP_MOVED_TEMPORARILY;
+// 		}
 
 // 		ap_set_content_type(r, "text/xml;charset=utf-8") ;
 		ap_rwrite(serviceResponse.c_str(), serviceResponse.size(), r);

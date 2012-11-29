@@ -1,7 +1,8 @@
 #include "answer/OperationStore.hh"
 #include "AxisEnvironmentWrapper.hh"
 #include "answer/Environment.hh"
-#include "answer/Context.hh"
+
+#include "AxisContext.hh"
 
 #include <stdio.h>
 #include <iostream>
@@ -26,7 +27,7 @@ using namespace std;
 #include <axis2_http_transport.h>
 
 /**
- * axis2_svc_skel_anubis_webservices.cpp
+ * axis2_svc_skel_answer.cpp
  */
 
 #include <axis2_svc_skeleton.h>
@@ -82,6 +83,8 @@ extern "C"
 
 	axiom_node_t* AXIS2_CALL toAxiomNode ( const axutil_env_t *env, const string& operationName, axiom_node_t *content_node, axis2_msg_ctx_t *msg_ctx )
 	{
+    answer::adapter::axis::AxisContext axis( env, msg_ctx );
+
 		axiom_node_t *parent = NULL;
 		try {
 
@@ -93,8 +96,11 @@ extern "C"
 			//remove the xml header
 
 			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
-			ResponseContext& response_context = answer::Context::getInstance().response();
-			response_context.reset();
+
+
+			//TODO: when context if refactores reinstate the Codecs, for now XML conly
+// 			ResponseContext& response_context = answer::Context::getInstance().response();
+// 			response_context.reset();
 			
 			string xmlResponse = oper_ref.invoke ( params );
 
@@ -110,31 +116,6 @@ extern "C"
 			axiom_data_source_t *data_source = axiom_data_source_create ( env, parent, &current_node );
 			axutil_stream_t *stream = axiom_data_source_get_stream ( data_source, env );
 
-			// Response Modifier
-#ifdef AXIS2_RAW_RESPONSE			
-			axis2_msg_ctx_set_doing_raw ( msg_ctx, env, response_context.useRaw() );
-#endif
-			axutil_array_list_t* header_list = axis2_msg_ctx_get_http_output_headers ( msg_ctx, env );
-			if ( !header_list ) {
-				// +1 for content-type
-				header_list = axutil_array_list_create ( env, response_context.getAdditionalHeaders().size() +1 ); 
-			}
-			//AXIS2_LOG_ERROR(env->log, AXIS2_LOG_SI, "headers");
-			
-			for ( list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it ) {
-				axis2_http_header_t* new_header = axis2_http_header_create ( env, it->first.c_str(), it->second.c_str() );
-				//AXIS2_LOG_ERROR(env->log, AXIS2_LOG_SI, "header - %s:%s", it->first.c_str(), it->second.c_str());
-				axutil_array_list_add ( header_list, env, new_header );
-#ifdef AXIS2_HTTP_RESPONSE_MOVED_TEMPORARILY_CODE_VAL
-				// if it's a location response, return code must change to 302
-				if ( response_context.isLocationResponse() ) {
-					axis2_msg_ctx_set_status_code ( msg_ctx, env, AXIS2_HTTP_RESPONSE_MOVED_TEMPORARILY_CODE_VAL );
-				}
-#endif
-			}
-			axutil_array_list_add ( header_list, env, axis2_http_header_create ( env, "Content-Type", response_context.getContentType().c_str() ) );
-			
-			axis2_msg_ctx_set_http_output_headers ( msg_ctx, env, header_list );
 			int written = axutil_stream_write ( stream, env, xmlResponse.c_str(), xmlResponse.size() );
 			AXIS2_LOG_DEBUG(env->log, AXIS2_LOG_SI, "Bytes written: %d", written);
 		} catch ( exception &ex ) {
@@ -148,21 +129,21 @@ extern "C"
 
 	/* On fault, handle the fault */
 	axiom_node_t* AXIS2_CALL
-	axis2_svc_skel_anubis_webservices_on_fault ( axis2_svc_skeleton_t */*svc_skeleton*/,
+	axis2_svc_skel_answer_on_fault ( axis2_svc_skeleton_t */*svc_skeleton*/,
 			const axutil_env_t *env, axiom_node_t *node )
 	{
 		axiom_node_t *error_node = NULL;
 		axiom_element_t *error_ele = NULL;
 		error_ele = axiom_element_create ( env, node, "fault", NULL,
 										   &error_node );
-		axiom_element_set_text ( error_ele, env, "anubis_webservices|http://anubis failed",
+		axiom_element_set_text ( error_ele, env, "answer|http://anubis failed",
 								 error_node );
 		return error_node;
 	}
 
 	/* Free the service */
 	int AXIS2_CALL
-	axis2_svc_skel_anubis_webservices_free ( axis2_svc_skeleton_t *svc_skeleton,
+	axis2_svc_skel_answer_free ( axis2_svc_skeleton_t *svc_skeleton,
 			const axutil_env_t *env )
 	{
 		/* Free the service skeleton */
@@ -175,7 +156,7 @@ extern "C"
 
 	/* This method invokes the right service method */
 	axiom_node_t* AXIS2_CALL
-	axis2_svc_skel_anubis_webservices_invoke ( axis2_svc_skeleton_t */*svc_skeleton*/,
+	axis2_svc_skel_answer_invoke ( axis2_svc_skeleton_t */*svc_skeleton*/,
 			const axutil_env_t *env,
 			axiom_node_t *content_node,
 			axis2_msg_ctx_t *msg_ctx )
@@ -190,26 +171,27 @@ extern "C"
 		// unused
 		// 		axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
 
-		RequestContext& request_context = answer::Context::getInstance().request();
-		request_context.reset();
-		axutil_array_list_t * accept_record_list_aux = axis2_msg_ctx_get_http_accept_record_list ( msg_ctx, env );
-		if ( accept_record_list_aux ) {
-			for ( int i =0; i< axutil_array_list_size ( accept_record_list_aux, env ); ++i ) {
-				axis2_http_accept_record_t* record = ( axis2_http_accept_record_t * ) axutil_array_list_get ( accept_record_list_aux, env, i );
-				char * name = axis2_http_accept_record_get_name ( record, env );
-				request_context.addAccept(name);
-			}
-		}
-		
-		if (msg_ctx) {
-			axis2_endpoint_ref_t* endpoint  = axis2_msg_ctx_get_from (msg_ctx, env);
-			if (endpoint) {
-				const axis2_char_t *url = axis2_endpoint_ref_get_address(endpoint, env);
-				if (url) {
-					request_context.setEndPointURL(url);
-				}
-			}
-		}
+			//TODO: when context if refactores reinstate inserters
+// 		RequestContext& request_context = answer::Context::getInstance().request();
+// 		request_context.reset();
+// 		axutil_array_list_t * accept_record_list_aux = axis2_msg_ctx_get_http_accept_record_list ( msg_ctx, env );
+// 		if ( accept_record_list_aux ) {
+// 			for ( int i =0; i< axutil_array_list_size ( accept_record_list_aux, env ); ++i ) {
+// 				axis2_http_accept_record_t* record = ( axis2_http_accept_record_t * ) axutil_array_list_get ( accept_record_list_aux, env, i );
+// 				char * name = axis2_http_accept_record_get_name ( record, env );
+// 				request_context.addAccept(name);
+// 			}
+// 		}
+// 		
+// 		if (msg_ctx) {
+// 			axis2_endpoint_ref_t* endpoint  = axis2_msg_ctx_get_from (msg_ctx, env);
+// 			if (endpoint) {
+// 				const axis2_char_t *url = axis2_endpoint_ref_get_address(endpoint, env);
+// 				if (url) {
+// 					request_context.setEndPointURL(url);
+// 				}
+// 			}
+// 		}
 
 		// 		cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
 		// 		string operationName(op_prefix);
@@ -227,18 +209,18 @@ extern "C"
 
 	/* Initializing the environment  */
 	int AXIS2_CALL
-	axis2_svc_skel_anubis_webservices_init ( axis2_svc_skeleton_t */*svc_skeleton*/,
+	axis2_svc_skel_answer_init ( axis2_svc_skeleton_t */*svc_skeleton*/,
 			const axutil_env_t */*env*/ )
 	{
-		/* Any initialization stuff of axis2_skel_anubis_webservices goes here */
+		/* Any initialization stuff of axis2_skel_answer goes here */
 		return AXIS2_SUCCESS;
 	}
 
-	static const axis2_svc_skeleton_ops_t axis2_svc_skel_anubis_webservices_svc_skeleton_ops_var = {
-		axis2_svc_skel_anubis_webservices_init,
-		axis2_svc_skel_anubis_webservices_invoke,
-		axis2_svc_skel_anubis_webservices_on_fault,
-		axis2_svc_skel_anubis_webservices_free,
+	static const axis2_svc_skeleton_ops_t axis2_svc_skel_answer_svc_skeleton_ops_var = {
+		axis2_svc_skel_answer_init,
+		axis2_svc_skel_answer_invoke,
+		axis2_svc_skel_answer_on_fault,
+		axis2_svc_skel_answer_free,
 		NULL //‘axis2_svc_skeleton_ops::init_with_conf’
 	};
 
@@ -251,7 +233,7 @@ extern "C"
 	}
 
 	axis2_svc_skeleton_t* AXIS2_CALL
-	axis2_svc_skel_anubis_webservices_create ( const axutil_env_t *env )
+	axis2_svc_skel_answer_create ( const axutil_env_t *env )
 	{
 		char *error = NULL;
 		axis2_svc_skeleton_t *svc_skeleton = NULL;
@@ -283,7 +265,7 @@ extern "C"
 		svc_skeleton = ( axis2_svc_skeleton_t * ) AXIS2_MALLOC ( env->allocator,
 					   sizeof ( axis2_svc_skeleton_t ) );
 
-		svc_skeleton->ops = &axis2_svc_skel_anubis_webservices_svc_skeleton_ops_var;
+		svc_skeleton->ops = &axis2_svc_skel_answer_svc_skeleton_ops_var;
 		return svc_skeleton;
 	}
 
@@ -295,7 +277,7 @@ extern "C"
 	axis2_get_instance ( struct axis2_svc_skeleton **inst,
 						 const axutil_env_t *env )
 	{
-		*inst = axis2_svc_skel_anubis_webservices_create ( env );
+		*inst = axis2_svc_skel_answer_create ( env );
 
 		if ( ! ( *inst ) ) {
 			return AXIS2_FAILURE;

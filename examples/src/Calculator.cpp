@@ -1,11 +1,10 @@
-#include "Calculator.hh"
+#include "../include/Calculator.hh"
 
 using namespace std;
 using namespace answer;
 
 AnubisResponse<CalculatorResponse> MyService::calculator(const CalculatorRequest &request){
 	AnubisResponse<CalculatorResponse> response;
-
 	switch(request.operation){
 		case 'x':
 		case '*':

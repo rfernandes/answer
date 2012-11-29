@@ -12,7 +12,6 @@ set (PROJECT_VERSION 0.1)
 # set (DESCRIPTION_SUMMARY "ANSWER C++ WebService framework")
 set (MANDATORY_LIBRARIES )
 set (MANDATORY_PACKAGES libxml++-2.6)
-# set (CMAKE_INSTALL_PREFIX /usr/)
 
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
@@ -24,7 +23,7 @@ include_directories (include)
 set (ADAPTER_SRC_FILES "src/Params.cpp" "src/Utils.cpp" "src/Operation.cpp" "src/OperationStore.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp" "src/Serialization.cpp")
 
 #Module support files
-set (MODULE_SRC_FILES "src/WebModule.cpp" "src/Exception.cpp")
+set (MODULE_SRC_FILES "src/Cookie.cpp" "src/WebModule.cpp" "src/Exception.cpp")
 
 file ( GLOB headersHH
 	include/answer/*.hh)

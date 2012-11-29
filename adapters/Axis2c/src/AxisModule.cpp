@@ -11,12 +11,14 @@
 #include <axis2_handler.h>
 
 #include "answer/WebModule.hh"
+#include <answer/Context.hh>
 #include "AxisEnvironmentWrapper.hh"
 #include "AxisCookieWrapper.hh"
 #include "XmlParams.hh"
 
 #include "AxisInFlowContext.hh"
 #include "AxisOutFlowContext.hh"
+#include "AxisContext.hh"
 
 #include <glob.h>
 
@@ -63,6 +65,7 @@ extern "C"
         struct axis2_msg_ctx * msg_ctx ) {
 
         AxisInFlowContext flowContext ( env, msg_ctx );
+
         const map< string, WebModule* > & storeMap = WebModuleStore::getInstance().getStore();
         map< string, WebModule* >::const_iterator it = storeMap.begin();
         try {
@@ -72,24 +75,24 @@ extern "C"
                 }
             }
         } catch ( ModuleAuthenticationException &ex ) {
-					cerr << "Authentication IN module exception error :" << flowContext.getOperation().getServiceName()
-                              << "/" << flowContext.getOperation().getOperationName() << ":" << ex.what() << endl;
+					cerr << "Authentication IN module exception error :" << flowContext.operationInfo().getServiceName()
+                              << "/" << flowContext.operationInfo().getOperationName() << ":" << ex.what() << endl;
             axis2_msg_ctx_set_status_code ( msg_ctx, env, 401 );
             return AXIS2_FAILURE;
         } catch ( ModuleAuthorizationException &ex ) {
-            cerr << "Authorization IN module exception error :" << flowContext.getOperation().getServiceName()
-                              << "/" << flowContext.getOperation().getOperationName() << ":" << ex.what() << endl;
+            cerr << "Authorization IN module exception error :" << flowContext.operationInfo().getServiceName()
+                              << "/" << flowContext.operationInfo().getOperationName() << ":" << ex.what() << endl;
             axis2_msg_ctx_set_status_code ( msg_ctx, env, 403 );
             return AXIS2_FAILURE;
         } catch ( ModuleException &ex ) {
-            cerr << "General IN module exception error :" << flowContext.getOperation().getServiceName()
-                              << "/" << flowContext.getOperation().getOperationName() << ":" << ex.what() << endl;
+            cerr << "General IN module exception error :" << flowContext.operationInfo().getServiceName()
+                              << "/" << flowContext.operationInfo().getOperationName() << ":" << ex.what() << endl;
 
             return AXIS2_FAILURE;
         }
         return AXIS2_SUCCESS;
     }
-
+    
     AXIS2_EXTERN axis2_handler_t *AXIS2_CALL
     axutil_module_in_handler_create (
         const axutil_env_t * env,
@@ -123,8 +126,8 @@ extern "C"
                 }
             }
         } catch ( ModuleException &ex ) {
-            cerr << "General OUT module exception error:" << flowContext.getOperation().getServiceName()
-                              << "/" << flowContext.getOperation().getOperationName() << ":" << ex.what() << endl;
+            cerr << "General OUT module exception error:" << flowContext.operationInfo().getServiceName()
+                              << "/" << flowContext.operationInfo().getOperationName() << ":" << ex.what() << endl;
             return AXIS2_FAILURE;
         }
         return AXIS2_SUCCESS;
@@ -200,15 +203,15 @@ extern "C"
         try {
             for ( ; it != storeMap.end(); ++it ) {
                 if ( it->second->outFlowFault ( flowContext ) != WebModule::OK ) {
-                    cerr << "General OUT FAULT module error:" << flowContext.getOperation().getServiceName()
-                                      << "/" << flowContext.getOperation().getOperationName() << endl;
+                    cerr << "General OUT FAULT module error:" << flowContext.operationInfo().getServiceName()
+                                      << "/" << flowContext.operationInfo().getOperationName() << endl;
 
                     return AXIS2_FAILURE;
                 }
             }
         } catch ( ModuleException &ex ) {
-            cerr << "General OUT FAULT module exception error:" << flowContext.getOperation().getServiceName()
-                              << "/" << flowContext.getOperation().getOperationName() << ":" << ex.what() << endl;
+            cerr << "General OUT FAULT module exception error:" << flowContext.operationInfo().getServiceName()
+                              << "/" << flowContext.operationInfo().getOperationName() << ":" << ex.what() << endl;
             return AXIS2_FAILURE;
         }
         return AXIS2_SUCCESS;

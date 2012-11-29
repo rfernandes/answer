@@ -2,7 +2,9 @@
 #define _ENVIRONMENT_HH_
 
 #include <string>
+#include <list>
 #include <boost/any.hpp>
+#include "answer/Cookie.hh"
 
 namespace answer{
 	class Environment{
@@ -25,6 +27,24 @@ namespace answer{
 		virtual const std::string& getOperationName() const = 0;
 		virtual const std::string& getName() const = 0;
 		virtual const std::string& getURL() const = 0;
+	};
+	
+	class TransportInfo{
+	public:
+		virtual const std::string& redirect(const std::string& uri) = 0;
+		virtual const std::string& redirect() const = 0;
+		virtual bool redirectSet() const = 0;
+	};
+
+	class CookieJar{
+	public:
+		virtual void insert(const Cookie& cookie) = 0;
+		virtual void remove(const std::string&cookieName) = 0;
+		
+		virtual std::list<Cookie> list() const = 0;
+		
+		virtual const Cookie& getCookie(const std::string&cookieName) const = 0;
+		virtual bool contains(const std::string &cookieName) const = 0;
 	};
 }
 

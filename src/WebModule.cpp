@@ -25,6 +25,7 @@ void WebModuleStore::registerModule(const std::string& name, WebModule *module){
 	}
 	_store[name] = module;
 }
+
 void WebModuleStore::removeModule(const std::string& name){
 	std::map< std::string, WebModule* >::iterator it = _store.find(name);
 	if (it != _store.end()){

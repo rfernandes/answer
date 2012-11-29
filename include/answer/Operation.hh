@@ -46,11 +46,12 @@ public:
 			}
 			
 			// we only look at the first accept. if it fails, we'll default to xml immediately
-			std::string accept;
-			const std::list<std::string>& accept_headers_list = answer::Context::getInstance().request().getAcceptList();
-			if (!accept_headers_list.empty()) {
-				accept = accept_headers_list.front();
-			}
+			//TODO: when context if refactores reinstate the Codecs, for now XML only
+// 			std::string accept;
+// 			const std::list<std::string>& accept_headers_list = answer::Context::getInstance().request().getAcceptList();
+// 			if (!accept_headers_list.empty()) {
+// 				accept = accept_headers_list.front();
+// 			}
 // 			std::cerr << "encoding response for: " << accept << std::endl;
 
 			Type &type(_methodHandle.getInstance());
@@ -58,10 +59,10 @@ public:
 			Response response( (type.*_op)(request) );
 
 			std::ostringstream ssOut;
-			if(!codec::Codec(ssOut, accept, response)) {
+// 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
 				return getResponseXml(1000, OK, ssOut.str() );
-			}
+// 			}
 			return ssOut.str();
 		} catch(const xmlpp::exception& ex){
 			return getResponseXml(1002, ex.what());
@@ -91,21 +92,22 @@ public:
 	virtual std::string invoke ( const std::string& ){
 		try {
 			// we only look at the first accept. if it fails, we'll default to xml immediately
-			std::string accept;
-			const std::list<std::string>& accept_headers_list = answer::Context::getInstance().request().getAcceptList();
-			if (!accept_headers_list.empty()) {
-				accept = accept_headers_list.front();
-			}
+// 			std::string accept;
+			//TODO: when context if refactores reinstate the Codecs, for now XML only
+// 			const std::list<std::string>& accept_headers_list = answer::Context::getInstance().request().getAcceptList();
+// 			if (!accept_headers_list.empty()) {
+// 				accept = accept_headers_list.front();
+// 			}
 			
 			Type &type(_methodHandle.getInstance());
 			
 			Response response( (type.*_op)() );
 			
 			std::ostringstream ssOut;
-			if(!codec::Codec(ssOut, accept, response)) {
+// 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
 				return getResponseXml(1000, OK, ssOut.str() );
-			}
+// 			}
 			return ssOut.str();
 		} catch(const xmlpp::exception& ex){
 			return getResponseXml(1002, ex.what());

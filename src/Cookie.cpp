@@ -1,7 +1,5 @@
 #include "answer/Cookie.hh"
 
-
-
 namespace answer{
 	
 static const char * hexa_digits = "0123456789ABCDEF";
@@ -16,7 +14,7 @@ std::string UrlEncode ( const std::string& orig )
 		if ( isalnum ( ch ) || strchr ( "-_.!~*'()", ch ) ) 
 		{
 			*dest++ = *it;
-		} 
+		}
 		else 
 		{
 			*dest++ = '%';
@@ -32,7 +30,6 @@ std::string UrlEncode ( const std::string& orig )
 
 const std::string Cookie::toString() const
 {
-	
 	std::stringstream ss;
 	ss << _name << "=" << _value << "; Path=" << _path;
 	if ( !_expires.empty() )
@@ -41,6 +38,11 @@ const std::string Cookie::toString() const
 		ss << "; Secure";
 	}
 	return ss.str();
+}
+
+const std::string& Cookie::getValue() const
+{
+	return _value;
 }
 
 Cookie::Cookie ( const std::string& name, const std::string& value, const std::string& path, const answer::Cookie::Expires& expires, bool secure ) :
@@ -64,6 +66,10 @@ std::string convert ( const boost::posix_time::ptime& t )
 	ss << t;
 	return ss.str();
 }
+
+const std::string& Cookie::getName() const{
+	return _name;
+};
 
 Cookie::Expires::Expires () : _expires() {}
 
