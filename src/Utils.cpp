@@ -7,8 +7,7 @@
 
 using namespace std;
 
-namespace anubis {
-namespace webservice {
+namespace answer {
 
 string encodeForXml( const string &sSrc, bool encode_special ) {
     ostringstream sRet;
@@ -121,6 +120,5 @@ string decodeFromXml(const string &in) {
 
 }
 
-}
 }
 
