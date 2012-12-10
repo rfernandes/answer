@@ -39,7 +39,6 @@
 // #include "../Utils.hh"
 // #include "../Exception.hh"
 
-
 class ws_xml_iarchive{
 
 // 	unsigned int m_depth;

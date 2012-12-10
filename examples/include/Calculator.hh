@@ -4,6 +4,8 @@
 #include <string>
 #include <set>
 
+namespace Webservice{
+
 ///Define request and response types
 struct CalculatorResponse{
 	double result;
@@ -27,48 +29,34 @@ struct CalculatorRequest{
 	}
 };
 
-template <class T>
-struct AnubisResponse{
-	
-	struct Status{
-		int status_code;
-		std::string status_message;
-
-		template<class Archive>
-		void serialize(Archive &ar, const unsigned int /*version*/){
-			ar & BOOST_SERIALIZATION_NVP(status_code);
-			ar & BOOST_SERIALIZATION_NVP(status_message);
-		}
-	};
-	
-	Status status;
-	T data;
-	
-	template<class Archive>
-	void serialize(Archive &ar, const unsigned int /*version*/){
-		ar & BOOST_SERIALIZATION_NVP(data);
-		ar & BOOST_SERIALIZATION_NVP(status);
-	}
-};
-
-std::string getResponseXml(int status_code, const std::string &status, const std::string& response){
-	std::stringstream ret;
-		ret << "<return>"
-		<< response
-		<< "<status>"
-		<< "<status_code>" << status_code << "</status_code>"
-		<< "<status_message>" << status << "</status_message>"
-		<< "</status>"
-		<< "</return>";
-	return ret.str();
-}
-
 ///Complex type service testing
 class MyService{
 	public:
-		AnubisResponse<CalculatorResponse> calculator(const CalculatorRequest &request);
+		CalculatorResponse calculator(const CalculatorRequest &request){
+			CalculatorResponse response;
+			switch(request.operation){
+				case 'x':
+				case '*':
+					response.result = request.operand1 * request.operand2;
+					break;
+				case '-':
+					response.result = request.operand1 - request.operand2;
+					break;
+				case 'd':
+				case '/':
+					response.result = request.operand1 / request.operand2;
+					break;
+				case '+':
+					response.result = request.operand1 + request.operand2;
+					break;
+				default:
+					throw answer::WebMethodInvalidInput("Invalid operation requested");
+			}
+		}
 };
 
 REGISTER_OPERATION(MyService::calculator);
+
+}
 
 #endif // _CALCULATOR_HH_

@@ -33,7 +33,7 @@ namespace answer{
 				if (pos != std::string::npos){
 					//TODO: url unescape these values
 					Cookie cookie(keyValuePair.substr(1,pos-1), keyValuePair.substr(pos + 1));
-					std::cerr << "Cookie found: " << cookie.toString() << std::endl;
+// 					std::cerr << "Cookie found: " << cookie.toString() << std::endl;
 					insert(cookie);
 				}
 			}

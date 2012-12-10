@@ -57,11 +57,11 @@ string xmlFromAxisXml(const string &service, const string &operation, const stri
 	return xml.str();
 }
 
-extern "C" module AP_MODULE_DECLARE_DATA anubiswebservices_module;
+extern "C" module AP_MODULE_DECLARE_DATA answer_module;
 
 static void debugRequest(const char *message, request_rec* r){
 	ap_set_content_type(r, "text/html;charset=ascii") ;
-	ap_rputs("<html><head><title>No anubiswebservices!</title></head>\n"
+	ap_rputs("<html><head><title>No answer!</title></head>\n"
 		"<body><pre>\n", r);
 	ap_rputs(r->uri, r);
 	ap_rputs("\n", r);
@@ -143,7 +143,7 @@ class Request{
 	
 public:
 
-	Request(request_rec* r, const anubisws_conf_t& conf){
+	Request(request_rec* r, const answer_conf_t& conf){
 // 		apr_table_t *params_table =  NULL;
 		apreq_handle_t* apreq_handle =  NULL;
 		apreq_handle = apreq_handle_apache2(r);
@@ -193,12 +193,12 @@ public:
 	
 };
 
-static int anubiswebservices_handler(request_rec* r) {
-//     int anubiswebservicesrand = (int) (rand());
-	if (!r->handler || strcmp(r->handler, "anubiswebservices") ) {
+static int answer_handler(request_rec* r) {
+//     int answerrand = (int) (rand());
+	if (!r->handler || strcmp(r->handler, "answer") ) {
 		return DECLINED;
 	}
-	anubisws_conf_t *conf = static_cast<anubisws_conf_t *>(ap_get_module_config(r->server->module_config, &anubiswebservices_module));
+	answer_conf_t *conf = static_cast<answer_conf_t *>(ap_get_module_config(r->server->module_config, &answer_module));
 	if (!conf){
 		return DECLINED;
 	}
@@ -240,9 +240,9 @@ static void dlOpen(const char * path, int mode = RTLD_LAZY){
 	}
 }
 
-static int anubiswebservices_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t */*ptemp*/,server_rec */*s*/)
+static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t */*ptemp*/,server_rec */*s*/)
 {
-	ap_add_version_component(p, "AnubisWebservices");
+	ap_add_version_component(p, "Answer");
 
 	dlOpen("/opt/wps/services/libwps_auth.so");
 	dlOpen("/opt/wps/services/libwps_category.so");
@@ -255,24 +255,24 @@ static int anubiswebservices_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, a
 	return OK;
 }
 
-static void anubiswebservices_hooks(apr_pool_t* /*pool*/) {
-	ap_hook_handler(anubiswebservices_handler, NULL, NULL, APR_HOOK_MIDDLE);
-	ap_hook_post_config(anubiswebservices_init_handler, NULL, NULL, APR_HOOK_MIDDLE);
+static void answer_hooks(apr_pool_t* /*pool*/) {
+	ap_hook_handler(answer_handler, NULL, NULL, APR_HOOK_MIDDLE);
+	ap_hook_post_config(answer_init_handler, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
 
 extern "C"
 {
 // Creates server-wide config structures
-static void * create_anubiswebservices_config( apr_pool_t * p, server_rec * /*s*/)
+static void * create_answer_config( apr_pool_t * p, server_rec * /*s*/)
 {
-	anubisws_conf_t *conf = static_cast<anubisws_conf_t *>(apr_palloc(p, sizeof(anubisws_conf_t)));
+	answer_conf_t *conf = static_cast<answer_conf_t *>(apr_palloc(p, sizeof(answer_conf_t)));
 	conf->axisRequestFormat = false;
 	return conf;
 }
 
 const char *set_axis_request_format(cmd_parms *cmd, void */*cfg*/, int flag) {
-	anubisws_conf_t *conf = static_cast<anubisws_conf_t *>(ap_get_module_config(cmd->server->module_config, &anubiswebservices_module));
+	answer_conf_t *conf = static_cast<answer_conf_t *>(ap_get_module_config(cmd->server->module_config, &answer_module));
 	server_rec *svr_rec = cmd->server;
 	ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, svr_rec, "%s AXIS REQUEST FORMAT ENABLED", LOGNAME);
 
@@ -283,7 +283,7 @@ const char *set_axis_request_format(cmd_parms *cmd, void */*cfg*/, int flag) {
 	
 // Module commands
 static const command_rec cmds[] = {
-		AP_INIT_FLAG   ("AWSAxisRequestFormat", (cmd_func) set_axis_request_format, NULL, RSRC_CONF, "Recognize axis2c requests (/service/operation/param1/...)"),
+		AP_INIT_FLAG   ("AnswerAxisRequestFormat", (cmd_func) set_axis_request_format, NULL, RSRC_CONF, "Recognize axis2c requests (/service/operation/param1/...)"),
 // 		AP_INIT_TAKE1  ("MPSCookie",           		(cmd_func) set_cookie_name, NULL, ACCESS_CONF, "MPS Session cookie name"),
 // 		AP_INIT_TAKE1  ("MPSLocation",          	(cmd_func) set_uri_location, NULL, ACCESS_CONF, "MPS base location"),
 // 		AP_INIT_TAKE1  ("MPSLocationPrepend",   	(cmd_func) set_uri_prelocation, NULL, ACCESS_CONF, "MPS prepended location"),
@@ -295,14 +295,14 @@ static const command_rec cmds[] = {
 		{ NULL }
 };
 
-module AP_MODULE_DECLARE_DATA anubiswebservices_module = {
+module AP_MODULE_DECLARE_DATA answer_module = {
 	STANDARD20_MODULE_STUFF,
 	NULL,                  /* create per-dir    config structures */
 	NULL,                  /* merge  per-dir    config structures */
-	create_anubiswebservices_config,                  /* create per-server config structures */
+	create_answer_config,                  /* create per-server config structures */
 	NULL,                  /* merge  per-server config structures */
 	cmds,                  /* table of config file commands       */
-	anubiswebservices_hooks/* register hooks                      */
+	answer_hooks/* register hooks                      */
 };
 
 }

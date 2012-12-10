@@ -248,9 +248,9 @@ class Echo: public Fastcgipp::Request<char>
 			if (pos != string::npos)
 				*itr = itr->substr(0,pos);
 		}
-// 		Context& anubis_context = answer::Context::getInstance();
-// 		anubis_context.reset();
-// 		anubis_context.request().setAcceptList(aux);
+// 		Context& context = answer::Context::getInstance();
+// 		context.reset();
+// 		context.request().setAcceptList(aux);
 		
 		cerr << "request :" << serviceRequest << endl;
 		Operation& oper_ref = OperationStore::getInstance().getOperation(operation);
@@ -295,18 +295,17 @@ int main()
 	try
 	{
 		//Load modules
-		dlOpen("/opt/wps/modules/libwps_module_authentication.so");
-		dlOpen("/opt/wps/modules/libwps_module_authorization.so");
+// 		dlOpen("/opt/wps/modules/libwps_module_authentication.so");
+// 		dlOpen("/opt/wps/modules/libwps_module_authorization.so");
 		
 		//Services
-		dlOpen("/opt/wps/services/libwps_auth.so");
-		dlOpen("/opt/wps/services/libwps_category.so");
-		dlOpen("/opt/wps/services/libwps_hierarchy.so");
-		dlOpen("/opt/wps/services/libwps_data.so");
-		dlOpen("/opt/wps/services/libwps_policy.so");
-		dlOpen("/opt/wps/services/libwps_reports.so");
-		dlOpen("/opt/wps/services/libwps_stats.so");
-		
+// 		dlOpen("/opt/wps/services/libwps_auth.so");
+// 		dlOpen("/opt/wps/services/libwps_category.so");
+// 		dlOpen("/opt/wps/services/libwps_hierarchy.so");
+// 		dlOpen("/opt/wps/services/libwps_data.so");
+// 		dlOpen("/opt/wps/services/libwps_policy.so");
+// 		dlOpen("/opt/wps/services/libwps_reports.so");
+// 		dlOpen("/opt/wps/services/libwps_stats.so");
 		Fastcgipp::Manager<Echo> fcgi;
 		fcgi.handler();
 	}

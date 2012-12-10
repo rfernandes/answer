@@ -33,10 +33,10 @@
 #define LOGNAME "[mod_wps]"
 
 /* Configuration structure populated by apache2.conf */
-// typedef struct anubisws_config_rec
+// typedef struct answer_config_rec
 // {
 // 
-// } anubisws_config_rec_t;
+// } answer_config_rec_t;
 
 // Configuration struct for directory or locations with MPSSession
 typedef struct  {
@@ -49,9 +49,9 @@ typedef struct  {
 // 	const char *forbidden_location;
 // 	const char *unauthorized_location;
 // 	std::set<std::string> *session_allow_always;
-} anubisws_conf_t;
+} answer_conf_t;
 
 
-extern "C" module AP_MODULE_DECLARE_DATA anubisws_module;
+extern "C" module AP_MODULE_DECLARE_DATA answer_module;
 
 #endif // _MOD_WPS_HH

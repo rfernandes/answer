@@ -52,8 +52,8 @@ std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_no
 	if ( content_node != NULL ) {
 		// Request Node preparation
 		//TODO : namespace can be static
-		axiom_namespace_t *		anub_ns = axiom_namespace_create ( axis_env, "http://www.w3.org/2001/12/soap-envelope","soapenv" );
-		if ( anub_ns == NULL )
+		axiom_namespace_t *		answer_ns = axiom_namespace_create ( axis_env, "http://www.w3.org/2001/12/soap-envelope","soapenv" );
+		if ( answer_ns == NULL )
 			throw std::runtime_error ( "Failed to create request namespace." );
 		// Get the element
 		axiom_element_t *content_node_element = ( axiom_element_t * ) axiom_node_get_data_element ( content_node, axis_env );
@@ -61,8 +61,8 @@ std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_no
 			throw std::runtime_error ( "Bad request content" );
 
 		// Namespace declaration for this node
-		axiom_element_declare_namespace ( content_node_element, axis_env, content_node, anub_ns );
-		axiom_element_declare_namespace_assume_param_ownership ( content_node_element, axis_env, anub_ns );
+		axiom_element_declare_namespace ( content_node_element, axis_env, content_node, answer_ns );
+		axiom_element_declare_namespace_assume_param_ownership ( content_node_element, axis_env, answer_ns );
 
 		// Request to string
 
@@ -71,7 +71,7 @@ std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_no
 		if ( request != NULL )
 			xmlString.append ( request );
 
-		axiom_namespace_free ( anub_ns, axis_env );
+		axiom_namespace_free ( answer_ns, axis_env );
 	}
 	return xmlString;
 }
@@ -107,7 +107,7 @@ extern "C"
 			// Response Node preparation
 			axiom_element_t *parent_element = NULL;
 			axiom_namespace_t *ns1 = NULL;
-			ns1 = axiom_namespace_create ( env,"http://anubis","n" );
+			ns1 = axiom_namespace_create ( env,"http://answer","n" );
 			parent_element = axiom_element_create ( env, NULL, operationName.c_str(), ns1 , &parent );
 
 			axiom_element_set_namespace ( parent_element, env, ns1, parent );
@@ -136,7 +136,7 @@ extern "C"
 		axiom_element_t *error_ele = NULL;
 		error_ele = axiom_element_create ( env, node, "fault", NULL,
 										   &error_node );
-		axiom_element_set_text ( error_ele, env, "answer|http://anubis failed",
+		axiom_element_set_text ( error_ele, env, "answer|http://answer failed",
 								 error_node );
 		return error_node;
 	}
