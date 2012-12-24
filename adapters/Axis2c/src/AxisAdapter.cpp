@@ -3,6 +3,7 @@
 #include "answer/Environment.hh"
 
 #include "AxisContext.hh"
+#include "AxisTransportInfo.hh"
 
 #include <stdio.h>
 #include <iostream>
@@ -65,7 +66,6 @@ std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_no
 		axiom_element_declare_namespace_assume_param_ownership ( content_node_element, axis_env, answer_ns );
 
 		// Request to string
-
 		// 		axis2_char_t* request = axiom_element_to_string(content_node_element, axis_env, content_node);
 		axis2_char_t* request = axiom_node_to_string ( content_node, axis_env );
 		if ( request != NULL )
@@ -97,10 +97,6 @@ extern "C"
 
 			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
 
-
-			//TODO: when context if refactores reinstate the Codecs, for now XML conly
-// 			ResponseContext& response_context = answer::Context::getInstance().response();
-// 			response_context.reset();
 			
 			string xmlResponse = oper_ref.invoke ( params );
 
@@ -163,6 +159,8 @@ extern "C"
 	{
 		/* depending on the function name invoke the corresponding  method */
 
+		//TODO: FIXME: Move context wachamacallit here
+		
 		axiom_node_t *ret_node = NULL;
 		axis2_op_ctx_t *operation_ctx = axis2_msg_ctx_get_op_ctx ( msg_ctx, env );
 		axis2_op_t *operation = axis2_op_ctx_get_op ( operation_ctx, env );
@@ -170,28 +168,6 @@ extern "C"
 		axis2_char_t *op_name = axutil_qname_get_localpart ( op_qname, env );
 		// unused
 		// 		axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
-
-			//TODO: when context if refactores reinstate inserters
-// 		RequestContext& request_context = answer::Context::getInstance().request();
-// 		request_context.reset();
-// 		axutil_array_list_t * accept_record_list_aux = axis2_msg_ctx_get_http_accept_record_list ( msg_ctx, env );
-// 		if ( accept_record_list_aux ) {
-// 			for ( int i =0; i< axutil_array_list_size ( accept_record_list_aux, env ); ++i ) {
-// 				axis2_http_accept_record_t* record = ( axis2_http_accept_record_t * ) axutil_array_list_get ( accept_record_list_aux, env, i );
-// 				char * name = axis2_http_accept_record_get_name ( record, env );
-// 				request_context.addAccept(name);
-// 			}
-// 		}
-// 		
-// 		if (msg_ctx) {
-// 			axis2_endpoint_ref_t* endpoint  = axis2_msg_ctx_get_from (msg_ctx, env);
-// 			if (endpoint) {
-// 				const axis2_char_t *url = axis2_endpoint_ref_get_address(endpoint, env);
-// 				if (url) {
-// 					request_context.setEndPointURL(url);
-// 				}
-// 			}
-// 		}
 
 		// 		cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
 		// 		string operationName(op_prefix);

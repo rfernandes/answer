@@ -53,30 +53,24 @@ namespace answer{
 	};
 
 	class WebModuleStore{
-		std::map<std::string, WebModule*> _store;
+	public:
+		typedef std::list<WebModule *> StoreT;
+	private:
+		StoreT _store;
 		WebModuleStore();
 	public:
+		
 		static WebModuleStore& getInstance();
-		~WebModuleStore();
-		//Takes ownership
-		const std::map<std::string, WebModule*>& getStore() const;
-		void registerModule(const std::string& name, WebModule *module);
-		void removeModule(const std::string& name);
+		const StoreT& getStore() const;
+		void registerModule(WebModule *const module);
 	};
 
 	template <class T>
 	class RegisterWebModule{
-		std::string _name;
+		T module;
 	public:
-		RegisterWebModule(const std::string& name): _name(name){
-			T *module = new T();
-// 			std::cerr << "Registering"<< name << std::endl;
-			WebModuleStore::getInstance().registerModule( _name, module );
-		}
-
-		~RegisterWebModule(){
-// 			std::cerr << "UnRegistering"<< _name << std::endl;
-			WebModuleStore::getInstance().removeModule( _name );
+		RegisterWebModule(){
+			WebModuleStore::getInstance().registerModule(&module );
 		}
 	};
 
