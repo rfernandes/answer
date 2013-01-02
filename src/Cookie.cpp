@@ -37,6 +37,9 @@ const std::string Cookie::toString() const
 	if ( _secure ) {
 		ss << "; Secure";
 	}
+	if ( _httpOnly ) {
+		ss << "; HttpOnly";
+	}
 	return ss.str();
 }
 
@@ -45,12 +48,13 @@ const std::string& Cookie::getValue() const
 	return _value;
 }
 
-Cookie::Cookie ( const std::string& name, const std::string& value, const std::string& path, const answer::Cookie::Expires& expires, bool secure ) :
+Cookie::Cookie ( const std::string& name, const std::string& value, const std::string& path, const answer::Cookie::Expires& expires, bool secure, bool httpOnly) :
 	_name ( UrlEncode(name) ),
 	_value ( UrlEncode(value) ),
 	_path ( path ),
 	_expires ( expires ),
-	_secure ( secure )
+	_secure ( secure ),
+	_httpOnly ( httpOnly )
 {}
 
 std::string convert ( const boost::posix_time::ptime& t )

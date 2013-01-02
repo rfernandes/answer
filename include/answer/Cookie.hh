@@ -33,7 +33,7 @@ public:
 		bool empty() const;
 	};
 	
-	Cookie(const std::string& name, const std::string& value, const std::string& path = "/", const Expires& expires = Expires(), bool secure = false);
+	Cookie(const std::string& name, const std::string& value, const std::string& path = "/", const Expires& expires = Expires(), bool secure = false, bool httponly = false);
 	const std::string toString() const;
 	std::string operator()() const;
 	const std::string& getName() const;
@@ -44,7 +44,7 @@ private:
 	std::string	_value;
 	std::string	_path;
 	Expires		_expires;
-	bool			_secure;
+	bool			_secure, _httpOnly;
 };
 
 }
