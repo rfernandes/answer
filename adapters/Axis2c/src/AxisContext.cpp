@@ -33,7 +33,7 @@ namespace answer{
 		std::list< Cookie > cookie = _cookies.list();
 		// Response Modifier
 #ifdef AXIS2_RAW_RESPONSE
-		axis2_msg_ctx_set_doing_raw ( _msg_ctx, _axis_env, _transport.redirectSet() /*|| */ );
+		axis2_msg_ctx_set_doing_raw ( _msg_ctx, _axis_env, _transport.redirectSet() || _transport.isBinaryTransport() );
 #endif
 		axutil_array_list_t* header_list = axis2_msg_ctx_get_http_output_headers ( _msg_ctx, _axis_env );
 		if ( !header_list ) {

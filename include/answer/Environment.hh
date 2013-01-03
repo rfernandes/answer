@@ -30,12 +30,17 @@ namespace answer{
 	};
 	
 	class TransportInfo{
+	private:
+		bool _binaryTransport;
 	public:
+		TransportInfo() : _binaryTransport(false) {}
 		virtual void addHeader(const std::string &key, const std::string &value = "", bool replace = true) = 0;
 		virtual const std::list<std::string>& accepts() const = 0;
 		virtual const std::string& redirect(const std::string& uri) = 0;
 		virtual const std::string& redirect() const = 0;
 		virtual bool redirectSet() const = 0;
+		virtual inline bool isBinaryTransport() const { return _binaryTransport; }
+		virtual inline void setBinaryTransport() { _binaryTransport = true; }
 	};
 
 	class CookieJar{
