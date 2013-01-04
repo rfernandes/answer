@@ -21,6 +21,7 @@ namespace std{
 
 #include <boost/type_traits/is_enum.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/optional.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/equal_to.hpp>
@@ -31,10 +32,14 @@ namespace std{
 #include <boost/serialization/version.hpp>
 #include <boost/archive/detail/common_oarchive.hpp>
 #include <boost/serialization/item_version_type.hpp>
+// #include <boost/serialization/optional.hpp>
 
 #include <list>
 
 #include "../Utils.hh"
+
+namespace answer{
+namespace archive{
 
 /////////////////////////////////////////////////////////////////////////
 // log data to an output stream.  This illustrates a simpler implemenation
@@ -189,6 +194,7 @@ public:
             N
         );
     }
+    
     template<class T>
     ws_xml_oarchive & operator<<(const boost::serialization::nvp< T > & t){
 			std::string itemName (t.name());
@@ -221,12 +227,22 @@ public:
 			}
 			return * this;
     }
+    
+		template<class T>
+		ws_xml_oarchive & operator<<(const boost::serialization::nvp< boost::optional<T> > & t){
+			if (!t.const_value().is_initialized()){ // Do not output
+				return * this;
+			}
+			//Unwrap
+			const boost::serialization::nvp< T > aux(t.name(), t.value().get());
+			return * this << aux;
+		}
 
-    // the & operator
-    template<class T>
-    ws_xml_oarchive & operator&(const T & t){
-            return * this << t;
-    }
+		// the & operator
+		template<class T>
+		ws_xml_oarchive & operator&(const T & t){
+			return * this << t;
+		}
 		
     ws_xml_oarchive(std::ostream & os) :
         m_os(os)
@@ -235,6 +251,9 @@ public:
 
 template<>
 ws_xml_oarchive & ws_xml_oarchive::operator<<(const boost::serialization::nvp< boost::serialization::collection_size_type > & t);
+
+}//namespace archive
+}//namespace answer
 
 // required by export
 // BOOST_SERIALIZATION_REGISTER_ARCHIVE(ws_xml_oarchive)

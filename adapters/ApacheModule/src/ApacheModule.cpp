@@ -18,17 +18,17 @@ string xmlFromAxisXml(const string &service, const string &operation, const stri
 	string file("/usr/axis2c/services/");
 	file.append(service).append("/services.xml");
 	
-	xmlpp::DomParser parser;
-	parser.parse_file(file);
+// 	xmlpp::DomParser parser;
+// 	parser.parse_file(file);
 
 // 		cerr << xmlpp::Element*(parser.get_document()->get_root_node()->find("//operation/parameter").front())->get_child_text()->get_content;
 
-	xmlpp::NodeSet nodeSet = parser.get_document()->get_root_node()->find("//operation[@name='"+operation+"']/parameter[@name='RESTLocation']");
+// 	xmlpp::NodeSet nodeSet = parser.get_document()->get_root_node()->find("//operation[@name='"+operation+"']/parameter[@name='RESTLocation']");
 	
-	cerr << nodeSet.size() << endl;
+// 	cerr << nodeSet.size() << endl;
 	
-	xmlpp::Element* location = static_cast<xmlpp::Element*>(nodeSet.front());
-	string locationString = location->get_child_text()->get_content();
+// 	xmlpp::Element* location = static_cast<xmlpp::Element*>(nodeSet.front());
+	string locationString ; // = location->get_child_text()->get_content();
 	
 	stringstream xml;
 	

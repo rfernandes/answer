@@ -3,15 +3,14 @@
 
 #include <string>
 #include <iostream>
-#include "serialization/ws_xml_oarchive.hpp"
+#include "archive/ws_xml_oarchive.hpp"
 
 namespace answer{
 	namespace codec{
 		template<typename T>
 		void defaultCodec ( std::ostream& out, const T& data)
 		{
-// 				std::cerr << "DEFAULT CODEC" << std::endl;
-			ws_xml_oarchive outA ( out );
+			answer::archive::ws_xml_oarchive outA ( out );
 			outA << data;
 		}
 
