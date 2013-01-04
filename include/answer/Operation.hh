@@ -5,8 +5,8 @@
 #include <sstream>
 #include <string>
 
-#include "serialization/ws_xml_oarchive.hpp"
-#include "serialization/ws_xml_iarchive.hpp"
+#include "archive/ws_xml_oarchive.hpp"
+#include "archive/ws_xml_iarchive.hpp"
 #include "Exception.hh"
 #include "Codec.hh"
 #include "Context.hh"
@@ -41,7 +41,7 @@ public:
 
 			std::istringstream ssIn(params);
 			{
-				ws_xml_iarchive inA(ssIn);
+				answer::archive::ws_xml_iarchive inA(ssIn);
 				inA >> request;
 			}
 			
@@ -62,7 +62,7 @@ public:
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();
-		} catch(const xmlpp::exception& ex){
+		} catch(const boost::archive::archive_exception& ex){
 			return getResponseXml(1002, ex.what());
 		} catch (const WebMethodMissingParameter &ex) {
 			return getResponseXml(1010, ex.what());
@@ -106,7 +106,7 @@ public:
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();
-		} catch(const xmlpp::exception& ex){
+		} catch(const boost::archive::archive_exception& ex){
 			return getResponseXml(1002, ex.what());
 		} catch (const WebMethodMissingParameter &ex) {
 			return getResponseXml(1010, ex.what());
@@ -138,7 +138,7 @@ public:
 			
 			std::istringstream ssIn(params);
 			{
-				ws_xml_iarchive inA(ssIn);
+				answer::archive::ws_xml_iarchive inA(ssIn);
 				inA >> request;
 			}
 			
@@ -148,7 +148,7 @@ public:
 			
 			return getResponseXml(1000, OK);
 			
-		}catch(const xmlpp::exception& ex){
+		}catch(const boost::archive::archive_exception& ex){
 			return getResponseXml(1002, ex.what());
 		} catch (const WebMethodException &ex) {
 			return getResponseXml(ex.getErrorLevel(), ex.what());
