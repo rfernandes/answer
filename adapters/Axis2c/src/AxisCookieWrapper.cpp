@@ -55,7 +55,6 @@ namespace answer{
 	std::list< Cookie > AxisCookieJarWrapper::list( bool onlyNew ) const
 	{
 		std::list< Cookie > lst;
-		std::cerr << "list size:" << _cookies.size() << std::endl;
 		for (std::map< std::string, CookieContext >::const_iterator it = _cookies.begin(); it != _cookies.end(); ++it){
 // 			std::cerr << "name=["<<it->first<<"] isnew=["<<it->second.isNew<<"] value=["<<(std::string)it->second.cookie<<"]" << std::endl;
 			if (onlyNew && !it->second.isNew)
