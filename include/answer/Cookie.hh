@@ -26,7 +26,7 @@ public:
 		
 		Expires& operator=(const Expires&);
 		
-		std::ostream& operator<< (std::ostream &out, const Expires& exp) {
+		friend std::ostream& operator<< (std::ostream &out, const Expires& exp) {
 			out << exp._expires;
 			return out;
 		}
