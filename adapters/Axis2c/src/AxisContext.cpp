@@ -30,7 +30,7 @@ namespace answer{
 		}
 
 	AxisContext::~AxisContext(){
-		std::list< Cookie > cookie = _cookies.list();
+		std::list< Cookie > cookie = _cookies.list(true);
 		// Response Modifier
 #ifdef AXIS2_RAW_RESPONSE
 		axis2_msg_ctx_set_doing_raw ( _msg_ctx, _axis_env, _transport.redirectSet() || _transport.isBinaryTransport() );

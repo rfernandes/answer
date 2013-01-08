@@ -45,10 +45,10 @@ namespace answer{
 
 	class CookieJar{
 	public:
-		virtual void insert(const Cookie& cookie) = 0;
+		virtual void insert(const Cookie& cookie, bool isNew = true) = 0;
 		virtual void remove(const std::string&cookieName) = 0;
 		
-		virtual std::list<Cookie> list() const = 0;
+		virtual std::list<Cookie> list(bool onlyNew) const = 0;
 		
 		virtual const Cookie& at(const std::string&cookieName) const = 0;
 		virtual bool contains(const std::string &cookieName) const = 0;
