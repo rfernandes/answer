@@ -10,15 +10,21 @@
 namespace answer{
 	namespace adapter{
 		namespace axis{
+			
+	struct CookieContext{
+		Cookie cookie;
+		bool isNew;
+		CookieContext(const Cookie& c, bool n) : cookie(c), isNew(n){}
+	};
 
 	class AxisCookieJarWrapper: public CookieJar{
-		std::map<std::string, Cookie> _cookies;
+		std::map<std::string, CookieContext> _cookies;
 	public:
 		AxisCookieJarWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx);
     virtual bool contains(const std::string& cookieName) const;
     virtual const Cookie& at(const std::string& cookieName) const;
-    virtual void insert(const Cookie& cookie);
-    virtual std::list< Cookie > list() const;
+    virtual void insert(const Cookie& cookie, bool isNew = true);
+    virtual std::list< Cookie > list(bool onlyNew) const;
     virtual void remove(const std::string& cookieName);
 	};
 
