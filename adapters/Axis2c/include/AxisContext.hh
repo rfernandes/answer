@@ -41,7 +41,6 @@ namespace answer{
 		virtual OperationInfo& operationInfo() {
 			return _operation;
 		}
-		
     virtual TransportInfo& transportInfo(){
 			return _transport;
 		}

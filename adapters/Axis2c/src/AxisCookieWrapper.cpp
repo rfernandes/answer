@@ -9,6 +9,7 @@
 #include <axis2_http_header.h>
 #include <axiom_element.h>
 #include <axis2_msg_ctx.h>
+#include <axis2_util.h>
 #include <axis2_http_transport_utils.h>
 
 namespace answer{
@@ -18,6 +19,7 @@ namespace answer{
 	AxisCookieJarWrapper::AxisCookieJarWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx){
 		axutil_hash_t* request_headers = axis2_msg_ctx_get_transport_headers(msg_ctx, env);
 		if (!request_headers){
+			std::cerr << "Could not get request headers, check if transportIn reciever defines exposeHeaders=true parameter" << std::endl;
 			//TODO: provide a diferent
 			return;
 		}
@@ -42,10 +44,10 @@ namespace answer{
 
 	void AxisCookieJarWrapper::insert(const answer::Cookie& cookie)
 	{
-		_cookies.insert(make_pair(cookie.getName(),cookie));
+		_cookies.insert(make_pair(cookie.name(),cookie));
 	}
 
-	const Cookie& AxisCookieJarWrapper::getCookie(const std::string& cookieName) const
+	const Cookie& AxisCookieJarWrapper::at(const std::string& cookieName) const
 	{
 		return _cookies.at(cookieName);
 	}
@@ -61,7 +63,11 @@ namespace answer{
 
 	void AxisCookieJarWrapper::remove(const std::string& cookieName)
 	{
-		_cookies.erase(cookieName);
+		std::map< std::string, Cookie >::iterator it = _cookies.find(cookieName);
+		if (it != _cookies.end()){
+			Cookie::Expires two_years_ago(boost::posix_time::second_clock::local_time() - boost::gregorian::years(2));
+			it->second.expires(two_years_ago);
+		}
 	}
 
 	bool AxisCookieJarWrapper::contains(const std::string& key) const

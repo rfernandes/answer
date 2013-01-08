@@ -28,7 +28,7 @@ std::string UrlEncode ( const std::string& orig )
 	return ret;
 }
 
-const std::string Cookie::toString() const
+Cookie::operator std::string() const
 {
 	std::stringstream ss;
 	ss << _name << "=" << _value << "; Path=" << _path;
@@ -43,10 +43,46 @@ const std::string Cookie::toString() const
 	return ss.str();
 }
 
-const std::string& Cookie::getValue() const
+const std::string& Cookie::value() const
 {
 	return _value;
 }
+
+void Cookie::value(const std::string& value)
+{
+	_value = value;
+}
+
+const Cookie::Expires& Cookie::expires() const
+{
+	return _expires;
+}
+
+void Cookie::expires(const answer::Cookie::Expires& expires)
+{
+	_expires = expires;
+}
+
+bool Cookie::secure() const
+{
+	return _secure;
+}
+
+void Cookie::secure(bool secure)
+{
+	_secure = secure;
+}
+
+bool Cookie::httpOnly() const
+{
+	return _httpOnly;
+}
+
+void Cookie::httpOnly(bool httpOnly)
+{
+	_httpOnly = httpOnly;
+}
+
 
 Cookie::Cookie ( const std::string& name, const std::string& value, const std::string& path, const answer::Cookie::Expires& expires, bool secure, bool httpOnly) :
 	_name ( UrlEncode(name) ),
@@ -71,8 +107,11 @@ std::string convert ( const boost::posix_time::ptime& t )
 	return ss.str();
 }
 
-const std::string& Cookie::getName() const{
+const std::string& Cookie::name() const{
 	return _name;
+};
+void Cookie::name(const std::string& name){
+	_name = name;
 };
 
 Cookie::Expires::Expires () : _expires() {}

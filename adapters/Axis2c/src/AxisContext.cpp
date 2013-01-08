@@ -44,7 +44,7 @@ namespace answer{
 
 		//Cookies
 		for ( std::list< Cookie >::const_iterator it = cookie.begin(); it != cookie.end(); ++it ) {
-			axis2_http_header_t* new_header = axis2_http_header_create ( _axis_env, "Set-Cookie", it->toString().c_str() );
+			axis2_http_header_t* new_header = axis2_http_header_create ( _axis_env, "Set-Cookie", static_cast<std::string>(*it).c_str() );
 // 			AXIS2_LOG_INFO(_axis_env->log, AXIS2_LOG_SI, "header - %s:%s", "Cookie", it->toString().c_str());
 			axutil_array_list_add ( header_list, _axis_env, new_header );
 		}

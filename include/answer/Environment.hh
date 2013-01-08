@@ -50,7 +50,7 @@ namespace answer{
 		
 		virtual std::list<Cookie> list() const = 0;
 		
-		virtual const Cookie& getCookie(const std::string&cookieName) const = 0;
+		virtual const Cookie& at(const std::string&cookieName) const = 0;
 		virtual bool contains(const std::string &cookieName) const = 0;
 	};
 }

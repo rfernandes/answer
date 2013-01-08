@@ -199,7 +199,6 @@ extern "C"
 		AxisOutFlowContext flowContext ( env, msg_ctx );
 		const WebModuleStore::StoreT & store = WebModuleStore::getInstance().getStore();
 		WebModuleStore::StoreT::const_iterator it = store.begin();
-		cerr << "Running outflowFault" << endl;
 		try {
 				for ( ; it != store.end(); ++it ) {
 						if ( (*it)->outFlowFault ( flowContext ) != WebModule::OK ) {

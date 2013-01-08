@@ -16,7 +16,7 @@ namespace answer{
 	public:
 		AxisCookieJarWrapper(const axutil_env_t * env, struct axis2_msg_ctx * msg_ctx);
     virtual bool contains(const std::string& cookieName) const;
-    virtual const Cookie& getCookie(const std::string& cookieName) const;
+    virtual const Cookie& at(const std::string& cookieName) const;
     virtual void insert(const Cookie& cookie);
     virtual std::list< Cookie > list() const;
     virtual void remove(const std::string& cookieName);

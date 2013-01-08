@@ -83,8 +83,7 @@ extern "C"
 
 	axiom_node_t* AXIS2_CALL toAxiomNode ( const axutil_env_t *env, const string& operationName, axiom_node_t *content_node, axis2_msg_ctx_t *msg_ctx )
 	{
-    answer::adapter::axis::AxisContext axis( env, msg_ctx );
-
+// 		return NULL;
 		axiom_node_t *parent = NULL;
 		try {
 
@@ -157,10 +156,9 @@ extern "C"
 			axiom_node_t *content_node,
 			axis2_msg_ctx_t *msg_ctx )
 	{
-		/* depending on the function name invoke the corresponding  method */
+    answer::adapter::axis::AxisContext axis( env, msg_ctx );
 
-		//TODO: FIXME: Move context wachamacallit here
-		
+		/* depending on the function name invoke the corresponding  method */
 		axiom_node_t *ret_node = NULL;
 		axis2_op_ctx_t *operation_ctx = axis2_msg_ctx_get_op_ctx ( msg_ctx, env );
 		axis2_op_t *operation = axis2_op_ctx_get_op ( operation_ctx, env );
