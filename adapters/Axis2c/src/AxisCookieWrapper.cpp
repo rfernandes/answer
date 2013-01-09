@@ -36,7 +36,7 @@ namespace answer{
 					//TODO: url unescape these values
 					Cookie cookie(keyValuePair.substr(1,pos-1), keyValuePair.substr(pos + 1));
 // 					std::cerr << "Cookie found: " << (std::string)cookie << std::endl;
-					insert(cookie,false);
+					insert(cookie, false);
 				}
 			}
 		}
@@ -44,7 +44,13 @@ namespace answer{
 
 	void AxisCookieJarWrapper::insert( const answer::Cookie& cookie, bool isNew )
 	{
-		_cookies.insert(make_pair(cookie.name(),CookieContext(cookie,isNew)));
+		// always smash existing cookie. this is the correct behaviour because all changes are made by the ws themselves
+		CookieContext c(cookie,isNew);
+		std::map< std::string, CookieContext >::iterator itr = _cookies.find(cookie.name());
+		if (itr != _cookies.end())
+			itr->second = c;
+		else
+			_cookies.insert( make_pair(cookie.name(), c) );
 	}
 
 	const Cookie& AxisCookieJarWrapper::at(const std::string& cookieName) const
