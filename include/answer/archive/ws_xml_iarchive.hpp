@@ -33,6 +33,7 @@
 #include <boost/iterator/iterator_concepts.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <list>
 
