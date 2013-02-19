@@ -1,5 +1,7 @@
 #include "answer/OperationStore.hh"
 
+#include "answer/archive/impl/basic_ws_xml_grammar.ipp"
+
 using namespace std;
 
 namespace answer{
