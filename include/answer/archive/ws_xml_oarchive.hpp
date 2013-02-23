@@ -51,11 +51,12 @@ class ws_xml_oarchive :
         base::save_override(boost::serialization::make_nvp(NULL, t), 0);
     }
 
-//     void save_override(const boost::serialization::nvp< boost::serialization::item_version_type > & t, int){
-// 			std::cerr << "Item version type" << std::endl;
-//     }
     void save_override(const boost::serialization::nvp< boost::serialization::collection_size_type > & t, int){
-			m_collectionStack.push_back({m_currentName, t.value(), true});
+			collectionEntry aux;
+			aux.itemName = m_currentName;
+			aux.size = t.value();
+			aux.newEntry = true;
+			m_collectionStack.push_back(aux);
     }
     template<class T>
     void save_override(const boost::serialization::nvp< T > & t, int){
@@ -92,6 +93,7 @@ class ws_xml_oarchive :
 // 			base::save_override(boost::serialization::make_nvp(itemName.c_str(), t.value()), 0);
     }
     
+    
     template<class T>
     void save_override(const boost::serialization::nvp< boost::optional<T> > & t, int){
 // 			boost::optional x;
@@ -110,7 +112,7 @@ class ws_xml_oarchive :
     void save_override(const boost::archive::class_id_reference_type & t, int){}
     void save_override(const boost::archive::class_name_type & t, int){}
     void save_override(const boost::archive::tracking_type & t, int){}
-
+    
 public:
     ws_xml_oarchive(std::ostream & os, unsigned int flags = 0) :
         boost::archive::xml_oarchive_impl<ws_xml_oarchive>(
@@ -120,6 +122,8 @@ public:
     {}
 };
 
+    template<>
+    void ws_xml_oarchive::save_override(const boost::serialization::nvp< bool > & t, int);
 }
 }
 

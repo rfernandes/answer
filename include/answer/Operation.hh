@@ -18,11 +18,13 @@ const std::string OK("OK");
 const std::string ERROR("ERROR");
 
 class Operation {
+protected:
+	std::string _name;
 public:
-	Operation() {}
+	Operation(const std::string& name):_name(name){}
     virtual ~Operation() {};
     //The invocation wrapper
-    virtual std::string invoke(const std::string&)=0;
+    virtual std::string invoke(const std::string&, const std::string & ="")=0;
 };
 
 std::string getResponseXml(int status_code, const std::string &status, const std::string &response = "");
@@ -33,16 +35,25 @@ class OperationHandler: public Operation{
 	Strategy _methodHandle;
 	OperationType _op;
 public:
-	OperationHandler(OperationType op):_op(op){}
+	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 	
-	virtual std::string invoke ( const std::string& params ){
+	
+	virtual std::string invoke ( const std::string& params, const std::string& prefix){
 		try {
 			Request request;
+			
+			size_t pos = _name.rfind("::");
+			std::string filteredName(pos != _name.npos ? _name.substr(pos + 2) : _name);
+			std::string operationName(prefix);
+			if (!operationName.empty()){
+				operationName.append(":");
+			}
+			operationName.append(filteredName);
 
 			std::istringstream ssIn(params);
 			{
 				answer::archive::ws_xml_iarchive inA(ssIn);
-				inA >> request;
+				inA >> boost::serialization::make_nvp(operationName.c_str(), request);
 			}
 			
 			// we only look at the first accept. if it fails, we'll default to xml immediately
@@ -59,6 +70,11 @@ public:
 			std::ostringstream ssOut;
 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
+				std::cerr << "[Response (default codec)] :" << std::endl;
+				{
+					std::cerr << ssOut.str() << std::endl;
+				}
+				std::cerr << "[/Response (default codec)] :" << std::endl;
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();
@@ -85,9 +101,9 @@ class OperationHandler<Type, OperationType, boost::mpl::void_, Response, Strateg
 	Strategy _methodHandle;
 	OperationType _op;
 public:
-	OperationHandler(OperationType op):_op(op){}
+	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 public:
-	virtual std::string invoke ( const std::string& ){
+	virtual std::string invoke ( const std::string& , const std::string&){
 		try {
 			// we only look at the first accept. if it fails, we'll default to xml immediately
 			std::string accept;
@@ -103,6 +119,11 @@ public:
 			std::ostringstream ssOut;
 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
+				std::cerr << "[Response (default codec)] :" << std::endl;
+				{
+					std::cerr << ssOut.str() << std::endl;
+				}
+				std::cerr << "[/Response (default codec)] :" << std::endl;
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();
@@ -130,18 +151,26 @@ class OperationHandler<Type, OperationType, Request, void, Strategy>: public Ope
 	Strategy _methodHandle;
 	OperationType _op;
 public:
-	OperationHandler(OperationType op):_op(op){}
+	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 
-	virtual std::string invoke ( const std::string& params ){
+	virtual std::string invoke ( const std::string& params , const std::string& prefix){
 		try {
 			Request request;
 			
+			size_t pos = _name.rfind("::");
+			std::string filteredName(pos != _name.npos ? _name.substr(pos + 2) : _name);
+			std::string operationName(prefix);
+			if (!operationName.empty()){
+				operationName.append(":");
+			}
+			operationName.append(filteredName);
+
 			std::istringstream ssIn(params);
 			{
 				answer::archive::ws_xml_iarchive inA(ssIn);
-				inA >> request;
+				inA >> boost::serialization::make_nvp(operationName.c_str(), request);
 			}
-			
+
 			Type &type(_methodHandle.getInstance());
 			
 			(type.*_op)(request);

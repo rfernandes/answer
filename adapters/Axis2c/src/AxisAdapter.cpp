@@ -81,7 +81,7 @@ extern "C"
 {
 #endif
 
-	axiom_node_t* AXIS2_CALL toAxiomNode ( const axutil_env_t *env, const string& operationName, axiom_node_t *content_node, axis2_msg_ctx_t *msg_ctx )
+	axiom_node_t* AXIS2_CALL toAxiomNode ( const axutil_env_t *env, const string& prefix, const string& operationName, axiom_node_t *content_node, axis2_msg_ctx_t *msg_ctx )
 	{
 // 		return NULL;
 		axiom_node_t *parent = NULL;
@@ -89,15 +89,15 @@ extern "C"
 
 			/* Get the string */
 			string params ( getRequest ( env, content_node ) );
-			//DEBUG
-			// 			cerr << "String params: " << params << endl;
-
-			//remove the xml header
+			
+			std::size_t beg = params.find(' ');
+			std::size_t end = params.find('>');
+			
+			params.replace(beg,  end-beg, "");
+			cerr << "Params: " << params << endl;
 
 			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
-
-			
-			string xmlResponse = oper_ref.invoke ( params );
+			string xmlResponse = oper_ref.invoke ( params, prefix);
 
 			// Response Node preparation
 			axiom_element_t *parent_element = NULL;
@@ -165,15 +165,15 @@ extern "C"
 		axutil_qname_t *op_qname = ( axutil_qname_t * ) axis2_op_get_qname ( operation, env );
 		axis2_char_t *op_name = axutil_qname_get_localpart ( op_qname, env );
 		// unused
-		// 		axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
+				axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
 
-		// 		cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
+				cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
 		// 		string operationName(op_prefix);
 		// 		operationName += "::";
 		// 		operationName += op_name;
 
 		try {
-			ret_node = toAxiomNode ( env, op_name, content_node, msg_ctx );
+			ret_node = toAxiomNode ( env, op_prefix, op_name, content_node, msg_ctx );
 		} catch ( exception &ex ) {
 			cout << ex.what() << endl;
 		}

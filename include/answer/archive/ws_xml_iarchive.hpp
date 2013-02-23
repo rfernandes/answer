@@ -16,22 +16,19 @@
 
 #include <cstring>
 
-
 namespace answer{
 namespace archive{
 
 struct archive_end_exception: public std::runtime_error{
 	archive_end_exception(const std::string& str): runtime_error(str){}
 };
-	
+
 using namespace boost::archive;
 
-class ws_xml_iarchive : 
+class ws_xml_iarchive :
 	public xml_iarchive_impl<ws_xml_iarchive>
 {
 	typedef xml_iarchive_impl<ws_xml_iarchive> base;
-//     bool closeCollectionExpected;
-    bool optionalNotFound;
 #ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
@@ -79,7 +76,7 @@ protected:
 			);
 		}
 	}
-	
+
 	// Anything not an attribute - see below - should be a name value
 	// pair and be processed here
 	template<class T>
@@ -90,25 +87,25 @@ protected:
 		boost::serialization::nvp< T > & t,
 		int
 	){
-		
+
 		std::string itemName = t.name();
-		std::cerr << ":" << itemName << " [" << char(is.peek()) << "] [" << int(is.tellg())<< ']' <<std::endl;
+// 		std::cerr << ":" << itemName << " [" << char(is.peek()) << "] [" << int(is.tellg())<< ']' <<std::endl;
 		m_lastPos = is.tellg();
 
 		m_currentName = itemName;
 
 		if (!m_collectionStack.empty() ){
-			
+
 			if (t.name() == "item_version"){
 				return; //Ignore item_version loading from default collection serialization implementations
 			}
 
 			if (itemName == "item"){ //Iterating the current collection loop
 				itemName = m_collectionStack.back().itemName;
-				
+
 				// If starting a collection the stream is at the value, so we skip the load_start
 				if (m_collectionStack.back().starting){
-					is.seekg(is.tellg() - m_collectionStack.back().itemName.size() - 2);
+					is.seekg( - (m_collectionStack.back().itemName.size() + 2), std::ios::cur);
 					m_collectionStack.back().starting = false;
 				}
 				//increase the count (it will be reset and removed on parse fail == collection end
@@ -127,7 +124,7 @@ protected:
 					//This is perhaps too generic but we are ending a collection
 					// in this particular exception stream end was also read
 					// retrace a bit and signal a collection end
-					is.seekg(m_lastPos - itemName.size() - 3);
+					is.seekg(m_lastPos - std::streampos(itemName.size()) - 3);
 					(*m_collectionStack.back().size) = 0;
 					m_collectionStack.pop_back();
 					throw answer::archive::archive_end_exception("Ending collection");
@@ -140,7 +137,7 @@ protected:
 		//Normal load
 		base::load_override(t, 0);
 	}
-	
+
 	template<class T>
 	void load_override(
 		#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
@@ -151,8 +148,8 @@ protected:
 	){
 		m_lastPos = is.tellg();
 		std::string itemName = t.name();
-		
-		std::cerr << ":(O):" << t.name() << " [" << char(is.peek()) << "] [" << int(is.tellg())<< ']' <<std::endl;
+
+// 		std::cerr << ":(O):" << t.name() << " [" << char(is.peek()) << "] [" << int(is.tellg())<< ']' <<std::endl;
 		try{
 			this->This()->load_start(t.name(), true);
 		}/*catch (boost::archive::xml_archive_exception &ex){
@@ -168,13 +165,13 @@ protected:
 			is.seekg(m_lastPos );
 			return;
 		}
-		
+
 		is.seekg(m_lastPos );
 		boost::serialization::detail::stack_construct<ws_xml_iarchive, T> aux(*this, 0);
 		load_override(boost::serialization::make_nvp(t.name(), aux.reference()), 0);
 		t.value().reset(aux.reference());
 	}
-	
+
 	void load_override(
 			#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
 			const
@@ -202,14 +199,20 @@ protected:
 	void load_override(boost::archive::class_id_reference_type & t, int){}
 	void load_override(boost::archive::class_name_type & t, int){}
 	void load_override(boost::archive::tracking_type & t, int){}
+
 public:
 	ws_xml_iarchive(std::istream & is, unsigned int flags = 0) :
-		xml_iarchive_impl<ws_xml_iarchive>(is, flags| boost::archive::no_header ),
-// 		closeCollectionExpected(false),
-		optionalNotFound(false)
+		xml_iarchive_impl<ws_xml_iarchive>(is, flags| boost::archive::no_header )
 	{}
 	~ws_xml_iarchive(){}
 };
+
+	template<>
+	void ws_xml_iarchive::load_override(
+		#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
+		const
+		#endif
+		boost::serialization::nvp< bool > & t, int);
 
 } // archive
 } // answer
@@ -219,12 +222,11 @@ public:
 
 //Provide partial template specializations for ws_xml_iarchives;
 // This allows us to cap the number items at the correct entry
-// instead of iterating one final time (which would at best 
+// instead of iterating one final time (which would at best
 // result in an empty entry)
 namespace boost{
 namespace serialization {
 namespace stl {
-	
 
 // sequential container input
 template<class Container>
@@ -232,8 +234,8 @@ struct archive_input_seq<answer::archive::ws_xml_iarchive, Container>
 {
     inline BOOST_DEDUCED_TYPENAME Container::iterator
     operator()(
-        answer::archive::ws_xml_iarchive &ar, 
-        Container &s, 
+        answer::archive::ws_xml_iarchive &ar,
+        Container &s,
         const unsigned int v,
         BOOST_DEDUCED_TYPENAME Container::iterator hint
     ){
@@ -288,8 +290,8 @@ struct archive_input_set<answer::archive::ws_xml_iarchive, Container>
 {
     inline BOOST_DEDUCED_TYPENAME Container::iterator
     operator()(
-        answer::archive::ws_xml_iarchive &ar, 
-        Container &s, 
+        answer::archive::ws_xml_iarchive &ar,
+        Container &s,
         const unsigned int v,
         BOOST_DEDUCED_TYPENAME Container::iterator hint
     ){
@@ -301,14 +303,14 @@ struct archive_input_set<answer::archive::ws_xml_iarchive, Container>
 			}catch (answer::archive::archive_end_exception &ex){
 				return hint;
 			}
-			BOOST_DEDUCED_TYPENAME Container::iterator result = 
+			BOOST_DEDUCED_TYPENAME Container::iterator result =
 					s.insert(hint, t.reference());
 			ar.reset_object_address(& (* result), & t.reference());
 			return result;
     }
 };
 
-} // namespace stl 
+} // namespace stl
 } // namespace serialization
 } // namespace boost
 
