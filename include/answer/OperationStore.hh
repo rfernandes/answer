@@ -99,7 +99,7 @@ public:
 // Check operation signature (must have at least one of [response] operator()([request])
 // 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
 		try{
-			OperationStore::getInstance().registerOperation(_operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op));
+			OperationStore::getInstance().registerOperation(_operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
 		}catch (std::exception &ex){
 			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
 		}
