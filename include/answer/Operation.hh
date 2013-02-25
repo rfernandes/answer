@@ -64,17 +64,12 @@ public:
 			}
 
 			Type &type(_methodHandle.getInstance());
-			
+
 			Response response( (type.*_op)(request) );
 
 			std::ostringstream ssOut;
 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
-				std::cerr << "[Response (default codec)] :" << std::endl;
-				{
-					std::cerr << ssOut.str() << std::endl;
-				}
-				std::cerr << "[/Response (default codec)] :" << std::endl;
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();
@@ -119,11 +114,6 @@ public:
 			std::ostringstream ssOut;
 			if(!codec::Codec(ssOut, accept, response)) {
 				codec::defaultCodec(ssOut, response);
-				std::cerr << "[Response (default codec)] :" << std::endl;
-				{
-					std::cerr << ssOut.str() << std::endl;
-				}
-				std::cerr << "[/Response (default codec)] :" << std::endl;
 				return getResponseXml(1000, OK, ssOut.str() );
 			}
 			return ssOut.str();

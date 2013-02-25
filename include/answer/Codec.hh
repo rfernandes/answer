@@ -17,7 +17,6 @@ namespace answer{
 		template<typename T>
 		bool Codec ( std::ostream&, const std::string&, const T&)
 		{
-// 				std::cerr << "USING DEFAULT CODEC" << std::endl;
 			return false;
 		}
 	}
