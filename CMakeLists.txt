@@ -15,7 +15,7 @@ set (MANDATORY_PACKAGES libxml++-2.6)
 include_directories (include)
 
 #Generic adapter files
-set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Params.cpp" "src/Utils.cpp" "src/Operation.cpp" "src/OperationStore.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp")
+set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Params.cpp" "src/OperationStore.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp")
 
 #Module support files
 set (MODULE_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Cookie.cpp" "src/WebModule.cpp" "src/Exception.cpp")

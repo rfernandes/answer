@@ -13,9 +13,6 @@
 #include <boost/algorithm/string.hpp>
 
 namespace answer {
-	
-const std::string OK("OK");
-const std::string ERROR("ERROR");
 
 class Operation {
 protected:
@@ -27,8 +24,6 @@ public:
     virtual std::string invoke(const std::string&, const std::string & ="")=0;
 };
 
-std::string getResponseXml(int status_code, const std::string &status, const std::string &response = "");
-
 //The default template is request / response
 template <typename Type, typename OperationType, typename Request, typename Response, class Strategy  >
 class OperationHandler: public Operation{
@@ -37,8 +32,8 @@ class OperationHandler: public Operation{
 public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 	
-	
 	virtual std::string invoke ( const std::string& params, const std::string& prefix){
+		std::ostringstream wrappedReponse;
 		try {
 			Request request;
 			
@@ -67,26 +62,20 @@ public:
 
 			Response response( (type.*_op)(request) );
 
-			std::ostringstream ssOut;
-			if(!codec::Codec(ssOut, accept, response)) {
-				codec::defaultCodec(ssOut, response);
-				return getResponseXml(1000, OK, ssOut.str() );
+			std::ostringstream encodedReponse;
+			if(!codec::Codec(encodedReponse, accept, response)) {
+				codec::GenericCodec(encodedReponse, response);
 			}
-			return ssOut.str();
-		} catch(const boost::archive::archive_exception& ex){
-			return getResponseXml(1002, ex.what());
-		} catch (const WebMethodMissingParameter &ex) {
-			return getResponseXml(1010, ex.what());
-		} catch (const WebMethodInvalidInput &ex) {
-			return getResponseXml(1003, ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), NULL);
 		} catch (const WebMethodException &ex) {
-			return getResponseXml(ex.getErrorLevel(), ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
 		} catch (const std::exception &ex) {
-			std::cerr << "Exception: " << ex.what() << "returning generic error message" << std::endl;
+			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
-			std::cerr << "Catastrophic error" <<std::endl;
+			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		return getResponseXml(1002, ERROR);
+		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+		return wrappedReponse.str();
 	}
 };
 
@@ -99,6 +88,7 @@ public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 public:
 	virtual std::string invoke ( const std::string& , const std::string&){
+		std::ostringstream wrappedReponse;
 		try {
 			// we only look at the first accept. if it fails, we'll default to xml immediately
 			std::string accept;
@@ -111,26 +101,20 @@ public:
 			
 			Response response( (type.*_op)() );
 			
-			std::ostringstream ssOut;
-			if(!codec::Codec(ssOut, accept, response)) {
-				codec::defaultCodec(ssOut, response);
-				return getResponseXml(1000, OK, ssOut.str() );
+			std::ostringstream encodedReponse;
+			if(!codec::Codec(encodedReponse, accept, response)) {
+				codec::GenericCodec(encodedReponse, response);
 			}
-			return ssOut.str();
-		} catch(const boost::archive::archive_exception& ex){
-			return getResponseXml(1002, ex.what());
-		} catch (const WebMethodMissingParameter &ex) {
-			return getResponseXml(1010, ex.what());
-		} catch (const WebMethodInvalidInput &ex) {
-			return getResponseXml(1003, ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), NULL);
 		} catch (const WebMethodException &ex) {
-			return getResponseXml(ex.getErrorLevel(), ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
 		} catch (const std::exception &ex) {
-			std::cerr << "Exception: " << ex.what() << "returning generic error message" << std::endl;
+			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
-			std::cerr << "Catastrophic error" <<std::endl;
+			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		return getResponseXml(1002, ERROR);
+		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+		return wrappedReponse.str();
 	}
 };
 
@@ -144,6 +128,7 @@ public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 
 	virtual std::string invoke ( const std::string& params , const std::string& prefix){
+		std::ostringstream wrappedReponse;
 		try {
 			Request request;
 			
@@ -164,19 +149,16 @@ public:
 			Type &type(_methodHandle.getInstance());
 			
 			(type.*_op)(request);
-			
-			return getResponseXml(1000, OK);
-			
-		}catch(const boost::archive::archive_exception& ex){
-			return getResponseXml(1002, ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, "", NULL);
 		} catch (const WebMethodException &ex) {
-			return getResponseXml(ex.getErrorLevel(), ex.what());
+			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
 		} catch (const std::exception &ex) {
-			std::cerr << "Exception: " << ex.what() << "returning generic error message" <<std::endl;
+			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
-			std::cerr << "Catastrophic error" <<std::endl;
+			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		return getResponseXml(1002, ERROR);
+		std::cerr << "Debug No req:" << wrappedReponse.str() << std::endl;
+		return wrappedReponse.str();
 	}
 };
 

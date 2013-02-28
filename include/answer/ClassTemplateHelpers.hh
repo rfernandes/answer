@@ -46,23 +46,23 @@ struct class_<void (Class::*)(Arg) const> {
 };
 
 // boiler-plate
-#define CONCATENATE_DETAIL(x, y) x##y
-#define CONCATENATE(x, y) CONCATENATE_DETAIL(x, y)
-#define MAKE_UNIQUE(x) CONCATENATE(x, __COUNTER__)
+#define ANSWER_CONCATENATE_DETAIL(x, y) x##y
+#define ANSWER_CONCATENATE(x, y) ANSWER_CONCATENATE_DETAIL(x, y)
+#define ANSWER_MAKE_UNIQUE(x) ANSWER_CONCATENATE(x, __COUNTER__)
 
 // The missing semicolon enforces the notion of simple replacement,
 //  requiring the user use the macro as a function (which helps doxygen/cpp_wsdl xslt detection of registrations)
 
 // Service registration macros
-#define REGISTER_OPERATION(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
+#define ANSWER_REGISTER_OPERATION(ServiceOperation) \
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
 
-#define REGISTER_OPERATION_UNDER(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
+#define ANSWER_REGISTER_OPERATION_UNDER(ServiceOperation) \
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
 
 	
-#define REGISTER_OPERATION_POST(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation, answer::FORCE_POST)
+#define ANSWER_REGISTER_OPERATION_POST(ServiceOperation) \
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation, answer::FORCE_POST)
 
 }
 
