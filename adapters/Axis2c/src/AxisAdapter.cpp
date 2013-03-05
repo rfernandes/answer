@@ -94,7 +94,7 @@ extern "C"
 			std::size_t end = params.find('>');
 			
 			params.replace(beg,  end-beg, "");
-			cerr << "Params: " << params << endl;
+// 			cerr << "Params: " << params << endl;
 
 			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
 			string xmlResponse = oper_ref.invoke ( params, prefix);
@@ -167,7 +167,7 @@ extern "C"
 		// unused
 				axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
 
-				cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
+// 				cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
 		// 		string operationName(op_prefix);
 		// 		operationName += "::";
 		// 		operationName += op_name;

@@ -23,6 +23,10 @@ struct archive_end_exception: public std::runtime_error{
 	archive_end_exception(const std::string& str): runtime_error(str){}
 };
 
+struct starttag_closed_exception: public std::runtime_error{
+	starttag_closed_exception(const std::string& str): runtime_error(str){}
+};
+
 using namespace boost::archive;
 
 class ws_xml_iarchive :
@@ -51,12 +55,29 @@ protected:
 	//We overload load_start to allow tag name checking
 	void
 	load_start(const char *name, bool check_tag = false){
+		std::streampos beginPos = is.tellg();
+		
 		// if there's no name
 		if(NULL == name)
 				return;
 		bool result = this->This()->gimpl->parse_start_tag(this->This()->get_is());
 		if(true != result){
-		boost::serialization::throw_exception(
+			if (check_tag){
+				//Todo: replace this with proper EBNF grammar
+				std::streampos failedPos = is.tellg();
+				is.seekg(beginPos);
+				std::string seekClosedTag = "<";
+				seekClosedTag.append(name).append("/>");
+				std::string::const_iterator it = seekClosedTag.begin();
+				while (is.good() && it != seekClosedTag.end() && is.get() == *it){
+					++it;
+				}
+				if (it == seekClosedTag.end()){
+					throw starttag_closed_exception("closed start tag found");
+				}
+				is.seekg(failedPos);
+			}
+			boost::serialization::throw_exception(
 				archive_exception(archive_exception::input_stream_error)
 			);
 		}
@@ -135,7 +156,14 @@ protected:
 			}
 		}
 		//Normal load
-		base::load_override(t, 0);
+		try{
+			this->This()->load_start(itemName.c_str(), true);
+		}catch (starttag_closed_exception &ex){
+			return;
+		}
+		
+		boost::archive::load(* this, t.value());
+		this->This()->load_end(itemName.c_str());
 	}
 
 	template<class T>
