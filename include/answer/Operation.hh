@@ -74,7 +74,7 @@ public:
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+// 		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
 		return wrappedReponse.str();
 	}
 };
@@ -113,7 +113,7 @@ public:
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+// 		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
 		return wrappedReponse.str();
 	}
 };
@@ -157,7 +157,7 @@ public:
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
-		std::cerr << "Debug No req:" << wrappedReponse.str() << std::endl;
+// 		std::cerr << "Debug No req:" << wrappedReponse.str() << std::endl;
 		return wrappedReponse.str();
 	}
 };

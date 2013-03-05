@@ -192,6 +192,8 @@ protected:
 			t.value().reset();
 			is.seekg(m_lastPos );
 			return;
+		} catch (starttag_closed_exception &ex){
+			return;
 		}
 
 		is.seekg(m_lastPos );
