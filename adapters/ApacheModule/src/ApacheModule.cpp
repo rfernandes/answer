@@ -13,6 +13,10 @@ using namespace boost::algorithm;
 using namespace answer;
 using namespace std;
 
+namespace answer{
+	const char* currentService = NULL;
+}
+
 string xmlFromAxisXml(const string &service, const string &operation, const string& parameters){
 
 	string file("/usr/axis2c/services/");
@@ -207,7 +211,7 @@ static int answer_handler(request_rec* r) {
 		
 		Request req(r, *conf);
 		
-		Operation& oper_ref = OperationStore::getInstance().getOperation(req.getOperation());
+		Operation& oper_ref = OperationStore::getInstance().getOperation(req.getService(), req.getOperation());
 		
 
 			//TODO: when context if refactores reinstate the Codecs, for now XML conly

@@ -19,7 +19,7 @@
 #include "ClassTemplateHelpers.hh"
 
 namespace answer{
-		
+
 class OperationStore {
 	std::map<std::string, Operation *> _map;
 	OperationStore();
@@ -30,10 +30,8 @@ public:
 
 	~OperationStore();
 
-	void registerOperation(const std::string& name, Operation *webMethodCreator);
-	void removeOperation(const std::string& name);
-
-	Operation& getOperation(const std::string& name) const;
+	void registerOperation(const std::string& operationName, answer::Operation* webMethodHandle);
+	Operation& getOperation(const std::string& serviceName, const std::string& operationName) const;
 
 	std::list<std::string> getOperationList();
 };
@@ -104,10 +102,10 @@ public:
 			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
 		}
 	}
-	
-	~RegisterOperation(){
-		OperationStore::getInstance().removeOperation(_operationName);
-	}
+
+// 	~RegisterOperation(){
+// 		OperationStore::getInstance().removeOperation(_operationName);
+// 	}
 };
 }
 #endif //_OPERATION_STORE_HH_

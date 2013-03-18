@@ -18,6 +18,10 @@ using namespace std;
 
 using namespace Fastcgipp;
 
+namespace answer{
+	const char* currentService = NULL;
+}
+
 class Echo: public Fastcgipp::Request<char>
 {
 	/*
@@ -254,7 +258,7 @@ class Echo: public Fastcgipp::Request<char>
 // 		context.request().setAcceptList(aux);
 		
 		cerr << "request :" << serviceRequest << endl;
-		Operation& oper_ref = OperationStore::getInstance().getOperation(operation);
+		Operation& oper_ref = OperationStore::getInstance().getOperation(service, operation);
 		
 		string serviceResponse =  oper_ref.invoke(serviceRequest);
 		

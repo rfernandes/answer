@@ -46,6 +46,9 @@ using namespace std;
 using namespace answer;
 using namespace std;
 
+namespace answer{
+	const char* currentService = NULL;
+}
 
 std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_node )
 {
@@ -96,7 +99,7 @@ extern "C"
 			params.replace(beg,  end-beg, "");
 // 			cerr << "Params: " << params << endl;
 
-			Operation& oper_ref = OperationStore::getInstance().getOperation ( operationName );
+			Operation& oper_ref = OperationStore::getInstance().getOperation (prefix, operationName );
 			string xmlResponse = oper_ref.invoke ( params, prefix);
 
 			// Response Node preparation
@@ -164,13 +167,7 @@ extern "C"
 		axis2_op_t *operation = axis2_op_ctx_get_op ( operation_ctx, env );
 		axutil_qname_t *op_qname = ( axutil_qname_t * ) axis2_op_get_qname ( operation, env );
 		axis2_char_t *op_name = axutil_qname_get_localpart ( op_qname, env );
-		// unused
-				axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
-
-// 				cerr << "Requested operation " << op_prefix << '.' << op_name << endl;
-		// 		string operationName(op_prefix);
-		// 		operationName += "::";
-		// 		operationName += op_name;
+		axis2_char_t *op_prefix = axutil_qname_get_prefix(op_qname, env);
 
 		try {
 			ret_node = toAxiomNode ( env, op_prefix, op_name, content_node, msg_ctx );
@@ -228,11 +225,17 @@ extern "C"
 		string wsSo ( dirname ( soPath ) );
 		wsSo.append ( "/service.so" );
 
-		dlopen ( wsSo.c_str(), RTLD_LAZY );
+		//We set the current service, so that services are registered under this service
+		answer::currentService = basename(soPath);
+
+		std::cerr << "loading service:" << answer::currentService << std::endl;
+		dlopen ( wsSo.c_str(), RTLD_LAZY | RTLD_LOCAL);
+// 		answer::currentService = NULL;
 		if ( ( error = dlerror() ) != NULL )  {
 			cerr << "module '" << wsSo << "' could not be loaded: " << error << endl;
 			return NULL;
 		}
+		
 
 		// 		cerr << "module loaded: " << dl_info.dli_fname << endl;
 
