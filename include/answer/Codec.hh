@@ -18,7 +18,6 @@ namespace answer{
 		template<typename T>
 		void GenericCodec ( std::ostream& out, const T& data)
 		{
-			std::cerr << "Using default codec" << std::endl;
 			answer::archive::ws_xml_oarchive outA ( out );
 			outA << data;
 		}
@@ -26,7 +25,6 @@ namespace answer{
 		template<typename T>
 		void ResponseWrapper( std::ostream& out, const std::string& response, const answer::WebMethodException*)
 		{
-			std::cerr << "Using default wrapper" << std::endl;
 			out << response;
 		}
 		
