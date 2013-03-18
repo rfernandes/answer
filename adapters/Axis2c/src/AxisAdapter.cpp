@@ -228,9 +228,8 @@ extern "C"
 		//We set the current service, so that services are registered under this service
 		answer::currentService = basename(soPath);
 
-		std::cerr << "loading service:" << answer::currentService << std::endl;
 		dlopen ( wsSo.c_str(), RTLD_LAZY | RTLD_LOCAL);
-// 		answer::currentService = NULL;
+		answer::currentService = NULL;
 		if ( ( error = dlerror() ) != NULL )  {
 			cerr << "module '" << wsSo << "' could not be loaded: " << error << endl;
 			return NULL;
