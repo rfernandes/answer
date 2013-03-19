@@ -3,11 +3,8 @@
 using namespace std;
 
 namespace answer{
-//Provided by adapter
-extern const char* currentService;
 
-OperationStore::OperationStore() {
-}
+OperationStore::OperationStore() {}
 
 OperationStore::~OperationStore() {
     map<string, Operation*>::const_iterator it = _map.begin();
@@ -26,15 +23,11 @@ std::list< std::string > OperationStore::getOperationList()
     return ret;
 }
 
-void OperationStore::registerOperation(const string& operationName, Operation *webMethodHandle) {
+void OperationStore::registerOperation( const string& serviceName, const string& operationName, answer::Operation* webMethodHandle ) {
 	//This removes the Class:: part of Macro registration
 	size_t pos = operationName.rfind("::");
 	std::string filteredName(pos != operationName.npos ? operationName.substr(pos + 2) : operationName);
-	if (!answer::currentService){
-		std::cerr << "Could not register ["<< operationName <<"] - Unknown service"<< std::endl;
-	}else{
-		_map[std::string(answer::currentService) + std::string("/") + filteredName] = webMethodHandle;
-	}
+	_map[serviceName + std::string("/") + filteredName] = webMethodHandle;
 }
 
 /*
