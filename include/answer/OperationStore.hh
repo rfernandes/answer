@@ -30,7 +30,7 @@ public:
 
 	~OperationStore();
 
-	void registerOperation(const std::string& operationName, answer::Operation* webMethodHandle);
+	void registerOperation(const std::string& serviceName, const std::string& operationName, answer::Operation* webMethodHandle);
 	Operation& getOperation(const std::string& serviceName, const std::string& operationName) const;
 
 	std::list<std::string> getOperationList();
@@ -58,9 +58,10 @@ struct ResolveStrategy <T, typename void_<typename T::InvokationStrategyType>::c
 template <typename Operation>
 class RegisterOperation{
 	std::string _operationName;
+	std::string _serviceName;
 public:
-	RegisterOperation(const std::string& operationName, const Operation &op, RestPayload payLoad = AUTO):
-		_operationName(operationName)
+	RegisterOperation(const std::string& serviceName, const std::string& operationName, const Operation &op, RestPayload payLoad = AUTO):
+		_operationName(operationName), _serviceName(serviceName)
 	{
 		//Unused parameter payload -> it's read by cpp_wsdl for service.xml generation
 		(void)(payLoad);
@@ -97,7 +98,7 @@ public:
 // Check operation signature (must have at least one of [response] operator()([request])
 // 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
 		try{
-			OperationStore::getInstance().registerOperation(_operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
+			OperationStore::getInstance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
 		}catch (std::exception &ex){
 			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
 		}
