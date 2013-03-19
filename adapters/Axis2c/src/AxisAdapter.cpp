@@ -46,10 +46,6 @@ using namespace std;
 using namespace answer;
 using namespace std;
 
-namespace answer{
-	const char* currentService = NULL;
-}
-
 std::string getRequest ( const axutil_env_t * axis_env, axiom_node_t *content_node )
 {
 	string xmlString;
@@ -225,11 +221,8 @@ extern "C"
 		string wsSo ( dirname ( soPath ) );
 		wsSo.append ( "/service.so" );
 
-		//We set the current service, so that services are registered under this service
-		answer::currentService = basename(soPath);
-
 		dlopen ( wsSo.c_str(), RTLD_LAZY | RTLD_LOCAL);
-// 		answer::currentService = NULL;
+
 		if ( ( error = dlerror() ) != NULL )  {
 			cerr << "module '" << wsSo << "' could not be loaded: " << error << endl;
 			return NULL;
