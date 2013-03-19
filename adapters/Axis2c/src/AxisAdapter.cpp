@@ -159,7 +159,7 @@ extern "C"
 			axiom_node_t *content_node,
 			axis2_msg_ctx_t *msg_ctx )
 	{
-    answer::adapter::axis::AxisContext axis( env, msg_ctx );
+		answer::adapter::axis::AxisContext axis( env, msg_ctx );
 
 		/* depending on the function name invoke the corresponding  method */
 		axiom_node_t *ret_node = NULL;
@@ -229,7 +229,7 @@ extern "C"
 		answer::currentService = basename(soPath);
 
 		dlopen ( wsSo.c_str(), RTLD_LAZY | RTLD_LOCAL);
-		answer::currentService = NULL;
+// 		answer::currentService = NULL;
 		if ( ( error = dlerror() ) != NULL )  {
 			cerr << "module '" << wsSo << "' could not be loaded: " << error << endl;
 			return NULL;
