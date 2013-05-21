@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <dlfcn.h>
 
 using namespace boost::algorithm;
@@ -17,62 +18,7 @@ namespace answer{
 	const char* currentService = NULL;
 }
 
-string xmlFromAxisXml(const string &service, const string &operation, const string& parameters){
-
-	string file("/usr/axis2c/services/");
-	file.append(service).append("/services.xml");
-	
-// 	xmlpp::DomParser parser;
-// 	parser.parse_file(file);
-
-// 		cerr << xmlpp::Element*(parser.get_document()->get_root_node()->find("//operation/parameter").front())->get_child_text()->get_content;
-
-// 	xmlpp::NodeSet nodeSet = parser.get_document()->get_root_node()->find("//operation[@name='"+operation+"']/parameter[@name='RESTLocation']");
-	
-// 	cerr << nodeSet.size() << endl;
-	
-// 	xmlpp::Element* location = static_cast<xmlpp::Element*>(nodeSet.front());
-	string locationString ; // = location->get_child_text()->get_content();
-	
-	stringstream xml;
-	
-//     string str1("hello abc-*-ABC-*-aBc goodbye");
-
-	typedef list< string > split_list_type;
-	typedef vector< string > split_vector_type;
-	
-	split_list_type paramsName; // #2: Search for tokens
-	split(paramsName, locationString, is_any_of("/{}"), token_compress_on ); // SplitVec == { "hello abc","ABC","aBc goodbye" }
-	
-	paramsName.pop_front();
-	paramsName.pop_back();
-	
-	split_vector_type params; // #2: Search for tokens
-	split(params, parameters, is_any_of("/"), token_compress_on ); // SplitVec == { "hello abc","ABC","aBc goodbye" }
-	
-	int idx = 0;
-	xml << "<" << operation << ">";
-	for (list< string >::const_iterator it = paramsName.begin(); it != paramsName.end(); ++it, ++idx){
-		xml << "<" << *it << ">" << params[idx] << "</" << *it << ">\n";
-	}
-	xml << "</" << operation << ">";
-	cerr << "Request: ["<< xml.str() << "]" << endl;
-	
-	return xml.str();
-}
-
 extern "C" module AP_MODULE_DECLARE_DATA answer_module;
-
-static void debugRequest(const char *message, request_rec* r){
-	ap_set_content_type(r, "text/html;charset=ascii") ;
-	ap_rputs("<html><head><title>No answer!</title></head>\n"
-		"<body><pre>\n", r);
-	ap_rputs(r->uri, r);
-	ap_rputs("\n", r);
-	ap_rputs(message, r);
-	ap_rputs("\n", r);
-	ap_rputs("</pre></body></html>\n", r);
-}
 
 class Request{
 	string _service;
@@ -163,7 +109,6 @@ public:
 		
 		switch (r->method_number){
 			case M_GET:
-				_serviceRequest = xmlFromAxisXml(_service, _operation, _params);
 				break;
 			case M_POST:
 				cerr << "Handling POST:" << _operation << endl;
@@ -214,10 +159,8 @@ static int answer_handler(request_rec* r) {
 		Operation& oper_ref = OperationStore::getInstance().getOperation(req.getService(), req.getOperation());
 		
 
-			//TODO: when context if refactores reinstate the Codecs, for now XML conly
-// 		ResponseContext& response_context = answer::Context::getInstance().response();
-// 		response_context.reset();
-		string serviceResponse =  oper_ref.invoke(req.getServiceRequest());
+     //TODO: when context if refactores reinstate the Codecs, for now XML conly
+		Response serviceResponse =  oper_ref.invoke(req.getServiceRequest());
 		
 // 		ap_set_content_type(r, response_context.getContentType().c_str());
 // 		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
@@ -229,10 +172,9 @@ static int answer_handler(request_rec* r) {
 // 		}
 
 // 		ap_set_content_type(r, "text/xml;charset=utf-8") ;
-		ap_rwrite(serviceResponse.c_str(), serviceResponse.size(), r);
+		ap_rwrite(serviceResponse.response.c_str(), serviceResponse.response.size(), r);
 	}catch (std::exception & ex){
-		ap_set_content_type(r, "text/html;charset=ascii") ;
-		debugRequest(ex.what(), r);
+		ap_set_content_type(r, "text/html;charset=ascii");
 	}
 	return OK;
 }
@@ -248,13 +190,40 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
 {
 	ap_add_version_component(p, "Answer");
 
-	dlOpen("/opt/wps/services/libwps_auth.so");
-	dlOpen("/opt/wps/services/libwps_category.so");
-	dlOpen("/opt/wps/services/libwps_hierarchy.so");
-	dlOpen("/opt/wps/services/libwps_data.so");
-	dlOpen("/opt/wps/services/libwps_policy.so");
-	dlOpen("/opt/wps/services/libwps_reports.so");
-	dlOpen("/opt/wps/services/libwps_stats.so");
+  //TODO: Load services
+  using namespace boost::filesystem;
+  
+    char *modulesDir = getenv("modulesDir");
+    char *servicesDir = getenv("servicesDir");
+
+    //Load modules
+    if (modulesDir){
+      directory_iterator end_itr;
+      for ( directory_iterator itr( modulesDir );
+        itr != end_itr;
+        ++itr )
+      {
+        if ( extension(itr->path()) == ".so"){
+          cerr << "Loading module: "<< itr->path() << endl;
+          dlOpen(itr->path().c_str());
+        }
+      }
+    }
+    
+    //Services
+    if (servicesDir){
+      directory_iterator end_itr;
+      for ( directory_iterator itr( servicesDir );
+        itr != end_itr;
+        ++itr )
+      {
+        if ( extension(itr->path()) == ".so"){
+          cerr << "Loading service: "<< itr->path() << endl;
+          dlOpen(itr->path().c_str());
+        }
+      }
+    }
+
 
 	return OK;
 }
@@ -287,15 +256,7 @@ const char *set_axis_request_format(cmd_parms *cmd, void */*cfg*/, int flag) {
 	
 // Module commands
 static const command_rec cmds[] = {
-		AP_INIT_FLAG   ("AnswerAxisRequestFormat", (cmd_func) set_axis_request_format, NULL, RSRC_CONF, "Recognize axis2c requests (/service/operation/param1/...)"),
-// 		AP_INIT_TAKE1  ("MPSCookie",           		(cmd_func) set_cookie_name, NULL, ACCESS_CONF, "MPS Session cookie name"),
-// 		AP_INIT_TAKE1  ("MPSLocation",          	(cmd_func) set_uri_location, NULL, ACCESS_CONF, "MPS base location"),
-// 		AP_INIT_TAKE1  ("MPSLocationPrepend",   	(cmd_func) set_uri_prelocation, NULL, ACCESS_CONF, "MPS prepended location"),
-// 		AP_INIT_TAKE1  ("MPSForbiddenLocation",      	(cmd_func) set_forbidden_location, NULL, ACCESS_CONF, "MPS Session URL location for Forbidden Responses"),
-// 		AP_INIT_TAKE1  ("MPSUnauthorizedLocation",   	(cmd_func) set_unauthorized_location, NULL, ACCESS_CONF, "MPS Session URL location for Unauthorized Responses"),
-// 		AP_INIT_FLAG   ("MPSEnableVSP",			(cmd_func) set_enable_vsp, NULL, ACCESS_CONF, "MPS enables VSP flag"),
-// 		AP_INIT_FLAG   ("MPSEnableOutbound",		(cmd_func) set_enable_outbound, NULL, ACCESS_CONF, "MPS enables OUTBOUND flag"),
-// 		AP_INIT_ITERATE("MPSSessionAllowAlways",   	(cmd_func) set_session_allow_always, NULL, ACCESS_CONF, "MPS Session allowed file types"),
+		AP_INIT_FLAG   ("AnswerAxisRequestFormat", (cmd_func) set_axis_request_format, NULL, RSRC_CONF, "Recognize axis2c requests (/service/operation/)"),
 		{ NULL }
 };
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <set>
 
-namespace Webservice{
+namespace WebServices{
 
 ///Define request and response types
 struct CalculatorResponse{
@@ -32,30 +32,10 @@ struct CalculatorRequest{
 ///Complex type service testing
 class MyService{
 	public:
-		CalculatorResponse calculator(const CalculatorRequest &request){
-			CalculatorResponse response;
-			switch(request.operation){
-				case 'x':
-				case '*':
-					response.result = request.operand1 * request.operand2;
-					break;
-				case '-':
-					response.result = request.operand1 - request.operand2;
-					break;
-				case 'd':
-				case '/':
-					response.result = request.operand1 / request.operand2;
-					break;
-				case '+':
-					response.result = request.operand1 + request.operand2;
-					break;
-				default:
-					throw answer::WebMethodInvalidInput("Invalid operation requested");
-			}
-		}
+		CalculatorResponse calculator(const CalculatorRequest &request);
 };
 
-REGISTER_OPERATION(MyService::calculator);
+ANSWER_REGISTER_OPERATION(MyService::calculator);
 
 }
 

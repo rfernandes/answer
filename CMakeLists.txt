@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/")
 
-
 ###########################################################
 # PROJECT SPECIFIC INFO
 ###########################################################
 project (answer)
 set (PROJECT_VERSION 0.1)
-set (MANDATORY_PACKAGES libxml++-2.6)
 
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
@@ -20,34 +18,22 @@ set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oar
 #Module support files
 set (MODULE_SRC_FILES "src/Cookie.cpp" "src/WebModule.cpp" "src/Exception.cpp")
 
-file ( GLOB headersHH
+file (GLOB headersHH
 	include/answer/*.hh)
-file ( GLOB headersArchiveHH
+file (GLOB headersArchiveHH
 	include/answer/archive/*.hpp)
-file ( GLOB headersArchiveImplHH
-	include/answer/archive/impl/*.hpp)
 
-#add_subdirectory(examples)
-#add_subdirectory(modules/Authorization)
-#add_subdirectory(modules/Authentication)
-###########################################################
-# LIB DEPENDENCY CHECK
-###########################################################
-include(DependencyCheck)
-MACRO_CHECK_DEPENDENCIES(/usr/axis2c/lib)
-
-# message(STATUS "ONE : ${MANDATORY_PACKAGES_LIBRARIES}")
 ###########################################################
 # TARGET GENERATION
 ###########################################################
-#Module component
+#Module support
 add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-module
 	boost_serialization
-	${MANDATORY_PACKAGES_LIBRARIES}
 )
 
+#Library
 add_library (${PROJECT_NAME} SHARED ${ADAPTER_SRC_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}
@@ -55,7 +41,8 @@ target_link_libraries (${PROJECT_NAME}
 )
 
 add_subdirectory(adapters/ApacheModule)
-add_subdirectory(adapters/Axis2c)
+add_subdirectory(adapters/CppNetlib)
+# add_subdirectory(adapters/Axis2c)
 add_subdirectory(adapters/FCGI)
 
 install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)
@@ -63,4 +50,5 @@ install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)
 
 install (FILES ${headersHH} DESTINATION include/answer COMPONENT headers)
 install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT headers)
-install (FILES ${headersArchiveImplHH} DESTINATION include/answer/archive/impl COMPONENT headers)
+
+add_subdirectory(examples)

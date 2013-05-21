@@ -1,10 +1,12 @@
-#include "../include/Calculator.hh"
+#include "Calculator.hh"
 
 using namespace std;
 using namespace answer;
 
-AnubisResponse<CalculatorResponse> MyService::calculator(const CalculatorRequest &request){
-	AnubisResponse<CalculatorResponse> response;
+namespace WebServices{
+	
+CalculatorResponse MyService::calculator(const CalculatorRequest &request){
+	CalculatorResponse response;
 	switch(request.operation){
 		case 'x':
 		case '*':
@@ -25,4 +27,6 @@ AnubisResponse<CalculatorResponse> MyService::calculator(const CalculatorRequest
 	}
 	
 	return response;
+}
+
 }

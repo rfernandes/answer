@@ -1,16 +1,20 @@
-#include "include/BasicService.hh"
+#include "BasicService.hh"
 
-std::set<std::string> BasicService::simple_operation(){
-	std::set<std::string> ret;
+#include <boost/serialization/set.hpp>
 
-	ret.insert("Ennie");
-	ret.insert("Meenie");
-	ret.insert("Miney");
-	ret.insert("Moe");
+namespace WebServices{
+	BasicOperationResponse BasicService::simple_operation(){
+		BasicOperationResponse ret;
 
-	return ret;
-}
+		ret.items.push_back("Ennie");
+		ret.items.push_back("Meenie");
+		ret.items.push_back("Miney");
+		ret.items.push_back("Moe");
 
-void BasicService::hello_world(){
-	return "Hello World";
+		return ret;
+	}
+
+	std::string BasicService::hello_world(){
+		return "Hello World";
+	}
 }

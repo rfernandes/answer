@@ -15,17 +15,6 @@ namespace answer{
 			_axis_env( axis_env ),
 			_msg_ctx( msg_ctx ){
 				_context = this;
-			
-// 			TODO: Move this to Axis* Constructors
-// 			if (msg_ctx) {
-// 				axis2_endpoint_ref_t* endpoint  = axis2_msg_ctx_get_from (msg_ctx, env);
-// 				if (endpoint) {
-// 					const axis2_char_t *url = axis2_endpoint_ref_get_address(endpoint, env);
-// 					if (url) {
-// 						request_context.setEndPointURL(url);
-// 					}
-// 				}
-// 			}
 
 		}
 

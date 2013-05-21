@@ -43,16 +43,16 @@ void OperationStore::removeOperation(const string& serviceName, const string& op
 }*/
 
 OperationStore& OperationStore::getInstance() {
-    static OperationStore inst;
-    return inst;
+	static OperationStore inst;
+	return inst;
 }
 
 Operation& OperationStore::getOperation(const string& serviceName, const string& operationName) const {
-    map<string, Operation*>::const_iterator it = _map.find(serviceName + "/" + operationName);
-    if (it == _map.end()) {
-        throw runtime_error("Unregistered web method requested : [" + serviceName +']');
-    }
-    return *it->second;
+	map<string, Operation*>::const_iterator it = _map.find(serviceName + "/" + operationName);
+	if (it == _map.end()) {
+		throw runtime_error("Unregistered web method requested : [" + serviceName +']');
+	}
+	return *it->second;
 }
 
 }

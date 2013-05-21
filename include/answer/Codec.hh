@@ -3,8 +3,10 @@
 
 #include <string>
 #include <iostream>
+#include "archive/ws_json_oarchive.hpp"
 #include "archive/ws_xml_oarchive.hpp"
 #include "Exception.hh"
+#include "Context.hh"
 
 namespace answer{
 	namespace codec{
@@ -13,19 +15,29 @@ namespace answer{
 		{
 			return false;
 		}
-		
-		//TODO: Move this to impl
+
 		template<typename T>
-		void GenericCodec ( std::ostream& out, const T& data)
+		bool GenericCodec ( std::ostream& out, const std::string& mimeType, const T& data)
 		{
-			answer::archive::ws_xml_oarchive outA ( out );
-			outA << data;
+			const std::string &operationName = Context::getInstance().operationInfo().getOperationName();
+			if (mimeType == "application/json"){
+				answer::archive::ws_json_oarchive outA ( out );
+				outA << boost::serialization::make_nvp(operationName.c_str(), data);
+				return true;
+			}
+			if (mimeType == "application/xml" || mimeType == "*/*"){
+				answer::archive::ws_xml_oarchive outA ( out );
+				outA << boost::serialization::make_nvp(operationName.c_str(), data);
+				return true;
+			}
+			return false;
 		}
 
 		template<typename T>
-		void ResponseWrapper( std::ostream& out, const std::string& response, const answer::WebMethodException*)
+		bool ResponseWrapper( std::ostream& out, const std::string& response, const std::string& mimeType, const answer::WebMethodException*)
 		{
-			out << response;
+      out << response;
+			return true;
 		}
 		
 	}
@@ -35,8 +47,8 @@ namespace answer{
 namespace answer{\
 	namespace codec{\
 		template<>\
-		void ResponseWrapper<void>( std::ostream& out, const std::string& response, const answer::WebMethodException* ex){\
-			WrapperFunction(out, response, ex);\
+		bool ResponseWrapper<void>( std::ostream& out, const std::string& response, const std::string& mimeType, const answer::WebMethodException* ex){\
+			return WrapperFunction(out, response, mimeType, ex);\
 		}\
 	}\
 }\

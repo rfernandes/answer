@@ -1,7 +1,6 @@
-
 set (APACHEMODULE_SRC_FILES "src/ApacheModule.cpp")
 
-set (APACHEMODULE_LIBRARIES "dl -lapreq2")
+set (APACHEMODULE_LIBRARIES "dl -lapreq2" "boost_filesystem")
 
 include_directories (include /usr/include/apreq2 /usr/include/apache2 /usr/include/httpd /usr/include/apr-1.0 /usr/include/apr-1 /opt/wps/include)
 
@@ -10,7 +9,6 @@ set_target_properties(mod_answer PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION
 target_link_libraries (mod_answer
 	${PROJECT_NAME}
 	${PROJECT_NAME}-module
-	${MANDATORY_PACKAGES_LIBRARIES}
 	${APACHEMODULE_LIBRARIES}
 )
 
