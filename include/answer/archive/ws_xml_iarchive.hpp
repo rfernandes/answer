@@ -117,7 +117,7 @@ protected:
 
 		if (!m_collectionStack.empty() ){
 
-			if (t.name() == "item_version"){
+			if (itemName == "item_version"){
 				return; //Ignore item_version loading from default collection serialization implementations
 			}
 
@@ -179,7 +179,7 @@ protected:
 
 // 		std::cerr << ":(O):" << t.name() << " [" << char(is.peek()) << "] [" << int(is.tellg())<< ']' <<std::endl;
 		try{
-			this->This()->load_start(t.name(), true);
+			this->This()->load_start(itemName.c_str(), true);
 		}/*catch (boost::archive::xml_archive_exception &ex){
 			// This optional is not present
 			//  retrace the stream and proceed
@@ -198,7 +198,7 @@ protected:
 
 		is.seekg(m_lastPos );
 		boost::serialization::detail::stack_construct<ws_xml_iarchive, T> aux(*this, 0);
-		load_override(boost::serialization::make_nvp(t.name(), aux.reference()), 0);
+		load_override(boost::serialization::make_nvp(itemName.c_str(), aux.reference()), 0);
 		t.value().reset(aux.reference());
 	}
 
@@ -221,18 +221,18 @@ protected:
 	// specific overrides for attributes - not name value pairs so we
 	// want to trap them before the above "fall through"
 	// since we don't want to see these in the output - make them no-ops.
-	void load_override(boost::archive::object_id_type & t, int){}
-	void load_override(boost::archive::object_reference_type & t, int){}
-	void load_override(boost::archive::version_type & t, int){}
-	void load_override(boost::archive::class_id_type & t, int){}
-	void load_override(boost::archive::class_id_optional_type & t, int){}
-	void load_override(boost::archive::class_id_reference_type & t, int){}
-	void load_override(boost::archive::class_name_type & t, int){}
-	void load_override(boost::archive::tracking_type & t, int){}
+	void load_override(boost::archive::object_id_type &, int){}
+	void load_override(boost::archive::object_reference_type &, int){}
+	void load_override(boost::archive::version_type &, int){}
+	void load_override(boost::archive::class_id_type &, int){}
+	void load_override(boost::archive::class_id_optional_type &, int){}
+	void load_override(boost::archive::class_id_reference_type &, int){}
+	void load_override(boost::archive::class_name_type &, int){}
+	void load_override(boost::archive::tracking_type &, int){}
 
 public:
-	ws_xml_iarchive(std::istream & is, unsigned int flags = 0) :
-		xml_iarchive_impl<ws_xml_iarchive>(is, flags| boost::archive::no_header )
+	ws_xml_iarchive(std::istream & is_, unsigned int flags = 0) :
+		xml_iarchive_impl<ws_xml_iarchive>(is_, flags| boost::archive::no_header )
 	{}
 	~ws_xml_iarchive(){}
 };

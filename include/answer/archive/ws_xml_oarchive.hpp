@@ -104,19 +104,19 @@ class ws_xml_oarchive :
     // specific overrides for attributes - not name value pairs so we
     // want to trap them before the above "fall through"
     // since we don't want to see these in the output - make them no-ops.
-    void save_override(const boost::archive::object_id_type & t, int){}
-    void save_override(const boost::archive::object_reference_type & t, int){}
-    void save_override(const boost::archive::version_type & t, int){}
-    void save_override(const boost::archive::class_id_type & t, int){}
-    void save_override(const boost::archive::class_id_optional_type & t, int){}
-    void save_override(const boost::archive::class_id_reference_type & t, int){}
-    void save_override(const boost::archive::class_name_type & t, int){}
-    void save_override(const boost::archive::tracking_type & t, int){}
+    void save_override(const boost::archive::object_id_type &, int){}
+    void save_override(const boost::archive::object_reference_type &, int){}
+    void save_override(const boost::archive::version_type &, int){}
+    void save_override(const boost::archive::class_id_type &, int){}
+    void save_override(const boost::archive::class_id_optional_type &, int){}
+    void save_override(const boost::archive::class_id_reference_type &, int){}
+    void save_override(const boost::archive::class_name_type &, int){}
+    void save_override(const boost::archive::tracking_type &, int){}
     
 public:
-    ws_xml_oarchive(std::ostream & os, unsigned int flags = 0) :
+    ws_xml_oarchive(std::ostream & os_, unsigned int flags = 0) :
         boost::archive::xml_oarchive_impl<ws_xml_oarchive>(
-            os, 
+            os_, 
             flags | boost::archive::no_header
         )
     {}
