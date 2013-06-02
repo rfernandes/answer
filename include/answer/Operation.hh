@@ -33,7 +33,8 @@ public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 	
 	virtual std::string invoke ( const std::string& params, const std::string& prefix){
-		std::ostringstream wrappedReponse;
+		std::ostringstream encodedReponse;
+		std::auto_ptr<WebMethodException> wrappedException;
 		try {
 			Request request;
 			
@@ -61,20 +62,21 @@ public:
 			Type &type(_methodHandle.getInstance());
 
 			Response response( (type.*_op)(request) );
-
-			std::ostringstream encodedReponse;
+			
 			if(!codec::Codec(encodedReponse, accept, response)) {
 				codec::GenericCodec(encodedReponse, response);
 			}
-			codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), NULL);
 		} catch (const WebMethodException &ex) {
-			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException(ex.what()));
 		} catch (const std::exception &ex) {
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException("Framework exception"));
 			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 // 		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+		std::ostringstream wrappedReponse;
+		codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), wrappedException.get());
 		return wrappedReponse.str();
 	}
 };
@@ -88,7 +90,8 @@ public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 public:
 	virtual std::string invoke ( const std::string& , const std::string&){
-		std::ostringstream wrappedReponse;
+		std::ostringstream encodedReponse;
+		std::auto_ptr<WebMethodException> wrappedException;
 		try {
 			// we only look at the first accept. if it fails, we'll default to xml immediately
 			std::string accept;
@@ -101,19 +104,20 @@ public:
 			
 			Response response( (type.*_op)() );
 			
-			std::ostringstream encodedReponse;
 			if(!codec::Codec(encodedReponse, accept, response)) {
 				codec::GenericCodec(encodedReponse, response);
 			}
-			codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), NULL);
 		} catch (const WebMethodException &ex) {
-			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException(ex.what()));
 		} catch (const std::exception &ex) {
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException("Framework exception"));
 			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 // 		std::cerr << "Debug:" << wrappedReponse.str() << std::endl;
+		std::ostringstream wrappedReponse;
+		codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), wrappedException.get());
 		return wrappedReponse.str();
 	}
 };
@@ -128,7 +132,7 @@ public:
 	OperationHandler(OperationType op, const std::string &name):Operation(name), _op(op){}
 
 	virtual std::string invoke ( const std::string& params , const std::string& prefix){
-		std::ostringstream wrappedReponse;
+		std::auto_ptr<WebMethodException> wrappedException;
 		try {
 			Request request;
 			
@@ -149,15 +153,17 @@ public:
 			Type &type(_methodHandle.getInstance());
 			
 			(type.*_op)(request);
-			codec::ResponseWrapper<void>(wrappedReponse, "", NULL);
 		} catch (const WebMethodException &ex) {
-			codec::ResponseWrapper<void>(wrappedReponse, "", &ex);
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException(ex.what()));
 		} catch (const std::exception &ex) {
+			wrappedException = std::auto_ptr<WebMethodException>(new WebMethodException("Framework exception"));
 			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
 			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 // 		std::cerr << "Debug No req:" << wrappedReponse.str() << std::endl;
+		std::ostringstream wrappedReponse;
+		codec::ResponseWrapper<void>(wrappedReponse, "", wrappedException.get());
 		return wrappedReponse.str();
 	}
 };
