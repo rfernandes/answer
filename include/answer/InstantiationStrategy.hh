@@ -30,9 +30,6 @@ template <class InstantiationStrategyType, typename ObjectT>
 // No default implementation
 class InstantiationStrategy{
 public:
-	
-// 	Auto is the default, FORCE_POST makes sense when payload is simple
-// 	 but you don't want it in the query string (ex: for passwords)
 };
 
 template <typename ObjectT>

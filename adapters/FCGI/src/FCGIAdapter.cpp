@@ -1,4 +1,6 @@
 #include <fstream>
+#include <algorithm>
+#include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <fastcgi++/request.hpp>
@@ -9,7 +11,10 @@
 #include "answer/WebModule.hh"
 #include "answer/Context.hh"
 
+#include "FCGIContext.hh"
+
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost::algorithm;
 
@@ -19,14 +24,16 @@ using namespace std;
 using namespace Fastcgipp;
 
 namespace answer{
-	const char* currentService = NULL;
-}
+namespace adapter{
+namespace fcgi{
 
-class Echo: public Fastcgipp::Request<char>
+class FcgiAdapter: public Fastcgipp::Request<char>
 {
-	/*
-	bool debug(const std::string& serviceRequest, const std::string& serviceResponse, const ResponseContext& response_context)
+
+	bool debug(const std::string& serviceRequest, const std::string& serviceResponse, const FCGIContext& context)
 	{
+   using Fastcgipp::HTML;
+   
 		out << "Content-Type: text/html; charset=utf-8\r\n\r\n";
 		
 		out << "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' />";
@@ -44,13 +51,13 @@ class Echo: public Fastcgipp::Request<char>
 		
 		out << "<h1>Response Modifiers</h1>";
 		out << "<pre>";
-		out << "<b>Content-Type:</b> " << encoding(HTML) << response_context.getContentType() << encoding(NONE) << "<br/>";
-		if (!response_context.getAdditionalHeaders().empty()) {
-			out << "<b>Additional Headers:</b><br/>";
-			for ( list< pair< string, string > >::const_iterator itr = response_context.getAdditionalHeaders().begin(); itr != response_context.getAdditionalHeaders().end(); ++itr) {
-				out << "&nbsp&nbsp&nbsp*&nbsp" << encoding(HTML) << itr->first << ": " << itr->second << encoding(NONE) << "<br/>";
-			}
-		}
+// 		out << "<b>Content-Type:</b> " << encoding(HTML) << response_context.getContentType() << encoding(NONE) << "<br/>";
+// 		if (!response_context.getAdditionalHeaders().empty()) {
+// 			out << "<b>Additional Headers:</b><br/>";
+// 			for ( list< pair< string, string > >::const_iterator itr = response_context.getAdditionalHeaders().begin(); itr != response_context.getAdditionalHeaders().end(); ++itr) {
+// 				out << "&nbsp&nbsp&nbsp*&nbsp" << encoding(HTML) << itr->first << ": " << itr->second << encoding(NONE) << "<br/>";
+// 			}
+// 		}
 		out << "</pre>";
 		
 		// 		out << "<b>Hostname:</b> " << encoding(HTML) << environment().host << encoding(NONE) << "<br />";
@@ -140,60 +147,10 @@ class Echo: public Fastcgipp::Request<char>
 		
 		return true;
 	}
-	*/
-	string xmlFromAxisXml(const string &service, const string &operation, const string& parameters) const{
-		
-		
-		string file("/usr/axis2c/services/");
-		file.append(service).append("/services.xml");
-		
-// 		xmlpp::DomParser parser;
-// 		parser.parse_file(file);
-		
-		
-		// 		cerr << xmlpp::Element*(parser.get_document()->get_root_node()->find("//operation/parameter").front())->get_child_text()->get_content;
-		
-// 		xmlpp::NodeSet nodeSet = parser.get_document()->get_root_node()->find("//operation[@name='"+operation+"']/parameter[@name='RESTLocation']");
-		
-// 		cerr << nodeSet.size() << endl;
-		
-// 		xmlpp::Element* location = static_cast<xmlpp::Element*>(nodeSet.front());
-		string locationString ; 
-// 		= location->get_child_text()->get_content();
-		
-		stringstream xml;
-		
-		//     string str1("hello abc-*-ABC-*-aBc goodbye");
-		
-		typedef list< string > split_list_type;
-		typedef vector< string > split_vector_type;
-		
-		split_list_type paramsName; // #2: Search for tokens
-		split(paramsName, locationString, is_any_of("/{}"), token_compress_on ); // SplitVec == { "hello abc","ABC","aBc goodbye" }
-		
-		paramsName.pop_front();
-		paramsName.pop_back();
-		
-		split_vector_type params; // #2: Search for tokens
-		split(params, parameters, is_any_of("/"), token_compress_on ); // SplitVec == { "hello abc","ABC","aBc goodbye" }
-		
-		
-		int idx = 0;
-		xml << "<" << operation << ">";
-		for (list< string >::const_iterator it = paramsName.begin(); it != paramsName.end(); ++it, ++idx){
-			xml << "<" << *it << ">" << params[idx] << "</" << *it << ">\n";
-		}
-		xml << "</" << operation << ">";
-		cerr << "Request: "<< xml.str() << "<<<<" << endl;
-		
-		return xml.str();
-	}
-	
 	
 	bool response(){
-		
-		cerr << "FCGI invoked: "<< endl;
-		
+		FCGIContext context(environment());
+
 		string serviceRequest;
 		string service;
 		string operation;
@@ -231,57 +188,41 @@ class Echo: public Fastcgipp::Request<char>
 					serviceRequest.append(string(it->second.data(), it->second.size()));
 				}
 			}
-		}else{ //Assume * GET
-			string getParams;
-			Fastcgipp::Http::Environment <char >::Gets::const_iterator it(environment().gets.find("params"));
-			if (it != environment().gets.end()){
-				getParams = it->second;
-				serviceRequest = xmlFromAxisXml(service, operation, getParams);
-			}else{
-				it = environment().gets.find("directRequest");
-				if (it != environment().gets.end()){
-					serviceRequest = it->second;
-				}
-			}
+		}
+		//If GET assume it's a ResponseOnly operation
+		
+		Response response;
+		try{
+			cerr << "try request [" << serviceRequest << "]" << endl;
+			Operation& oper_ref = OperationStore::getInstance().getOperation(service, operation);
+			response = oper_ref.invoke(serviceRequest);
+		}catch(answer::WebMethodException &ex){
+			out << "Content-Type: text/plain\r\n";
+			out << "\r\n";
+			out << ex.what();
+			cerr << "WebException: " << ex.what();
+		}catch(exception &ex){
+			cerr << "Exception: "<< ex.what();
 		}
 		
-		list< string > aux;
-		boost::split(aux, environment().acceptContentTypes, boost::is_any_of(","), boost::token_compress_on);
-		// remove "quality"
-		for (list< string >::iterator itr = aux.begin(); itr != aux.end(); ++itr) {
-			std::size_t pos = itr->find(";");
-			if (pos != string::npos)
-				*itr = itr->substr(0,pos);
-		}
-// 		Context& context = answer::Context::getInstance();
-// 		context.reset();
-// 		context.request().setAcceptList(aux);
+		//TODO: when context if refactores reinstate the Codecs, for now XML conly
+		const TransportInfo &transport_info = answer::Context::getInstance().transportInfo();
 		
-		cerr << "request :" << serviceRequest << endl;
-		Operation& oper_ref = OperationStore::getInstance().getOperation(service, operation);
-		
-		string serviceResponse =  oper_ref.invoke(serviceRequest);
-		
-			//TODO: when context if refactores reinstate the Codecs, for now XML conly
-// 		const ResponseContext& response_context = answer::Context::getInstance().response();
 		if (environment().gets.count("debug"))
 		{
-// 			debug(serviceRequest, serviceResponse, response_context);
+			debug(serviceRequest, response.response, context);
 		}else{
-// 			out << "Content-Type: " << response_context.getContentType() << "\r\n";
-// 			for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
-// 				out << it->first << ": " << it->second << "\r\n";
-// 			}
+			out << "Content-Type: " << response.acceptType << "\r\n";
 			out << "\r\n";
-			out << serviceResponse;
+			out << response.response;
 		}
-		
-		
 		return true;
 	}
-public:
-	void positr ( const char* arg1 );
 };
+
+} //fcgi
+} //adapter
+} //answer
 
 void dlOpen(const char * path, int mode = RTLD_LAZY){
 	void * handle = dlopen(path, mode);
@@ -290,28 +231,44 @@ void dlOpen(const char * path, int mode = RTLD_LAZY){
 	}
 }
 
-void loadFlowModules(){
-	
-}
-
-// The main function is easy to set up
 int main()
 {
+	using namespace boost::filesystem;
+	
 	try
 	{
+		char *modulesDir = getenv("modulesDir");
+		char *servicesDir = getenv("servicesDir");
+
 		//Load modules
-// 		dlOpen("/opt/wps/modules/libwps_module_authentication.so");
-// 		dlOpen("/opt/wps/modules/libwps_module_authorization.so");
+		if (modulesDir){
+			directory_iterator end_itr;
+			for ( directory_iterator itr( modulesDir );
+				itr != end_itr;
+				++itr )
+			{
+				if ( extension(itr->path()) == ".so"){
+					cerr << "Loading module: "<< itr->path() << endl;
+					dlOpen(itr->path().c_str());
+				}
+			}
+		}
 		
 		//Services
-// 		dlOpen("/opt/wps/services/libwps_auth.so");
-// 		dlOpen("/opt/wps/services/libwps_category.so");
-// 		dlOpen("/opt/wps/services/libwps_hierarchy.so");
-// 		dlOpen("/opt/wps/services/libwps_data.so");
-// 		dlOpen("/opt/wps/services/libwps_policy.so");
-// 		dlOpen("/opt/wps/services/libwps_reports.so");
-// 		dlOpen("/opt/wps/services/libwps_stats.so");
-		Fastcgipp::Manager<Echo> fcgi;
+		if (servicesDir){
+			directory_iterator end_itr;
+			for ( directory_iterator itr( servicesDir );
+				itr != end_itr;
+				++itr )
+			{
+				if ( extension(itr->path()) == ".so"){
+					cerr << "Loading service: "<< itr->path() << endl;
+					dlOpen(itr->path().c_str());
+				}
+			}
+		}
+
+		Fastcgipp::Manager<answer::adapter::fcgi::FcgiAdapter> fcgi;
 		fcgi.handler();
 	}
 	catch(exception& e)

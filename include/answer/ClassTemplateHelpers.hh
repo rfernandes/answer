@@ -53,16 +53,20 @@ struct class_<void (Class::*)(Arg) const> {
 // The missing semicolon enforces the notion of simple replacement,
 //  requiring the user use the macro as a function (which helps doxygen/cpp_wsdl xslt detection of registrations)
 
+// The ANSWER_SERVICE_NAME definition should be provided on a per project basis,
+//  the provided answer .cmake automatically set it to the project name
+// #ifndef ANSWER_SERVICE_NAME
+// #error "Answer: ANSWER_SERVICE_NAME has to be defined, usually done in the build definition"
+// #endif //ANSWER_SERVICE_NAME
 // Service registration macros
 #define ANSWER_REGISTER_OPERATION(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation)
 
 #define ANSWER_REGISTER_OPERATION_UNDER(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation)
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation)
 
-	
 #define ANSWER_REGISTER_OPERATION_POST(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(#ServiceOperation, &ServiceOperation, answer::FORCE_POST)
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation, answer::FORCE_POST)
 
 }
 

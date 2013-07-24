@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<cppDataTypes>
+	<wsdlMappings>
+		<pair key="std::string" value="xs:string"/>
+		<pair key="string" value="xs:string" />
+		<pair key="int" value="xs:int" />
+		<pair key="double" value="xs:double" />
+		<pair key="float" value="xs:float" />
+		<pair key="short" value="xs:short" />
+		<pair key="long" value="xs:long" />
+		<pair key="unsigned int" value="xs:unsignedInt" />
+		<pair key="unsigned short" value="xs:unsignedShort" />
+		<pair key="unsigned long" value="xs:unsignedLong" />
+		<pair key="unsigned" value="xs:unsignedInt" />
+		<pair key="bool" value="xs:boolean" />
+	</wsdlMappings>
+	<collectionTypes>
+		<item value="std::vector" />
+		<item value="std::list" />
+		<item value="std::deque" />
+		<item value="std::set" />
+		<item value="std::multiset" />
+		<item value="std::map" />
+		<item value="std::multimap" />
+		<item value="vector" />
+		<item value="list" />
+		<item value="deque" />
+		<item value="set" />
+		<item value="multiset" />
+		<item value="map" />
+		<item value="multimap" />
+	</collectionTypes>
+	<wrapperTypes>
+		<item value="boost::optional" />
+		<item value="optional" />
+	</wrapperTypes>
+
+	<htmlMappings>
+		<pair key="std::string" value="textInput.html"/>
+		<pair key="string" value="textInput.html" />
+		<pair key="int" value="textInput.html" />
+		<pair key="double" value="textInput.html" />
+		<pair key="bool" value="checkBox.html" />
+		<pair key="scopeId" value="test.html" />
+	</htmlMappings>
+</cppDataTypes>

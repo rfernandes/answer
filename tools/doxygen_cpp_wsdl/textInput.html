@@ -1,0 +1,11 @@
+<xsl:template match="string">
+	<xsl:value-of select="{description}"/><input name="{name}" type="text"/>
+</xsl:template>
+
+<xsl:template match="/">
+<html>
+<body>
+<xsl:apply-templates/>
+</body>
+</html>
+</xsl:template>

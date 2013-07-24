@@ -9,7 +9,6 @@ namespace answer{
 		namespace axis{
 
 			class AxisOperation: public OperationInfo {
-					std::string _full_name;
 					std::string _service_name;
 					std::string _operation_name;
 					std::string _url;
@@ -21,7 +20,6 @@ namespace answer{
 							axutil_qname_t *op_qname = ( axutil_qname_t * ) axis2_op_get_qname ( operation, axis_env );
 							_operation_name = axutil_qname_get_localpart ( op_qname, axis_env );
 							_service_name = axutil_qname_get_prefix ( op_qname, axis_env );
-							_full_name = _service_name + "." + _operation_name;
 
 					axis2_endpoint_ref_t* endpoint_ref = axis2_msg_ctx_get_from (msg_ctx, axis_env);
 					if (endpoint_ref) {
@@ -34,9 +32,6 @@ namespace answer{
 
 					virtual const std::string& getServiceName() const {
 							return _service_name;
-					}
-					virtual const std::string& getName() const {
-							return _full_name;
 					}
 					virtual const std::string& getOperationName() const {
 							return _operation_name;

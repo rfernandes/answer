@@ -20,6 +20,9 @@ namespace answer {
 		virtual TransportInfo& transportInfo()=0;
 		
 		static Context& getInstance(){
+      if (!_context){
+        throw std::runtime_error("Uninitialized context");
+      }
 			return *_context;
 		}
 	};
