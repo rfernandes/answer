@@ -7,7 +7,7 @@ include_directories("include")
 add_executable (${PROJECT_NAME}.fcgi ${FCGI_ADAPTER_SRC_FILES})
 target_link_libraries (${PROJECT_NAME}.fcgi
 	${PROJECT_NAME}
-# 	${PROJECT_NAME}-module
+	${PROJECT_NAME}-module
 	${FCGI_LIBRARIES}
   boost_system
 )

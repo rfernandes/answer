@@ -40,10 +40,32 @@ target_link_libraries (${PROJECT_NAME}
 	boost_serialization boost_date_time
 )
 
-add_subdirectory(adapters/ApacheModule)
-add_subdirectory(adapters/CppNetlib)
-# add_subdirectory(adapters/Axis2c)
-add_subdirectory(adapters/FCGI)
+option(APACHE_ADAPTER "compile the native apache module adapter" true)
+option(FCGI_ADAPTER "compile the fastcgi++ adapter" true)
+option(AXIS_ADAPTER "compile the axis2/C adapter" true)
+option(NETLIB_ADAPTER "compile the axis2/C adapter / tool" true)
+
+# if (APACHE_ADAPTER || ! FCGI_ADAPTER)
+# 	message(FATAL_ERROR "Must compile at least one adaptar, please check settings")
+# endif()
+
+if (APACHE_ADAPTER)
+	add_subdirectory(adapters/ApacheModule)
+endif()
+
+if (FCGI_ADAPTER)
+	add_subdirectory(adapters/FCGI)
+endif()
+
+if (AXIS_ADAPTER)
+	add_subdirectory(adapters/Axis2c)
+endif()
+
+if (NETLIB_ADAPTER)
+	message(STATUS "The netlib adapter is stil experimental")
+	add_subdirectory(adapters/CppNetlib)
+endif()
+
 
 install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)
 install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)

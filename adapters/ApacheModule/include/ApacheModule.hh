@@ -42,6 +42,8 @@
 typedef struct  {
 // 	char *directory;
 	bool axisRequestFormat;
+  std::string servicesDir;
+  std::string modulesDir;
 // 	const char *cookie_name;
 // 	const char *cookie_header;
 // 	const char *uri_location;

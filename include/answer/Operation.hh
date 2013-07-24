@@ -31,6 +31,7 @@ public:
     virtual Response invoke(const std::string&, const std::string & ="")=0;
 };
 
+
 //The default template is request / response
 template <typename Type, typename OperationType, typename RequestT, typename ResponseT, class Strategy  >
 class OperationHandler: public Operation{

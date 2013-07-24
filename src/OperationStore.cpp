@@ -42,6 +42,7 @@ void OperationStore::removeOperation(const string& serviceName, const string& op
 	}
 }*/
 
+//TODO: fix this
 OperationStore& OperationStore::getInstance() {
 	static OperationStore inst;
 	return inst;

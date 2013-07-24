@@ -30,6 +30,15 @@ namespace WebServices{
 		}
 	};
 	
+  struct testInput{
+    std::set<unsigned> test;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int /*version*/)
+    {
+      ar & BOOST_SERIALIZATION_NVP(test);
+    }
+  };
 	
 	class BasicService{
 	public:
@@ -37,6 +46,7 @@ namespace WebServices{
 		BasicService(){std::cerr << "Hi" << std::endl;}
 
 		std::string hello_world();
+    void testOperation(const testInput& test);
 		BasicOperationResponse simple_operation();
 	};
 }
@@ -44,5 +54,6 @@ namespace WebServices{
 ANSWER_RESPONSE_WRAPPER(WebServices::responseWrapper);
 ANSWER_REGISTER_OPERATION(WebServices::BasicService::hello_world);
 ANSWER_REGISTER_OPERATION(WebServices::BasicService::simple_operation);
+ANSWER_REGISTER_OPERATION(WebServices::BasicService::testOperation);
 
 #endif //_BASIC_SERVICE_HH_

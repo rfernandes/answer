@@ -17,4 +17,12 @@ namespace WebServices{
 	std::string BasicService::hello_world(){
 		return "Hello World";
 	}
+
+ void BasicService::testOperation(const WebServices::testInput& test)
+ {
+  std::cerr << "Got : " << std::endl;
+  std::copy(test.test.begin(), test.test.end(), std::ostream_iterator<unsigned>(std::cerr, " - "));
+ }
+
 }
+
