@@ -19,7 +19,7 @@ namespace answer {
 		virtual CookieJar& cookieJar()=0;
 		virtual TransportInfo& transportInfo()=0;
 		
-		static Context& getInstance(){
+		static Context& Instance(){
       if (!_context){
         throw std::runtime_error("Uninitialized context");
       }

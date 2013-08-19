@@ -25,49 +25,7 @@ namespace answer{
 
 extern "C" module AP_MODULE_DECLARE_DATA answer_module;
 
-class Request{
-	string _service;
-	string _operation;
-	string _params;
-	string _serviceRequest;
-	
-	string _body;
-	
-// 	void fillAcceptList(request_rec* r){
-// 		const char * accepts = apr_table_get(r->headers_in, "Accept");
-// 		std::list<std::string> aux;
-// 		boost::split(aux, accepts, boost::is_any_of(","), boost::token_compress_on);
-// 		// remove "quality"
-// 		for (list< string >::iterator itr = aux.begin(); itr != aux.end(); ++itr) {
-// 			std::size_t pos = itr->find(";");
-// 			if (pos != string::npos)
-// 				*itr = itr->substr(0,pos);
-// 		}
-// 		answer::Context::getInstance().request().setAcceptList(aux);
-// 	}
-	
-// 	static int bodyEntryCallback(void *rec, const char *key, const char *value){
-// 		Request * that = static_cast<Request*>(rec);
-// 		that->_body.append(key).append(value);
-// 		cerr << "POST k[" << key << "] v[" << value << "]" << endl;
-// 	}
-	
-public:
-
-	Request(request_rec* r, const answer_conf_t& conf){
-
-	}
-	
-	const string& getService() const{ return _service; }
-	const string& getOperation() const{ return _operation; }
-	const string& getParams() const{ return _params; }
-	const string& getServiceRequest() const{ return _serviceRequest; }
-	
-};
-
 static int answer_handler(request_rec* r) {
-//     int answerrand = (int) (rand());
-//  cerr << "Service " << r->handler << endl;
 	if (!r->handler || strcmp(r->handler, "answer_module") ) {
 		return DECLINED;
 	}
@@ -79,11 +37,10 @@ static int answer_handler(request_rec* r) {
 	try{
     cerr << "Initing context" << endl;
 		answer::adapter::apache::ApacheContext context(r, config);
-		Request req(r, config);
 
-		Operation& oper_ref = OperationStore::getInstance().getOperation(context.operationInfo().getServiceName(), context.operationInfo().getOperationName());
+		Operation& oper_ref = OperationStore::Instance().operation(context.operationInfo().serviceName(), context.operationInfo().operationName());
 
-		Response serviceResponse =  oper_ref.invoke(req.getServiceRequest());
+		Response serviceResponse =  oper_ref.invoke(context.transportInfo().redirect("REPLACE ME"));
 
 // 		ap_set_content_type(r, response_context.getContentType().c_str());
 // 		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {

@@ -14,12 +14,12 @@ FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment< char >&
 
 	
 
-const std::string& FCGIOperationInfo::getOperationName() const
+const std::string& FCGIOperationInfo::operationName() const
 {
 	return _operation;
 }
 
-const std::string& FCGIOperationInfo::getServiceName() const
+const std::string& FCGIOperationInfo::serviceName() const
 {
 	return _service;
 }

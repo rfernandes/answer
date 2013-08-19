@@ -14,8 +14,8 @@ class FCGIOperationInfo: public OperationInfo{
 public:
 	FCGIOperationInfo(const Fastcgipp::Http::Environment< char > &env);
 
-	virtual const std::string& getOperationName() const;
-	virtual const std::string& getServiceName() const;
+	virtual const std::string& operationName() const;
+	virtual const std::string& serviceName() const;
 	virtual const std::string& getURL() const;
 };
 

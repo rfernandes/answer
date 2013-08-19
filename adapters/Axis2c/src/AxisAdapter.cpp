@@ -95,7 +95,7 @@ extern "C"
 			params.replace(beg,  end-beg, "");
 // 			cerr << "Params: " << params << endl;
 
-			Operation& oper_ref = OperationStore::getInstance().getOperation (prefix, operationName );
+			Operation& oper_ref = OperationStore::Instance().operation (prefix, operationName );
 			string xmlResponse = oper_ref.invoke ( params, prefix);
 
 			// Response Node preparation

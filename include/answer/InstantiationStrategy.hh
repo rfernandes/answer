@@ -39,7 +39,7 @@ public:
 	InstantiationStrategy():_webMethod(0){}
 	~InstantiationStrategy(){if (_webMethod) delete _webMethod;}
 	
-	ObjectT& getInstance() const{
+	ObjectT& Instance() const{
 		if (_webMethod){ delete _webMethod; }
 		_webMethod = new ObjectT();
 		return *_webMethod;
@@ -53,7 +53,7 @@ public:
 	InstantiationStrategy():_webMethod( new ObjectT() ){}
 	~InstantiationStrategy(){delete _webMethod;}
 
-	ObjectT& getInstance() const{
+	ObjectT& Instance() const{
 		return *_webMethod;
 	}
 };
@@ -61,7 +61,7 @@ public:
 template <typename ObjectT>
 class InstantiationStrategy<instantiation::LazySingleton, ObjectT>{
 public:
-	ObjectT& getInstance() const{
+	ObjectT& Instance() const{
 		static ObjectT webMethod;
 		return webMethod;
 	}
@@ -75,7 +75,7 @@ public:
 		std::cerr << "Max Workers: " << MAX << std::endl;
 	}
 	
-	ObjectT& getInstance() const{ // Incomplete
+	ObjectT& Instance() const{ // Incomplete
 		static ObjectT webMethod;
 		return webMethod;
 	}

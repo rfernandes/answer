@@ -30,10 +30,10 @@ namespace answer{
 					}
 					}
 
-					virtual const std::string& getServiceName() const {
+					virtual const std::string& serviceName() const {
 							return _service_name;
 					}
-					virtual const std::string& getOperationName() const {
+					virtual const std::string& operationName() const {
 							return _operation_name;
 					}
 					virtual const std::string& getURL() const {

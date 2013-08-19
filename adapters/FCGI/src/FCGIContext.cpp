@@ -15,7 +15,6 @@ namespace fcgi{
 			size_t pos = itr->find(";");
 			if (pos != string::npos)
 				*itr = itr->substr(0,pos);
-			cerr << "Accept>>" << *itr<< endl;
 		}
 	}
 

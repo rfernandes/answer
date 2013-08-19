@@ -139,7 +139,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 			out << "<p>No POST data</p>";
 		
 		out << "<h2>Loaded Services</h2>";
-		list< string > opList = OperationStore::getInstance().getOperationList();
+		list< string > opList = OperationStore::Instance().operationList();
 		for (list< string >::const_iterator it = opList.begin(); it != opList.end(); ++it){
 			out << *it << "</br>";
 		}
@@ -194,7 +194,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		Response response;
 		try{
 			cerr << "try request [" << serviceRequest << "]" << endl;
-			Operation& oper_ref = OperationStore::getInstance().getOperation(service, operation);
+			Operation& oper_ref = OperationStore::Instance().operation(service, operation);
 			response = oper_ref.invoke(serviceRequest);
 		}catch(answer::WebMethodException &ex){
 			out << "Content-Type: text/plain\r\n";
@@ -206,7 +206,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		}
 		
 		//TODO: when context if refactores reinstate the Codecs, for now XML conly
-		const TransportInfo &transport_info = answer::Context::getInstance().transportInfo();
+		const TransportInfo &transport_info = answer::Context::Instance().transportInfo();
 		
 		if (environment().gets.count("debug"))
 		{

@@ -60,7 +60,7 @@ namespace answer{
 		WebModuleStore();
 	public:
 		
-		static WebModuleStore& getInstance();
+		static WebModuleStore& Instance();
 		const StoreT& getStore() const;
 		void registerModule(WebModule *const module);
 	};
@@ -70,7 +70,7 @@ namespace answer{
 		T module;
 	public:
 		RegisterWebModule(){
-			WebModuleStore::getInstance().registerModule(&module );
+			WebModuleStore::Instance().registerModule(&module );
 		}
 	};
 

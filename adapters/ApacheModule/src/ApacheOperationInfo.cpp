@@ -22,7 +22,7 @@ ApacheOperationInfo::ApacheOperationInfo(request_rec* r, const answer_conf_t& co
       queryRequestFormat(apreq_handle);
     }
     
-//    answer::Context::getInstance().request().reset();
+//    answer::Context::Instance().request().reset();
 //    fillAcceptList(r);
     
     switch (r->method_number){
@@ -50,12 +50,12 @@ ApacheOperationInfo::ApacheOperationInfo(request_rec* r, const answer_conf_t& co
     }
 }
 
-const std::string& ApacheOperationInfo::getOperationName() const
+const std::string& ApacheOperationInfo::operationName() const
 {
   return _operation;
 }
 
-const std::string& ApacheOperationInfo::getServiceName() const
+const std::string& ApacheOperationInfo::serviceName() const
 {
   return _service;
 }

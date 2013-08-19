@@ -55,7 +55,7 @@ RequestT requestPart (const std::string& name, const std::string& params, const 
 template <typename ResponseT>
 void responsePart ( Response& ret, const ResponseT& response){
 	// TODO: we only look at the first accept. if it fails, we'll default to xml immediately
-	const std::list<std::string>& accept_headers_list = answer::Context::getInstance().transportInfo().accepts();
+	const std::list<std::string>& accept_headers_list = answer::Context::Instance().transportInfo().accepts();
 	std::list<std::string>::const_iterator it = accept_headers_list.begin();
 	
 	std::ostringstream encodedReponse;
@@ -100,7 +100,7 @@ public:
 		Response ret;
 		try {
 			RequestT request = requestPart<RequestT>(_name, params, prefix);
-			Type &type(_methodHandle.getInstance());
+			Type &type(_methodHandle.Instance());
 			ResponseT response( (type.*_op)(request) );
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
@@ -129,7 +129,7 @@ public:
 	virtual Response invoke ( const std::string& , const std::string&){
 		Response ret;
 		try {
-			Type &type(_methodHandle.getInstance());
+			Type &type(_methodHandle.Instance());
 			ResponseT response( (type.*_op)() );
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
@@ -160,7 +160,7 @@ public:
 		std::ostringstream wrappedReponse;
 		try {
 			RequestT request = requestPart<RequestT>(_name, params, prefix);
-			Type &type(_methodHandle.getInstance());
+			Type &type(_methodHandle.Instance());
 			(type.*_op)(request);
 // 			codec::ResponseWrapper<void>(wrappedReponse, "", "", NULL);
 		} catch (const WebMethodException &ex) {

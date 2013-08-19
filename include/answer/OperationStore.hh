@@ -26,14 +26,14 @@ class OperationStore {
 
 public:
 
-	static OperationStore& getInstance();
+	static OperationStore& Instance();
 
 	~OperationStore();
 
 	void registerOperation(const std::string& serviceName, const std::string& operationName, answer::Operation* webMethodHandle);
-	Operation& getOperation(const std::string& serviceName, const std::string& operationName) const;
+	Operation& operation(const std::string& serviceName, const std::string& operationName) const;
 
-	std::list<std::string> getOperationList();
+	std::list<std::string> operationList();
 };
 
 // SFINAE test
@@ -98,14 +98,14 @@ public:
 // Check operation signature (must have at least one of [response] operator()([request])
 // 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
 		try{
-			OperationStore::getInstance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
+			OperationStore::Instance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
 		}catch (std::exception &ex){
 			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
 		}
 	}
 
 // 	~RegisterOperation(){
-// 		OperationStore::getInstance().removeOperation(_operationName);
+// 		OperationStore::Instance().removeOperation(_operationName);
 // 	}
 };
 }

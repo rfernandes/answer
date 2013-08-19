@@ -56,7 +56,7 @@ class ws_json_oarchive:
 	bool _isItem;
 	bool _complex_object_begin;
 	bool _complex_object_end;
-    bool _wasLastEntry;
+	bool _wasLastEntry;
 	
 	template<class Archive>
 	struct save_enum_type {
@@ -132,13 +132,13 @@ class ws_json_oarchive:
 	}
 	#ifndef BOOST_NO_STD_WSTRING
 	void save(const std::wstring &/*ws*/){
-			     _os << "wide string types not suported in log archive";
+		_os << "wide string types not suported in log archive";
 	}
 	#endif
 
 	void save(const std::string & str){
 		//TODO: Encode for json
-		      _os << '"' << str << '"';
+		_os << '"' << str << '"';
 	}
 
 public:
@@ -153,12 +153,12 @@ public:
 	void register_type(const T * = NULL){}
 
 	unsigned int get_library_version(){
-			return 0;
+		return 0;
 	}
 
 	void
 	save_binary(const void */*address*/, std::size_t /*count*/){
-			     _os << "save_binary not implemented";
+		_os << "save_binary not implemented";
 	}
 
 	// the << operators

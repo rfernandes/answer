@@ -23,8 +23,8 @@ namespace answer{
 	
 	class OperationInfo{
 	public:
-		virtual const std::string& getServiceName() const = 0;
-		virtual const std::string& getOperationName() const = 0;
+		virtual const std::string& serviceName() const = 0;
+		virtual const std::string& operationName() const = 0;
 		virtual const std::string& getURL() const = 0;
 	};
 	

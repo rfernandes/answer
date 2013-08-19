@@ -13,7 +13,7 @@ OperationStore::~OperationStore() {
     }
 }
 
-std::list< std::string > OperationStore::getOperationList()
+std::list< std::string > OperationStore::operationList()
 {
     std::list< std::string > ret;
     map<string, Operation*>::const_iterator it = _map.begin();
@@ -43,12 +43,12 @@ void OperationStore::removeOperation(const string& serviceName, const string& op
 }*/
 
 //TODO: fix this
-OperationStore& OperationStore::getInstance() {
+OperationStore& OperationStore::Instance() {
 	static OperationStore inst;
 	return inst;
 }
 
-Operation& OperationStore::getOperation(const string& serviceName, const string& operationName) const {
+Operation& OperationStore::operation(const string& serviceName, const string& operationName) const {
 	map<string, Operation*>::const_iterator it = _map.find(serviceName + "/" + operationName);
 	if (it == _map.end()) {
 		throw runtime_error("Unregistered web method requested : [" + serviceName +']');

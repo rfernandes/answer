@@ -4,7 +4,7 @@ namespace answer{
 
 WebModuleStore::WebModuleStore(){}
 
-WebModuleStore& WebModuleStore::getInstance(){
+WebModuleStore& WebModuleStore::Instance(){
 	static WebModuleStore store;
 	return store;
 }
