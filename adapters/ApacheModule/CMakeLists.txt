@@ -19,7 +19,7 @@ target_link_libraries (mod_answer
 if ( DEFINED ENV{ANSWER_APACHE_MODULES_PATH} )
 	set (ANSWER_APACHE_ADAPTER_INSTALL $ENV{ANSWER_APACHE_MODULES_PATH})
 else()
-	set (ANSWER_APACHE_ADAPTER_INSTALL "/usr/lib/apache2/modules")
+	set (ANSWER_APACHE_ADAPTER_INSTALL "/usr/lib/httpd/modules")
 endif()
 
 install (TARGETS mod_answer DESTINATION ${ANSWER_APACHE_ADAPTER_INSTALL} COMPONENT library)

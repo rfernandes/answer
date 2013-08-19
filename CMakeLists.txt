@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 2.6)
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/")
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 ###########################################################
 # PROJECT SPECIFIC INFO
 ###########################################################
 project (answer)
 set (PROJECT_VERSION 0.1)
+
+list( APPEND CMAKE_CXX_FLAGS "-std=c++11")
 
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
@@ -27,27 +30,29 @@ file (GLOB headersArchiveHH
 # TARGET GENERATION
 ###########################################################
 #Module support
+
+find_package(Boost COMPONENTS serialization REQUIRED QUIET)
+
 add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-module
-	boost_serialization
+	${Boost_LIBRARIES}
 )
+
+find_package(Boost COMPONENTS serialization date_time REQUIRED QUIET)
 
 #Library
 add_library (${PROJECT_NAME} SHARED ${ADAPTER_SRC_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}
-	boost_serialization boost_date_time
+	${Boost_LIBRARIES}
 )
 
 option(APACHE_ADAPTER "compile the native apache module adapter" true)
 option(FCGI_ADAPTER "compile the fastcgi++ adapter" true)
 option(AXIS_ADAPTER "compile the axis2/C adapter" true)
-option(NETLIB_ADAPTER "compile the axis2/C adapter / tool" true)
-
-# if (APACHE_ADAPTER || ! FCGI_ADAPTER)
-# 	message(FATAL_ERROR "Must compile at least one adaptar, please check settings")
-# endif()
+option(NETLIB_ADAPTER "compile the cpp-netlib adapter" true)
+option(REMOTING_ADAPTER "compile the remoting adapter" true)
 
 if (APACHE_ADAPTER)
 	add_subdirectory(adapters/ApacheModule)
@@ -62,10 +67,14 @@ if (AXIS_ADAPTER)
 endif()
 
 if (NETLIB_ADAPTER)
-	message(STATUS "The netlib adapter is stil experimental")
+	message(STATUS "Building Experimental CPPNETLIB adapter")
 	add_subdirectory(adapters/CppNetlib)
 endif()
 
+if (REMOTING_ADAPTER)
+	message(STATUS "Building Experimental REMOTING adapter")
+	add_subdirectory(adapters/Remote)
+endif()
 
 install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)
 install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)
