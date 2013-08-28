@@ -36,23 +36,6 @@ public:
 	std::list<std::string> operationList();
 };
 
-// SFINAE test
-template<typename>
-struct void_ {
-	typedef void check;
-};
-
-// The default strategy type
-template<typename T, typename X = void>
-struct ResolveStrategy{
-	typedef instantiation::SingleCall type;
-};
-
-template<typename T>
-struct ResolveStrategy <T, typename void_<typename T::InvokationStrategyType>::check> {
-	typedef typename T::InvokationStrategyType type;
-};
-
 //TODO: RestPayload dies here... it's only read by for the service.xml REST Gateway
 // Consider using just macros, REGISTER(AUTO) REGISTER_POST REGISTER_REST <- Future
 template <typename Operation>
@@ -83,8 +66,6 @@ public:
 				const_request
 			>::type request;
 
-		typedef typename ResolveStrategy<Type>::type Strategy;
-
 		/*
 		 * Get types of function
 		 * request (const & request),
@@ -98,7 +79,7 @@ public:
 // Check operation signature (must have at least one of [response] operator()([request])
 // 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
 		try{
-			OperationStore::Instance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Strategy, Type> >(op, _operationName));
+			OperationStore::Instance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, InstantiationStrategy<Type> >(op, _operationName));
 		}catch (std::exception &ex){
 			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
 		}
