@@ -5,7 +5,7 @@ Features
 * Support for multiple adapters (FCGI, Apache native module, Axis2C, CPPNetLib)
 * Implement */RPC, SOAP or REST webservices 
 
-While documentation is still a work in progress, I you would like to know more about Answer, follow the links below:
+While documentation is still a work in progress, if you would like to know more about Answer, follow the links below:
 
 * [RPC/SOAP programming model](https://github.com/rfernandes/answer/wiki/RPC---SOAP-Programming-Model)
 * [Adapters](https://github.com/rfernandes/answer/wiki/Adapters)
