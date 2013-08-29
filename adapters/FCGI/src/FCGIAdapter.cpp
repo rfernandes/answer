@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <string>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
@@ -177,10 +179,13 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		
 		cerr << "Requested: "<< service << "::" << operation << endl;
 		
+		boost::property_tree::ptree pt;
+		
 		if(!environment().posts.empty()){
 			for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
 				cerr << "Posted form data {" << it->first << "}"  << endl;
 				if(it->second.type== Http::Post<char>::form){
+					pt.put(it->first, it->second.value);
 					serviceRequest.append(it->second.value);
 					cerr << "Posted a form {" << it->second.value << "}" << endl;
 				}else{
@@ -189,8 +194,14 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 				}
 			}
 		}
-		//If GET assume it's a ResponseOnly operation
+		stringstream ss;
+		boost::property_tree::write_xml(ss, pt);
+
+		cerr << "ptree to xml :" << endl
+			<< ss.str() << endl;
 		
+		//If GET assume it's a ResponseOnly operation
+		serviceRequest = ss.str();
 		Response response;
 		try{
 			cerr << "try request [" << serviceRequest << "]" << endl;
