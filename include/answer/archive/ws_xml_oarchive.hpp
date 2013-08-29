@@ -119,7 +119,9 @@ public:
             os_, 
             flags | boost::archive::no_header
         )
-    {}
+    {
+      os_.setf(std::ios::boolalpha);
+    }
 };
 
     template<>

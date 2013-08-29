@@ -72,14 +72,6 @@ class ws_json_oarchive:
 			(ar._os) << t;
 		}
 	};
-	//It's impossible to specialize a class template member of a class template if the enclosing class template is not fully specialized at the same time
-	template<class Archive>
-	struct save_bool_primitive {
-		template<class T>
-		static void invoke(Archive & ar, const T & t){
-			(ar._os) << (t?"true":"false");
-		}
-	};
 
 	template<class Archive>
 	struct save_only {
@@ -117,13 +109,7 @@ class ws_json_oarchive:
 						boost::serialization::implementation_level< T >,
 							boost::mpl::int_<boost::serialization::primitive_type>
 					>,
-					BOOST_DEDUCED_TYPENAME boost::mpl::eval_if<
-						boost::is_same<
-							T,
-							bool
-						>,
-						boost::mpl::identity<save_bool_primitive<ws_json_oarchive> >,
-						boost::mpl::identity<save_primitive<ws_json_oarchive> >
+          boost::mpl::identity<save_primitive<ws_json_oarchive>
 					>,
 					// else
 			boost::mpl::identity<save_only<ws_json_oarchive> >
@@ -255,7 +241,9 @@ public:
 	///////////////////////////////////////////////
 
 	~ws_json_oarchive(){
-   _os << '}';
+    if (_complex_object_end){
+      _os << '}';
+    }
 	}
 
 	ws_json_oarchive(std::ostream & os) :
@@ -265,7 +253,7 @@ public:
 		_complex_object_end(false),
 		_wasLastEntry(false)
 	{
-   _os << '{';
+    _os.setf(std::ios::boolalpha);
 	}
 };
 

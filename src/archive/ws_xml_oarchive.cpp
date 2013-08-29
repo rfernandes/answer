@@ -6,17 +6,6 @@
 #include <boost/archive/impl/basic_xml_oarchive.ipp>
 #include <boost/archive/impl/xml_oarchive_impl.ipp>
 
-namespace answer{
-namespace archive{
-	template <>
-	void ws_xml_oarchive::save_override(const boost::serialization::nvp< bool > & t, int){
-		std::string aux(t.value() ? "true": "false");
-		//Serialize the string
-		* this << boost::serialization::make_nvp(t.name(), aux);
-	}
-}
-}
-
 namespace boost {
 namespace archive {
 

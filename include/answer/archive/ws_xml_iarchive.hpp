@@ -233,16 +233,11 @@ protected:
 public:
 	ws_xml_iarchive(std::istream & is_, unsigned int flags = 0) :
 		xml_iarchive_impl<ws_xml_iarchive>(is_, flags| boost::archive::no_header )
-	{}
+	{
+    is_.setf(std::ios::boolalpha);
+  }
 	~ws_xml_iarchive(){}
 };
-
-	template<>
-	void ws_xml_iarchive::load_override(
-		#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-		const
-		#endif
-		boost::serialization::nvp< bool > & t, int);
 
 } // archive
 } // answer
