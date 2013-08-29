@@ -19,15 +19,30 @@ namespace adapter{
 namespace apache{
  
   ApacheTransport::ApacheTransport(request_rec* r, const answer_conf_t& conf){
-    //TODO: Read this off of request struct
-    _accepts.push_back("application/xml");
+    // Read the accepts
+    apr_table_do(
+      [](void *acceptsRaw, const char* key, const char* value) -> int {
+        list<string>& accepts = *static_cast<list<string>*>(acceptsRaw);
+        if (!strncmp(key, "Accept", sizeof("Accept"))){
+          boost::split(accepts, value, boost::is_any_of(","), boost::token_compress_on);
+          // remove "quality"
+          for (list< string >::iterator itr = accepts.begin(); itr != accepts.end(); ++itr) {
+            size_t pos = itr->find(";");
+            if (pos != string::npos)
+              *itr = itr->substr(0,pos);
+          }
+          return 0; //done
+        }
+        return 1;
+      },
+      &_accepts, r->headers_in, NULL
+    );
   }
 
   ApacheContext::ApacheContext(request_rec* r, const answer_conf_t& conf):
     _transport(r,conf),
     _operation(r,conf)
   {
-    cerr << "Initing context" << endl;
    _context = this;
   }
 

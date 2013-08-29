@@ -3,6 +3,8 @@
 #include <exception>
 #include <boost/algorithm/string.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+
 using namespace std;
 using namespace boost::algorithm;
 
@@ -36,6 +38,30 @@ ApacheOperationInfo::ApacheOperationInfo(request_rec* r, const answer_conf_t& co
           while ( (len = ap_get_client_block(r, buffer, 1024)) > 0 ) {
             _rawRequest.append(buffer, len);
           }
+
+          //HACK: Convert application/x-www-form-urlencoded to XML#
+          // make this parsing robust
+          string contentType(apr_table_get(r->headers_in, "Content-Type"));
+          cerr << "contentType:" << contentType << endl;
+//           if (arg){
+//             apr_brigade_write()
+//             apr_table_t *     apreq_params (apreq_handle_t *apreq_handle, apr_pool_t *p)
+// 
+//             //Alternate functions for apreq_args_get
+//             // apr_table_t *     apreq_params (apreq_handle_t *req, apr_pool_t *p)
+//             // apreq_param_t *     apreq_param (apreq_handle_t *req, const char *key)
+//             apreq_param_t * serviceParam = NULL;
+//             serviceParam = apreq_args_get(apr, "service");
+//             apreq_param_t * operationParam = NULL;
+//             operationParam = apreq_args_get(apr, "operation");
+//             
+//             if (!serviceParam || !operationParam){
+//               //TODO: error log incorrect params
+//               throw runtime_error("Missing required parameters for service or operation");
+//             }
+//             _service = serviceParam->v.data;
+//             _operation = operationParam->v.data;
+//           }
         }
 // TODO: This is usefull for post data in multipart/form-data or application/x-www-form-urlencoded
 //        {
@@ -58,6 +84,11 @@ const std::string& ApacheOperationInfo::operationName() const
 const std::string& ApacheOperationInfo::serviceName() const
 {
   return _service;
+}
+
+const std::string& ApacheOperationInfo::getRawRequest() const
+{
+  return _rawRequest;
 }
 
 const std::string& ApacheOperationInfo::getURL() const

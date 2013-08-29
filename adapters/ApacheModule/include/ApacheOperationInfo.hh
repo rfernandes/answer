@@ -22,6 +22,7 @@ class ApacheOperationInfo: public OperationInfo{
 public:
   ApacheOperationInfo(request_rec* r, const answer_conf_t& conf);
 
+  virtual const std::string& getRawRequest() const;
   virtual const std::string& operationName() const;
   virtual const std::string& serviceName() const;
   virtual const std::string& getURL() const;

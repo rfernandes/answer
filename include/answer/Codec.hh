@@ -22,7 +22,7 @@ namespace answer{
 			const std::string &operationName = Context::Instance().operationInfo().operationName();
 			if (mimeType == "application/json"){
 				answer::archive::ws_json_oarchive outA ( out );
-				outA << boost::serialization::make_nvp(operationName.c_str(), data);
+				outA << data;
 				return true;
 			}
 			if (mimeType == "application/xml" || mimeType == "*/*"){

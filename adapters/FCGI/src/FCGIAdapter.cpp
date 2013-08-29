@@ -176,7 +176,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		}
 		
 		cerr << "Requested: "<< service << "::" << operation << endl;
-		
+   
 		if(!environment().posts.empty()){
 			for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
 				cerr << "Posted form data {" << it->first << "}"  << endl;
@@ -188,7 +188,10 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 					serviceRequest.append(string(it->second.data(), it->second.size()));
 				}
 			}
-		}
+		}else{
+      cerr << "No post" << endl;
+    }
+
 		//If GET assume it's a ResponseOnly operation
 		
 		Response response;
@@ -207,7 +210,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		
 		//TODO: when context if refactores reinstate the Codecs, for now XML conly
 		const TransportInfo &transport_info = answer::Context::Instance().transportInfo();
-		
+		cerr << "ContentLength: " << environment().contentLength << endl;
 		if (environment().gets.count("debug"))
 		{
 			debug(serviceRequest, response.response, context);
@@ -233,6 +236,10 @@ void dlOpen(const char * path, int mode = RTLD_LAZY){
 
 int main()
 {
+  //Temp logging
+  ofstream flog("/tmp/answer.fcgi.Log");
+  cerr.rdbuf(flog.rdbuf());
+
 	using namespace boost::filesystem;
 	
 	try

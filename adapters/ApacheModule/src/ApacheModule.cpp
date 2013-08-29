@@ -35,12 +35,12 @@ static int answer_handler(request_rec* r) {
 // 	}
 
 	try{
-    cerr << "Initing context" << endl;
 		answer::adapter::apache::ApacheContext context(r, config);
 
 		Operation& oper_ref = OperationStore::Instance().operation(context.operationInfo().serviceName(), context.operationInfo().operationName());
 
-		Response serviceResponse =  oper_ref.invoke(context.transportInfo().redirect("REPLACE ME"));
+// 		Response serviceResponse =  oper_ref.invoke(context.transportInfo().redirect("REPLACE ME"));
+    Response serviceResponse =  oper_ref.invoke(static_cast<answer::adapter::apache::ApacheOperationInfo &>(context.operationInfo()).getRawRequest());
 
 // 		ap_set_content_type(r, response_context.getContentType().c_str());
 // 		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
