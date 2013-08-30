@@ -1,18 +1,17 @@
-
 #ifndef _OPERATION_HH_
 #define _OPERATION_HH_
 
 #include <sstream>
 #include <string>
+#include <stdexcept>
+#include <exception>
+#include <boost/algorithm/string.hpp>
 
 #include "archive/ws_xml_oarchive.hpp"
 #include "archive/ws_xml_iarchive.hpp"
 #include "Exception.hh"
 #include "Codec.hh"
 #include "Context.hh"
-#include <boost/algorithm/string.hpp>
-#include <stdexcept>
-#include <exception>
 
 namespace answer {
 

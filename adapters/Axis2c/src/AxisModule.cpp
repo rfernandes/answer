@@ -10,7 +10,7 @@
 
 #include <axis2_handler.h>
 
-#include "answer/WebModule.hh"
+#include "answer/Module.hh"
 #include <answer/Context.hh>
 #include "AxisEnvironmentWrapper.hh"
 #include "AxisCookieWrapper.hh"
@@ -66,27 +66,27 @@ extern "C"
 
 		AxisInFlowContext flowContext ( env, msg_ctx );
 
-		const WebModuleStore::StoreT & store = WebModuleStore::Instance().getStore();
-		WebModuleStore::StoreT::const_iterator it = store.begin();
+		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
+		ModuleStore::StoreT::const_iterator it = store.begin();
 		try {
 			for ( ; it != store.end(); ++it ) {
-				if ( (*it)->inFlow ( flowContext ) != WebModule::OK ) {
+				if ( (*it)->inFlow ( flowContext ) != Module::OK ) {
 					return AXIS2_FAILURE;
 				}
 			}
 		} catch ( ModuleAuthenticationException &ex ) {
-			cerr << "Authentication IN module exception error :" << flowContext.operationInfo().serviceName()
-					<< "/" << flowContext.operationInfo().operationName() << ":" << ex.what() << endl;
+			cerr << "Authentication IN module exception error :" << flowContext.operationInfo().service()
+					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
 			axis2_msg_ctx_set_status_code ( msg_ctx, env, 401 );
 			return AXIS2_FAILURE;
 		} catch ( ModuleAuthorizationException &ex ) {
-				cerr << "Authorization IN module exception error :" << flowContext.operationInfo().serviceName()
-						<< "/" << flowContext.operationInfo().operationName() << ":" << ex.what() << endl;
+				cerr << "Authorization IN module exception error :" << flowContext.operationInfo().service()
+						<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
 			axis2_msg_ctx_set_status_code ( msg_ctx, env, 403 );
 			return AXIS2_FAILURE;
 		} catch ( ModuleException &ex ) {
-			cerr << "General IN module exception error :" << flowContext.operationInfo().serviceName()
-					<< "/" << flowContext.operationInfo().operationName() << ":" << ex.what() << endl;
+			cerr << "General IN module exception error :" << flowContext.operationInfo().service()
+					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
 
 			return AXIS2_FAILURE;
 		}
@@ -117,17 +117,17 @@ extern "C"
 		const axutil_env_t * env,
 		struct axis2_msg_ctx * msg_ctx ) {
 		AxisOutFlowContext flowContext ( env, msg_ctx );
-		const WebModuleStore::StoreT & store = WebModuleStore::Instance().getStore();
-		WebModuleStore::StoreT::const_iterator it = store.begin();
+		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
+		ModuleStore::StoreT::const_iterator it = store.begin();
 		try {
 			for ( ; it != store.end(); ++it ) {
-				if ( (*it)->outFlow ( flowContext ) != WebModule::OK ) {
+				if ( (*it)->outFlow ( flowContext ) != Module::OK ) {
 					return AXIS2_FAILURE;
 				}
 			}
 		} catch ( ModuleException &ex ) {
-			cerr << "General OUT module exception error:" << flowContext.operationInfo().serviceName()
-					<< "/" << flowContext.operationInfo().operationName() << ":" << ex.what() << endl;
+			cerr << "General OUT module exception error:" << flowContext.operationInfo().service()
+					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
 			return AXIS2_FAILURE;
 		}
 		return AXIS2_SUCCESS;
@@ -197,20 +197,20 @@ extern "C"
 		struct axis2_msg_ctx * msg_ctx ) {
 		AXIS2_LOG_INFO ( env->log, "[Generic Module] out FAULT handler" );
 		AxisOutFlowContext flowContext ( env, msg_ctx );
-		const WebModuleStore::StoreT & store = WebModuleStore::Instance().getStore();
-		WebModuleStore::StoreT::const_iterator it = store.begin();
+		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
+		ModuleStore::StoreT::const_iterator it = store.begin();
 		try {
 				for ( ; it != store.end(); ++it ) {
-						if ( (*it)->outFlowFault ( flowContext ) != WebModule::OK ) {
-								cerr << "General OUT FAULT module error:" << flowContext.operationInfo().serviceName()
-																	<< "/" << flowContext.operationInfo().operationName() << endl;
+						if ( (*it)->outFlowFault ( flowContext ) != Module::OK ) {
+								cerr << "General OUT FAULT module error:" << flowContext.operationInfo().service()
+																	<< "/" << flowContext.operationInfo().operation() << endl;
 
 								return AXIS2_FAILURE;
 						}
 				}
 		} catch ( ModuleException &ex ) {
-				cerr << "General OUT FAULT module exception error:" << flowContext.operationInfo().serviceName()
-													<< "/" << flowContext.operationInfo().operationName() << ":" << ex.what() << endl;
+				cerr << "General OUT FAULT module exception error:" << flowContext.operationInfo().service()
+													<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
 				return AXIS2_FAILURE;
 		}
 		return AXIS2_SUCCESS;

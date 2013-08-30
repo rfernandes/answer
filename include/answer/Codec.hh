@@ -19,7 +19,7 @@ namespace answer{
 		template<typename T>
 		bool GenericCodec ( std::ostream& out, const std::string& mimeType, const T& data)
 		{
-			const std::string &operationName = Context::Instance().operationInfo().operationName();
+			const std::string &operationName = Context::Instance().operationInfo().operation();
 			if (mimeType == "application/json"){
 				answer::archive::ws_json_oarchive outA ( out );
 				outA << data;

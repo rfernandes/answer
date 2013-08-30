@@ -1,0 +1,39 @@
+FCGI Updated and modules cleanup
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   CMakeLists.txt
+#	modified:   adapters/ApacheModule/include/ApacheOperationInfo.hh
+#	modified:   adapters/ApacheModule/src/ApacheModule.cpp
+#	modified:   adapters/ApacheModule/src/ApacheOperationInfo.cpp
+#	modified:   adapters/Axis2c/include/AxisInFlowContext.hh
+#	modified:   adapters/Axis2c/include/AxisOperation.hh
+#	modified:   adapters/Axis2c/include/AxisOutFlowContext.hh
+#	modified:   adapters/Axis2c/src/AxisModule.cpp
+#	modified:   adapters/CppNetlib/CppNetlib.cpp
+#	modified:   adapters/FCGI/include/FCGIContext.hh
+#	modified:   adapters/FCGI/include/FCGIOperationInfo.hh
+#	modified:   adapters/FCGI/src/FCGIAdapter.cpp
+#	modified:   adapters/FCGI/src/FCGIOperationInfo.cpp
+#	modified:   include/answer/ClassTemplateHelpers.hh
+#	modified:   include/answer/Codec.hh
+#	modified:   include/answer/Context.hh
+#	modified:   include/answer/Environment.hh
+#	new file:   include/answer/Module.hh
+#	modified:   include/answer/Operation.hh
+#	modified:   include/answer/OperationStore.hh
+#	deleted:    include/answer/WebModule.hh
+#	new file:   src/Module.cpp
+#	deleted:    src/WebModule.cpp
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	.kdev4/
+#	answer.kdev4
+#	include/answer/Macros.hh
+

@@ -1,10 +1,11 @@
-#ifndef CONTEXT_HH
-#define CONTEXT_HH
+#ifndef _CONTEXT_HH_
+#define _CONTEXT_HH_
 
 #include <string>
-#include "answer/Cookie.hh"
-#include "WebModule.hh"
 #include <list>
+#include "Environment.hh"
+#include "Params.hh"
+#include "Cookie.hh"
 
 namespace answer {
 
@@ -27,7 +28,6 @@ namespace answer {
 		}
 	};
 
-
 }
 
-#endif // CONTEXT_HH
+#endif // _CONTEXT_HH_

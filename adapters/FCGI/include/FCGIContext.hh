@@ -24,7 +24,7 @@ namespace fcgi{
 		virtual bool redirectSet() const;
 	};
 
-	class FCGIContext: public Context {
+	class FCGIContext: public Context{
 // 		FCGICookieJarWrapper _cookies;
 // 		FCGIEnvironmentWrapper _environment;
 // 		FCGIProviderStoreFacility _providerStore;
@@ -52,6 +52,10 @@ namespace fcgi{
 		virtual TransportInfo& transportInfo(){
 			return _transport;
 		}
+
+    virtual Params &params(){
+      throw std::runtime_error("Params unimplemented");
+    }
 	};
 
 

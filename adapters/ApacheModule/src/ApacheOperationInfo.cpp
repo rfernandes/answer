@@ -76,12 +76,12 @@ ApacheOperationInfo::ApacheOperationInfo(request_rec* r, const answer_conf_t& co
     }
 }
 
-const std::string& ApacheOperationInfo::operationName() const
+const std::string& ApacheOperationInfo::operation() const
 {
   return _operation;
 }
 
-const std::string& ApacheOperationInfo::serviceName() const
+const std::string& ApacheOperationInfo::service() const
 {
   return _service;
 }
@@ -91,7 +91,7 @@ const std::string& ApacheOperationInfo::getRawRequest() const
   return _rawRequest;
 }
 
-const std::string& ApacheOperationInfo::getURL() const
+const std::string& ApacheOperationInfo::url() const
 {
   throw std::runtime_error("Get URL Unimplemented");
 }

@@ -1,4 +1,4 @@
-#include "answer/WebModule.hh"
+#include "answer/Module.hh"
 #include "answer/Environment.hh"
 #include "XmlParams.hh"
 #include "AxisCookieWrapper.hh"

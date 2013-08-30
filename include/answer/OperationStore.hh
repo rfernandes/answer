@@ -16,6 +16,7 @@
 
 #include "Operation.hh"
 #include "InstantiationStrategy.hh"
+#include "Macros.hh"
 #include "ClassTemplateHelpers.hh"
 
 namespace answer{

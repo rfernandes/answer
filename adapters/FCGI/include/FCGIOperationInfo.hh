@@ -11,12 +11,13 @@ namespace fcgi{
 class FCGIOperationInfo: public OperationInfo{
 	std::string _service;
 	std::string _operation;
+  std::string _url;
 public:
 	FCGIOperationInfo(const Fastcgipp::Http::Environment< char > &env);
 
-	virtual const std::string& operationName() const;
-	virtual const std::string& serviceName() const;
-	virtual const std::string& getURL() const;
+	virtual const std::string& operation() const;
+	virtual const std::string& service() const;
+	virtual const std::string& url() const;
 };
 
 

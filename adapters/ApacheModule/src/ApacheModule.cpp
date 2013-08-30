@@ -1,5 +1,5 @@
 #include "answer/OperationStore.hh"
-#include "answer/WebModule.hh"
+#include "answer/Module.hh"
 #include "answer/Context.hh"
 
 #include "ApacheModule.hh"
@@ -37,7 +37,7 @@ static int answer_handler(request_rec* r) {
 	try{
 		answer::adapter::apache::ApacheContext context(r, config);
 
-		Operation& oper_ref = OperationStore::Instance().operation(context.operationInfo().serviceName(), context.operationInfo().operationName());
+		Operation& oper_ref = OperationStore::Instance().operation(context.operationInfo().service(), context.operationInfo().operation());
 
 // 		Response serviceResponse =  oper_ref.invoke(context.transportInfo().redirect("REPLACE ME"));
     Response serviceResponse =  oper_ref.invoke(static_cast<answer::adapter::apache::ApacheOperationInfo &>(context.operationInfo()).getRawRequest());

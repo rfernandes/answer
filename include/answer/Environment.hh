@@ -23,9 +23,9 @@ namespace answer{
 	
 	class OperationInfo{
 	public:
-		virtual const std::string& serviceName() const = 0;
-		virtual const std::string& operationName() const = 0;
-		virtual const std::string& getURL() const = 0;
+		virtual const std::string& service() const = 0;
+		virtual const std::string& operation() const = 0;
+		virtual const std::string& url() const = 0;
 	};
 	
 	class TransportInfo{

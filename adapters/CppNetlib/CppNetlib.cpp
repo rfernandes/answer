@@ -82,14 +82,14 @@ public:
 		throw std::runtime_error("addHeader unimplemented");
 	}
 	
-	virtual const std::string& serviceName() const{
+	virtual const std::string& service() const{
 		return _service;
 	}
-	virtual const std::string& operationName() const{
+	virtual const std::string& operation() const{
 		return _operation;
 	}
-	virtual const std::string& getURL() const{
-		throw std::runtime_error("getURL unimplemented");
+	virtual const std::string& url() const{
+		throw std::runtime_error("url unimplemented");
 	}
 	const string& rawRequest() const{
 		return _rawRequest;
@@ -142,7 +142,7 @@ public:
 										http_server::response &response) {
 		try{
 			CppNetLibContext context(request);
-			Operation& oper_ref = OperationStore::Instance().operation(context.serviceName(), context.operationName());
+			Operation& oper_ref = OperationStore::Instance().operation(context.service(), context.operation());
 
 			Response serviceResponse = oper_ref.invoke(context.rawRequest());
 			

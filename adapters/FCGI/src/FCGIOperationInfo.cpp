@@ -2,31 +2,39 @@
 
 #include <exception>
 
+using namespace std;
+
 namespace answer{
 namespace adapter{
 namespace fcgi{
 
 FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment< char >& env)
 {
-	_service = env.gets.at("service");
-	_operation = env.gets.at("operation");
+  //Get service and operation values, if available
+  map< string, string >::const_iterator it;
+
+  it = env.gets.find("service");
+  if (it != env.gets.end())
+    _service = it->second;
+  it = env.gets.find("operation");
+  if (it != env.gets.end())
+    _operation = it->second;
+  _url = env.requestUri;
 }
 
-	
-
-const std::string& FCGIOperationInfo::operationName() const
+const string& FCGIOperationInfo::operation() const
 {
 	return _operation;
 }
 
-const std::string& FCGIOperationInfo::serviceName() const
+const string& FCGIOperationInfo::service() const
 {
 	return _service;
 }
 
-const std::string& FCGIOperationInfo::getURL() const
+const string& FCGIOperationInfo::url() const
 {
-	throw std::runtime_error("Get URL Unimplemented");
+  return _url;
 }
 
 

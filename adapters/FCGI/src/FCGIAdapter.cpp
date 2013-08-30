@@ -10,7 +10,7 @@
 #include <dlfcn.h>
 
 #include "answer/OperationStore.hh"
-#include "answer/WebModule.hh"
+#include "answer/Module.hh"
 #include "answer/Context.hh"
 
 #include "FCGIContext.hh"
@@ -153,30 +153,25 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 	bool response(){
 		FCGIContext context(environment());
 
+    const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
+    cerr << store.size() << endl;
+    try{
+      for (ModuleStore::StoreT::const_iterator it = store.begin(); it != store.end(); ++it ) {
+        if ( (*it)->inFlow ( context ) != Module::OK ) {
+          cerr << "General INFLOW module error:" << context.operationInfo().service()
+                << "/" << context.operationInfo().operation() << endl;
+          return true;
+        }
+      }
+    }catch (ModuleException &ex){
+      cerr << "General INFLOW module exception error:" << context.operationInfo().service()
+        << "/" << context.operationInfo().operation() << ":" << ex.what() << endl;
+      return true;
+    }
+
 		string serviceRequest;
-		string service;
-		string operation;
-		Fastcgipp::Http::Environment<char>::Gets g = environment().gets;
-		{
-			std::map< std::string, std::string >::iterator it = g.find("service");
-			if (it != g.end()) {
-				service = it->second;
-			} else {
-				cerr << "service not found" << std::endl;
-				return false;
-			}
-			it = g.find("operation");
-			if (it != g.end()) {
-				operation = it->second;
-			} else {
-				cerr << "operation not found" << std::endl;
-				for (it = g.begin(); it != g.end(); ++it) {
-					cerr << it->first << "=" << it->second << std::endl;
-				}
-				return false;
-			}
-		}
-		
+		string service = context.operationInfo().service();
+		string operation = context.operationInfo().operation();
 		cerr << "Requested: "<< service << "::" << operation << endl;
 		
 		boost::property_tree::ptree pt;
@@ -185,8 +180,8 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 			for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
 				cerr << "Posted form data {" << it->first << "}"  << endl;
 				if(it->second.type== Http::Post<char>::form){
-					pt.put(it->first, it->second.value);
-					serviceRequest.append(it->second.value);
+					pt.put(operation + "." + it->first, it->second.value);
+// 					serviceRequest.append(it->second.value);
 					cerr << "Posted a form {" << it->second.value << "}" << endl;
 				}else{
 					cerr << "Posted data {" << it->first << string(it->second.data(), it->second.size()) << "}" << endl;
@@ -195,13 +190,14 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 			}
 		}
 		stringstream ss;
-		boost::property_tree::write_xml(ss, pt);
 
+		boost::property_tree::write_xml(ss, pt);
 		cerr << "ptree to xml :" << endl
 			<< ss.str() << endl;
-		
+
 		//If GET assume it's a ResponseOnly operation
-		serviceRequest = ss.str();
+    // Remove the headers, this never fails because the header is always present
+		serviceRequest = ss.str().substr(ss.str().find_first_of("\n") + 1);
 		Response response;
 		try{
 			cerr << "try request [" << serviceRequest << "]" << endl;
