@@ -8,7 +8,7 @@
 namespace WebServices{
 
 	bool responseWrapper( std::ostream& out, const std::string& response, const std::string& mimetype, const answer::WebMethodException* ex){
-		if (mimetype != "text/xml") return false;
+		if (mimetype != "application/xml") return false;
 		
 		out << "<return>"
 		<< response
