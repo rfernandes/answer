@@ -4,14 +4,19 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
-#include <exception>
+#include <type_traits>
 #include <boost/algorithm/string.hpp>
+#include <boost/function_types/function_type.hpp>
+#include <boost/function_types/parameter_types.hpp>
+#include <boost/function_types/result_type.hpp>
 
 #include "archive/ws_xml_oarchive.hpp"
 #include "archive/ws_xml_iarchive.hpp"
+#include "Macros.hh"
 #include "Exception.hh"
 #include "Codec.hh"
 #include "Context.hh"
+#include "Instantiation.hh"
 
 namespace answer {
 
@@ -174,6 +179,131 @@ public:
 	}
 };
 
+namespace detail{
+
+// Declaration of general template
+template<typename Pmf> struct class_;
+// Partial specialisation for pointers to
+// member functions
+
+//Request response
+template<typename Result, typename Class,
+         typename Arg>
+struct class_<Result (Class::*)(Arg)> {
+  typedef Class type;
+};
+//Request response const
+template<typename Result, typename Class,
+         typename Arg>
+struct class_<Result (Class::*)(Arg) const> {
+  typedef Class type;
+};
+
+//Response
+template<typename Result, typename Class>
+struct class_<Result (Class::*)()> {
+  typedef Class type;
+};
+//Response const
+template<typename Result, typename Class>
+struct class_<Result (Class::*)() const> {
+  typedef Class type;
+};
+
+//Request
+template<typename Class, typename Arg>
+struct class_<void (Class::*)(Arg)> {
+  typedef Class type;
+};
+//Request const
+template<typename Class, typename Arg>
+struct class_<void (Class::*)(Arg) const> {
+  typedef Class type;
+};
+
+}// namespace detail
+
+class OperationStore {
+	std::map<std::string, Operation *> _map;
+	OperationStore();
+
+public:
+
+	static OperationStore& Instance();
+
+	~OperationStore();
+
+	void registerOperation(const std::string& serviceName, const std::string& operationName, answer::Operation* webMethodHandle);
+	Operation& operation(const std::string& serviceName, const std::string& operationName) const;
+
+	std::list<std::string> operationList();
+};
+
+template <typename Operation>
+class RegisterOperation{
+	std::string _operationName;
+	std::string _serviceName;
+public:
+	RegisterOperation(const std::string& serviceName, const std::string& operationName, const Operation &op):
+		_operationName(operationName), _serviceName(serviceName)
+	{
+		typedef typename detail::class_<Operation>::type Type;
+
+		typedef typename boost::function_types::result_type<Operation>::type
+			response;
+			
+		typedef typename boost::mpl::at_c<boost::function_types::parameter_types<Operation>,1>::type response_type;
+
+		typedef typename
+			std::remove_reference<
+				response_type
+			>::type const_request;
+
+		typedef typename
+			std::remove_const<
+				const_request
+			>::type request;
+
+		/*
+		 * Get types of function
+		 * request (const & request),
+		 * where request is optional;
+		 * 
+		 *   response (void) and arity == 2 -> RequestOnly
+		 *   response (!void) and arity == 2 -> RequestResponse
+		 *   response (!void) and arity == 1 -> ResponseOnly
+		 */
+
+// Check operation signature (must have at least one of [response] operator()([request])
+// 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
+		try{
+			OperationStore::Instance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type> >(op, _operationName));
+		}catch (std::exception &ex){
+			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
+		}
+	}
+
+// 	~RegisterOperation(){
+// 		OperationStore::Instance().removeOperation(_operationName);
+// 	}
+};
+
+
 }
+
+// The missing semicolon enforces the notion of simple replacement,
+//  requiring the user use the macro as a function (which helps doxygen/cpp_wsdl xslt detection of registrations)
+
+// The ANSWER_SERVICE_NAME definition should be provided on a per project basis,
+//  the provided answer .cmake automatically set it to the project name
+// #ifndef ANSWER_SERVICE_NAME
+// #error "Answer: ANSWER_SERVICE_NAME has to be defined, usually done in the build definition"
+// #endif //ANSWER_SERVICE_NAME
+// Service registration macros
+#define ANSWER_REGISTER_OPERATION(ServiceOperation) \
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation)
+
+#define ANSWER_REGISTER_OPERATION_AS(ServiceOperation, ServiceName) \
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, ServiceName, &ServiceOperation)
 
 #endif //_OPERATION_HH_

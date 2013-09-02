@@ -1,11 +1,12 @@
 #ifndef _APACHE_OPERATION_INFO_HH_
 #define _APACHE_OPERATION_INFO_HH_
-#include <answer/Environment.hh>
+
 #include <httpd.h>
 #include <apreq.h>
 #include <apreq_module.h>
-#include "ApacheModule.hh"
 
+#include "answer/Environment.hh"
+#include "ApacheModule.hh"
 
 namespace answer{
 namespace adapter{

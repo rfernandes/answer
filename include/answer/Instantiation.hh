@@ -1,32 +1,28 @@
-#ifndef _INSTANTIATION_STRATEGY_HH_
-#define _INSTANTIATION_STRATEGY_HH_
+#ifndef _INSTANTIATION_HH_
+#define _INSTANTIATION_HH_
 
-#include "OperationStore.hh"
 #include <type_traits>
 
 class Object;
 namespace answer{
 
-// enum InstantiationStrategyType {SINGLECALL, SINGLETON, LAZY_SINGLETON};
-enum RestPayload { AUTO, FORCE_POST, FORCE_GET };
 
 namespace instantiation{
+// enum InstantiationStrategyType {SINGLECALL, SINGLETON, LAZY_SINGLETON};
 
-class Instance{};
+class SingleCall{};
 
-class SingleCall: public Instance{};
+class Singleton{};
 
-class Singleton: public Instance{};
+class LazySingleton{};
 
-class LazySingleton: public Instance{};
-
-template <unsigned MIN_THREADS, unsigned MAX_THREADS>
-class WorkerPool: public Instance{
-public:
-	enum {min_threads = MIN_THREADS};
-	enum {max_threads = MAX_THREADS};
-};
-}
+// template <unsigned MIN_THREADS, unsigned MAX_THREADS>
+// class WorkerPool{
+// public:
+// 	enum {min_threads = MIN_THREADS};
+// 	enum {max_threads = MAX_THREADS};
+// };
+// }
 
 //The default strategy is singleCall
 template <typename ObjectT, class InstantiationStrategyType = void>
@@ -95,4 +91,6 @@ public:
 // };
 }
 
-#endif //_INSTANTIATION_STRATEGY_HH_
+}//namespace answer
+
+#endif //_INSTANTIATION_HH_

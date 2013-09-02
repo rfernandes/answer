@@ -14,8 +14,6 @@ namespace answer{
 			_transport( axis_env,msg_ctx ),
 			_axis_env( axis_env ),
 			_msg_ctx( msg_ctx ){
-				_context = this;
-
 		}
 
 	AxisContext::~AxisContext(){

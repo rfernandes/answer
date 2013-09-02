@@ -22,7 +22,6 @@ namespace fcgi{
 		_transport(env),
 		_operation(env)
 	{
-		_context = this;
 	}
 
 	FCGIContext::~FCGIContext()

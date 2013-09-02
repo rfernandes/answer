@@ -43,7 +43,6 @@ namespace apache{
     _transport(r,conf),
     _operation(r,conf)
   {
-   _context = this;
   }
 
   ApacheContext::~ApacheContext()

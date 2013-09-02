@@ -1,5 +1,5 @@
-#ifndef _AXIS_PROVIDERSTORE_FACILITY_HH_
-#define _AXIS_PROVIDERSTORE_FACILITY_HH_
+#ifndef _AXIS_PROVIDERSTORE_HH_
+#define _AXIS_PROVIDERSTORE_HH_
 
 #include "answer/Environment.hh"
 
@@ -22,4 +22,4 @@ namespace answer{
 	}
 }
 
-#endif //_AXIS_PROVIDERSTORE_FACILITY_HH_
+#endif //_AXIS_PROVIDERSTORE_HH_

@@ -1,5 +1,3 @@
-set (FCGI_ADAPTER_SRC_FILES "src/FCGIAdapter.cpp" "src/FCGIContext.cpp" "src/FCGIOperationInfo.cpp")
-
 set (FCGI_LIBRARIES "dl")
 
 find_package(FastCGI++ REQUIRED QUIET)
@@ -10,7 +8,12 @@ include_directories(
   ${FastCGI++_INCLUDE_DIRS}
 )
 
-add_executable (${PROJECT_NAME}.fcgi ${FCGI_ADAPTER_SRC_FILES})
+add_executable (${PROJECT_NAME}.fcgi
+	"src/FCGIAdapter.cpp"
+	"src/FCGIContext.cpp"
+	"src/FCGIOperationInfo.cpp"
+)
+
 target_link_libraries (${PROJECT_NAME}.fcgi
 	${PROJECT_NAME}
 	${PROJECT_NAME}-module

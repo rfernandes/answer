@@ -1,6 +1,6 @@
 #ifndef _BASIC_SERVICE_HH_
 #define _BASIC_SERVICE_HH_
-#include <answer/OperationStore.hh>
+#include <answer/Operation.hh>
 #include <string>
 #include <boost/serialization/list.hpp>
 

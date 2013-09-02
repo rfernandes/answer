@@ -1,5 +1,5 @@
-#ifndef _CODECSTORE_HH_
-#define _CODECSTORE_HH_
+#ifndef _CODEC_HH_
+#define _CODEC_HH_
 
 #include <string>
 #include <iostream>
@@ -53,4 +53,4 @@ namespace answer{\
 	}\
 }\
 
-#endif // _CODECSTORE_HH_
+#endif // _CODEC_HH_

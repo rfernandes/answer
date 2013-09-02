@@ -1,6 +1,6 @@
 #ifndef _CALCULATOR_HH_
 #define _CALCULATOR_HH_
-#include <answer/OperationStore.hh>
+#include <answer/Operation.hh>
 #include <string>
 #include <set>
 

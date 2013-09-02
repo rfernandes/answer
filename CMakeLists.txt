@@ -13,10 +13,15 @@ list( APPEND CMAKE_CXX_FLAGS "-std=c++11")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
+find_package(Boost COMPONENTS serialization REQUIRED QUIET)
 
+include_directories (
+  include
+  ${Boost_INCLUDE_DIRS}
+)
 
 #Generic adapter files
-set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Params.cpp" "src/OperationStore.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp")
+set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Operation.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp")
 
 #Module support files
 set (MODULE_SRC_FILES "src/Cookie.cpp" "src/Module.cpp" "src/Exception.cpp" "src/Context.cpp")
@@ -30,13 +35,6 @@ file (GLOB headersArchiveHH
 # TARGET GENERATION
 ###########################################################
 #Module support
-
-find_package(Boost COMPONENTS serialization REQUIRED QUIET)
-
-include_directories (
-  include
-  ${Boost_INCLUDE_DIRS}
-)
 
 add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})

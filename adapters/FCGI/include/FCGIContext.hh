@@ -53,9 +53,6 @@ namespace fcgi{
 			return _transport;
 		}
 
-    virtual Params &params(){
-      throw std::runtime_error("Params unimplemented");
-    }
 	};
 
 

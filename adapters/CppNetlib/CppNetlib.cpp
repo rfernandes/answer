@@ -8,8 +8,8 @@
 #include <iostream>
 #include <vector>
 
-#include <answer/OperationStore.hh>
-#include <answer/Context.hh>
+#include "answer/Operation.hh"
+#include "answer/Context.hh"
 
 // using namespace boost::network;
 using namespace boost::program_options;
@@ -29,7 +29,6 @@ class CppNetLibContext: public Context, OperationInfo, TransportInfo{
 public:
 	
 	CppNetLibContext(const http_server::request &request){
-		_context = this;
 		for (const auto &test: request.headers){
 			if (test.name == "Accept"){
 				boost::split(_accepts, test.value, boost::is_any_of(","), boost::token_compress_on);
