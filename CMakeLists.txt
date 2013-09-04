@@ -8,8 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 project (answer)
 set (PROJECT_VERSION 0.1)
 
-list( APPEND CMAKE_CXX_FLAGS "-std=c++11")
-
+list( APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
@@ -17,14 +16,17 @@ find_package(Boost COMPONENTS serialization REQUIRED QUIET)
 
 include_directories (
   include
+)
+
+include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
 )
 
 #Generic adapter files
-set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Operation.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Context.cpp")
+set (ADAPTER_SRC_FILES "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Operation.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Environment.cpp" "src/Context.cpp")
 
 #Module support files
-set (MODULE_SRC_FILES "src/Cookie.cpp" "src/Module.cpp" "src/Exception.cpp" "src/Context.cpp")
+set (MODULE_SRC_FILES "src/Cookie.cpp" "src/Module.cpp" "src/Exception.cpp" "src/Environment.cpp" "src/Context.cpp")
 
 file (GLOB headersHH
 	include/answer/*.hh)

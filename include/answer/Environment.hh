@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 #include <boost/any.hpp>
-#include "answer/Cookie.hh"
+#include "Cookie.hh"
 
 namespace answer{
 	class Environment{
@@ -27,10 +27,27 @@ namespace answer{
 		virtual const std::string& operation() const = 0;
 		virtual const std::string& url() const = 0;
 	};
-	
+
+  class Response{
+  protected:
+    std::string _body;
+    std::string _contentType;
+    std::vector<std::pair<std::string, std::string>> _header;
+  public:
+    //TODO: Add vector<char> data accessors for body
+    const std::string &body() const;
+    void body(const std::string &body);
+    const std::string &contentType() const;
+    void contentType(const std::string &contentType);
+
+    void header(const std::string &key, const std::string &value);
+    const std::string & header(const std::string &key) const;
+  };
+
 	class TransportInfo{
 	private:
 		bool _binaryTransport;
+  protected:
 	public:
 		TransportInfo() : _binaryTransport(false) {}
 		virtual void addHeader(const std::string &key, const std::string &value = "", bool replace = true) = 0;

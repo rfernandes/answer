@@ -31,24 +31,24 @@ namespace apache{
     void queryRequestFormat(apreq_handle_t* apr);
     void axisRequestFormat(request_rec* r);
 
-    ApacheOperationInfo _operation;
     ApacheTransport _transport;
+    ApacheOperationInfo _operation;
 
   public:
     ApacheContext (request_rec* r, const answer_conf_t& conf);
     
     ~ApacheContext();
 
-    virtual CookieJar& cookieJar() {
+    virtual CookieJar& cookieJar(){
       throw std::runtime_error("CookieJar unimplemented");
     }
-    virtual Environment& environment() {
+    virtual Environment& environment(){
       throw std::runtime_error("Environment unimplemented");
     }
-    virtual ProviderStore& providerStore() {
+    virtual ProviderStore& providerStore(){
       throw std::runtime_error("ProviderStore unimplemented");
     }
-    virtual OperationInfo& operationInfo() {
+    virtual OperationInfo& operationInfo(){
       return _operation;
     }
     virtual TransportInfo& transportInfo(){

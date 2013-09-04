@@ -39,8 +39,7 @@ static int answer_handler(request_rec* r) {
 
 		Operation& oper_ref = OperationStore::Instance().operation(context.operationInfo().service(), context.operationInfo().operation());
 
-// 		Response serviceResponse =  oper_ref.invoke(context.transportInfo().redirect("REPLACE ME"));
-    Response serviceResponse =  oper_ref.invoke(static_cast<answer::adapter::apache::ApacheOperationInfo &>(context.operationInfo()).getRawRequest());
+    context.response(oper_ref.invoke(static_cast<answer::adapter::apache::ApacheOperationInfo &>(context.operationInfo()).getRawRequest()));
 
 // 		ap_set_content_type(r, response_context.getContentType().c_str());
 // 		for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
@@ -52,8 +51,8 @@ static int answer_handler(request_rec* r) {
 // 		}
 //     ap_set_content_type(r, "text/html");
 //     ap_rprintf(r, "Hello, world!");
-		ap_set_content_type(r, serviceResponse.acceptType.c_str()) ;
-		ap_rwrite(serviceResponse.response.c_str(), serviceResponse.response.size(), r);
+		ap_set_content_type(r, context.response().contentType().c_str()) ;
+		ap_rwrite(context.response().body().c_str(), context.response().body().size(), r);
 	}catch (std::exception & ex){
 		ap_set_content_type(r, "text/html;charset=ascii");
 	}
@@ -83,7 +82,7 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
     {
       if ( extension(itr->path()) == ".so"){
         cerr << "Loading module: "<< itr->path() << endl;
-        dlOpen(itr->path().c_str());
+        dlOpen(itr->path().c_str(), RTLD_GLOBAL);
       }
     }
   }
@@ -97,7 +96,7 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
     {
       if ( extension(itr->path()) == ".so"){
         cerr << "Loading service: "<< itr->path() << endl;
-        dlOpen(itr->path().c_str());
+        dlOpen(itr->path().c_str(), RTLD_GLOBAL);
       }
     }
   }

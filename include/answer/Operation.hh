@@ -19,12 +19,12 @@
 #include "Instantiation.hh"
 
 namespace answer {
-
+/*
 struct Response{
 	std::string response;
 	std::string acceptType;
 };
-	
+	*/
 class Operation {
 protected:
 	std::string _name;
@@ -67,7 +67,7 @@ void responsePart ( Response& ret, const ResponseT& response){
 	for (; it !=accept_headers_list.end(); ++it){
 		// Search for custom codecs
 		if(codec::Codec(encodedReponse, *it, response)) {
-			ret.acceptType = *it;
+			ret.contentType(*it);
 			break;
 		}
 	}
@@ -75,7 +75,7 @@ void responsePart ( Response& ret, const ResponseT& response){
 	if (it == accept_headers_list.end() )
 	for (it = accept_headers_list.begin(); it !=accept_headers_list.end(); ++it){
 		if (codec::GenericCodec(encodedReponse, *it, response)){
-			ret.acceptType = *it;
+			ret.contentType(*it);
 			break;
 		}
 	}
@@ -86,10 +86,10 @@ void responsePart ( Response& ret, const ResponseT& response){
 	// TODO: Rework this interface
 	//  If void is overwritten and returns false, use the default
 	//  implementation (Assumes no char template is defined)
-	if (!codec::ResponseWrapper<void>( wrappedReponse, encodedReponse.str(), ret.acceptType, NULL)){
-		codec::ResponseWrapper<char>( wrappedReponse, encodedReponse.str(), ret.acceptType, NULL);
+	if (!codec::ResponseWrapper<void>( wrappedReponse, encodedReponse.str(), ret.contentType(), NULL)){
+		codec::ResponseWrapper<char>( wrappedReponse, encodedReponse.str(), ret.contentType(), NULL);
 	}
-	ret.response = wrappedReponse.str();
+	ret.body(wrappedReponse.str());
 }
 
 //The default template is request / response
@@ -109,10 +109,10 @@ public:
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
 			std::ostringstream wrappedReponse;
-			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.acceptType, &ex)){
-				codec::ResponseWrapper<char>(wrappedReponse, "", ret.acceptType, &ex);
+			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex)){
+				codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
 			}
-			ret.response = wrappedReponse.str();
+			ret.body(wrappedReponse.str());
 		} catch (const std::exception &ex) {
 			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
@@ -138,10 +138,10 @@ public:
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
 			std::ostringstream wrappedReponse;
-			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.acceptType, &ex)){
-				codec::ResponseWrapper<char>(wrappedReponse, "", ret.acceptType, &ex);
+			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex)){
+				codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
 			}
-			ret.response = wrappedReponse.str();
+			ret.body(wrappedReponse.str());
 		} catch (const std::exception &ex) {
 			std::cerr << "Exception: " << ex.what() << std::endl;
 		} catch (...){
@@ -224,16 +224,14 @@ struct class_<void (Class::*)(Arg) const> {
 }// namespace detail
 
 class OperationStore {
-	std::map<std::string, Operation *> _map;
+	std::map<std::string, std::unique_ptr<Operation>> _map;
 	OperationStore();
 
 public:
 
 	static OperationStore& Instance();
 
-	~OperationStore();
-
-	void registerOperation(const std::string& serviceName, const std::string& operationName, answer::Operation* webMethodHandle);
+	void registerOperation(const std::string &serviceName, const std::string &operationName, std::unique_ptr< answer::Operation > webMethodHandle);
 	Operation& operation(const std::string& serviceName, const std::string& operationName) const;
 
 	std::list<std::string> operationList();
@@ -264,30 +262,25 @@ public:
 				const_request
 			>::type request;
 
-		/*
-		 * Get types of function
-		 * request (const & request),
-		 * where request is optional;
-		 * 
-		 *   response (void) and arity == 2 -> RequestOnly
-		 *   response (!void) and arity == 2 -> RequestResponse
-		 *   response (!void) and arity == 1 -> ResponseOnly
-		 */
+    typedef
+      OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type>>
+      Handler;
 
 // Check operation signature (must have at least one of [response] operator()([request])
 // 		BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
 		try{
-			OperationStore::Instance().registerOperation(_serviceName, _operationName, new OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type> >(op, _operationName));
+			OperationStore::Instance()
+        .registerOperation(
+          _serviceName,
+          _operationName,
+          std::unique_ptr<Handler>( new Handler(op, _operationName) )
+        );
 		}catch (std::exception &ex){
-			std::cerr << "Error initializing operation ["<< _operationName << ": " << ex.what() << std::endl;
+			std::cerr << "Error initializing operation ["<< _serviceName << "::" << _operationName << "] : " << ex.what() << std::endl;
 		}
 	}
 
-// 	~RegisterOperation(){
-// 		OperationStore::Instance().removeOperation(_operationName);
-// 	}
 };
-
 
 }
 

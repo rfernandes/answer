@@ -1,6 +1,6 @@
 #ifndef _FCGI_OPERATION_INFO_HH_
 #define _FCGI_OPERATION_INFO_HH_
-#include <answer/Environment.hh>
+#include "answer/Environment.hh"
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
 
@@ -18,6 +18,7 @@ public:
 	virtual const std::string& operation() const;
 	virtual const std::string& service() const;
 	virtual const std::string& url() const;
+
 };
 
 

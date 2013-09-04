@@ -1,7 +1,7 @@
 #ifndef _FCGI_CONTEXT_HH_
 #define _FCGI_CONTEXT_HH_
 
-#include <answer/Context.hh>
+#include "answer/Context.hh"
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
 
@@ -29,32 +29,20 @@ namespace fcgi{
 // 		FCGIEnvironmentWrapper _environment;
 // 		FCGIProviderStoreFacility _providerStore;
 	
-		FCGIOperationInfo _operation;
 		FCGITransport _transport;
+		FCGIOperationInfo _operation;
 
 	public:
 		FCGIContext (const Fastcgipp::Http::Environment< char > &env);
 		
 		~FCGIContext();
 
-		virtual CookieJar& cookieJar() {
-			throw std::runtime_error("CookieJar unimplemented");
-		}
-		virtual Environment& environment() {
-			throw std::runtime_error("Environment unimplemented");
-		}
-		virtual ProviderStore& providerStore() {
-			throw std::runtime_error("ProviderStore unimplemented");
-		}
-		virtual OperationInfo& operationInfo() {
-			return _operation;
-		}
-		virtual TransportInfo& transportInfo(){
-			return _transport;
-		}
-
+		virtual CookieJar& cookieJar();
+		virtual Environment& environment();
+		virtual ProviderStore& providerStore();
+		virtual OperationInfo& operationInfo();
+		virtual TransportInfo& transportInfo();
 	};
-
 
 } //fcgi
 } //adapter

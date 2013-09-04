@@ -18,32 +18,36 @@ namespace answer{
 	
 	class Module{
 	public:
-		enum FlowStatus{OK, ERROR};
+		enum FlowStatus{OK, ERROR, SKIP};
 		virtual ~Module(){}
 		virtual FlowStatus inFlow(Context &context) = 0;
 		virtual FlowStatus outFlow(Context &context) = 0;
 		virtual FlowStatus outFlowFault(Context &context) = 0;
 	};
 
-	class ModuleStore{
-	public:
-		typedef std::list<Module *> StoreT;
-	private:
-		StoreT _store;
-		ModuleStore();
-	public:
-		
-		static ModuleStore& Instance();
-		const StoreT& getStore() const;
-		void registerModule(Module *const module);
-	};
+  class ModuleStore: public Module{
+  public:
+    typedef std::list<Module *> StoreT;
+  private:
+    StoreT _store;
+    ModuleStore();
+  public:
+    
+    static ModuleStore& Instance();
+//     const StoreT& getStore() const;
+    void registerModule(Module *const module);
+
+    virtual FlowStatus inFlow(Context &context);
+    virtual FlowStatus outFlow(Context &context);
+    virtual FlowStatus outFlowFault(Context &context);
+  };
 
 	template <class T>
 	class RegisterModule{
 		T module;
 	public:
 		RegisterModule(){
-			ModuleStore::Instance().registerModule(&module );
+			ModuleStore::Instance().registerModule(&module);
 		}
 	};
 }

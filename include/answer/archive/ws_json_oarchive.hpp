@@ -69,7 +69,10 @@ class ws_json_oarchive:
 	struct save_primitive {
 		template<class T>
 		static void invoke(Archive & ar, const T & t){
-			(ar._os) << t;
+      //JSON types have some caveats, we need to detect what conversion
+      // Primitive types are doing
+      //TODO: this should also encode 0 starting digits with quotes
+			(ar._os) << '"' << t << '"';
 		}
 	};
 

@@ -5,6 +5,9 @@ find_package(Boost COMPONENTS system thread filesystem REQUIRED QUIET)
 
 include_directories(
   include
+)
+
+include_directories(SYSTEM
   ${FastCGI++_INCLUDE_DIRS}
 )
 

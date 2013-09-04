@@ -56,22 +56,22 @@ namespace apache{
 
   void ApacheTransport::addHeader(const string& key, const string& value, bool replace)
   {
-
+    throw std::runtime_error("Apache addHeader");
   }
 
   const string& ApacheTransport::redirect() const
   {
-
+    throw std::runtime_error("Apache redirect");
   }
 
   const string& ApacheTransport::redirect(const string& uri)
   {
-
+    throw std::runtime_error("Apache redirect");
   }
 
   bool ApacheTransport::redirectSet() const
   {
-
+    return false;
   }
 
 } //apache

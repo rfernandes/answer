@@ -9,11 +9,9 @@
 #include <fastcgi++/manager.hpp>
 #include <dlfcn.h>
 
-#include "answer/OperationStore.hh"
-#include "answer/Module.hh"
-#include "answer/Context.hh"
-
 #include "FCGIContext.hh"
+#include "answer/Operation.hh"
+#include "answer/Module.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -32,7 +30,7 @@ namespace fcgi{
 class FcgiAdapter: public Fastcgipp::Request<char>
 {
 
-	bool debug(const std::string& serviceRequest, const std::string& serviceResponse, const FCGIContext& context)
+	bool debug(const std::string& serviceRequest, const FCGIContext& context)
 	{
    using Fastcgipp::HTML;
    
@@ -48,7 +46,7 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 		
 		out << "<h1>Service Response</h1>";
 		out << "<pre>";
-		out << encoding(HTML) << serviceResponse << encoding(NONE);
+// 		out << encoding(HTML) << context.response.body() << encoding(NONE);
 		out << "</pre>";
 		
 		out << "<h1>Response Modifiers</h1>";
@@ -151,80 +149,75 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 	}
 	
 	bool response(){
-		FCGIContext context(environment());
-
-    const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
-    cerr << store.size() << endl;
     try{
-      for (ModuleStore::StoreT::const_iterator it = store.begin(); it != store.end(); ++it ) {
-        if ( (*it)->inFlow ( context ) != Module::OK ) {
-          cerr << "General INFLOW module error:" << context.operationInfo().service()
-                << "/" << context.operationInfo().operation() << endl;
-          return true;
+      FCGIContext context(environment());
+
+      ModuleStore & store = ModuleStore::Instance();
+      Module::FlowStatus status = store.inFlow(context);
+
+      //TODO: It's not explicit that this is what is suppost to happen
+      // when an INFLOW module returns SKIP
+      if (status == Module::SKIP){ // Read from context and return
+        out << "Content-Type: " << context.response().contentType() << "\r\n";
+        out << "\r\n";
+        out << context.response().body();
+        return true;
+      }
+
+      string serviceRequest;
+      string service = context.operationInfo().service();
+      string operation = context.operationInfo().operation();
+
+      boost::property_tree::ptree pt;
+      if(!environment().posts.empty()){
+        for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
+          if(it->second.type== Http::Post<char>::form){
+            pt.put(operation + "." + it->first, it->second.value);
+    // // 					serviceRequest.append(it->second.value);
+    // 					cerr << "Posted a form {" << it->second.value << "}" << endl;
+    // 				}else{
+    // 					cerr << "Posted data {" << it->first << string(it->second.data(), it->second.size()) << "}" << endl;
+    // 					serviceRequest.append(string(it->second.data(), it->second.size()));
+          }
         }
       }
-    }catch (ModuleException &ex){
-      cerr << "General INFLOW module exception error:" << context.operationInfo().service()
-        << "/" << context.operationInfo().operation() << ":" << ex.what() << endl;
-      return true;
-    }
+      stringstream ss;
 
-		string serviceRequest;
-		string service = context.operationInfo().service();
-		string operation = context.operationInfo().operation();
-		cerr << "Requested: "<< service << "::" << operation << endl;
-		
-		boost::property_tree::ptree pt;
-		
-		if(!environment().posts.empty()){
-			for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
-				cerr << "Posted form data {" << it->first << "}"  << endl;
-				if(it->second.type== Http::Post<char>::form){
-					pt.put(operation + "." + it->first, it->second.value);
-// 					serviceRequest.append(it->second.value);
-					cerr << "Posted a form {" << it->second.value << "}" << endl;
-				}else{
-					cerr << "Posted data {" << it->first << string(it->second.data(), it->second.size()) << "}" << endl;
-					serviceRequest.append(string(it->second.data(), it->second.size()));
-				}
-			}
-		}
-		stringstream ss;
+      boost::property_tree::write_xml(ss, pt);
+      // Remove the xml header, header is always present
+      serviceRequest = ss.str().substr(ss.str().find_first_of("\n") + 1);
 
-		boost::property_tree::write_xml(ss, pt);
-		cerr << "ptree to xml :" << endl
-			<< ss.str() << endl;
-
-		//If GET assume it's a ResponseOnly operation
-    // Remove the headers, this never fails because the header is always present
-		serviceRequest = ss.str().substr(ss.str().find_first_of("\n") + 1);
-		Response response;
-		try{
-			cerr << "try request [" << serviceRequest << "]" << endl;
 			Operation& oper_ref = OperationStore::Instance().operation(service, operation);
-			response = oper_ref.invoke(serviceRequest);
+			context.response(oper_ref.invoke(serviceRequest));
+
+      if (environment().gets.count("debug"))
+      {
+        debug(serviceRequest, context);
+      }else{
+        out << "Content-Type: " << context.response().contentType() << "\r\n";
+        out << "Content-Length: " << context.response().body().size() << "\r\n";
+        out << "\r\n";
+        out << context.response().body();
+      }
+
 		}catch(answer::WebMethodException &ex){
 			out << "Content-Type: text/plain\r\n";
 			out << "\r\n";
 			out << ex.what();
 			cerr << "WebException: " << ex.what();
+    }catch(answer::ModuleException &ex){
+      out << "Content-Type: text/plain\r\n";
+      out << "\r\n";
+      out << ex.what();
+      cerr << "ModuleException: " << ex.what();
 		}catch(exception &ex){
 			cerr << "Exception: "<< ex.what();
 		}
-		
-		//TODO: when context if refactores reinstate the Codecs, for now XML conly
-		const TransportInfo &transport_info = answer::Context::Instance().transportInfo();
-		cerr << "ContentLength: " << environment().contentLength << endl;
-		if (environment().gets.count("debug"))
-		{
-			debug(serviceRequest, response.response, context);
-		}else{
-			out << "Content-Type: " << response.acceptType << "\r\n";
-			out << "\r\n";
-			out << response.response;
-		}
+
 		return true;
 	}
+public:
+  virtual ~FcgiAdapter(){ }
 };
 
 } //fcgi
@@ -251,33 +244,38 @@ int main()
 		char *modulesDir = getenv("modulesDir");
 		char *servicesDir = getenv("servicesDir");
 
+    std::set<std::string> modulePath;
 		//Load modules
 		if (modulesDir){
 			directory_iterator end_itr;
 			for ( directory_iterator itr( modulesDir );
 				itr != end_itr;
-				++itr )
-			{
+				++itr ){
 				if ( extension(itr->path()) == ".so"){
-					cerr << "Loading module: "<< itr->path() << endl;
-					dlOpen(itr->path().c_str());
+          modulePath.insert(itr->path().string());
 				}
 			}
 		}
-		
+
 		//Services
 		if (servicesDir){
 			directory_iterator end_itr;
 			for ( directory_iterator itr( servicesDir );
 				itr != end_itr;
-				++itr )
-			{
+				++itr ){
 				if ( extension(itr->path()) == ".so"){
-					cerr << "Loading service: "<< itr->path() << endl;
-					dlOpen(itr->path().c_str());
+					modulePath.insert(itr->path().string());
 				}
 			}
 		}
+
+    for(const auto& path: modulePath){
+      //Symbol resolution must be GLOBAL due to implicit cast of Context
+      // inherited object, otherwise called address will be wrong
+      // http://gcc.gnu.org/faq.html#dso
+      cerr  << "Loading " << path << endl;
+      dlOpen(path.c_str(), RTLD_LAZY);
+    }
 
 		Fastcgipp::Manager<answer::adapter::fcgi::FcgiAdapter> fcgi;
 		fcgi.handler();

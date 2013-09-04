@@ -6,34 +6,26 @@ namespace answer{
 
 OperationStore::OperationStore() {}
 
-OperationStore::~OperationStore() {
-    map<string, Operation*>::const_iterator it = _map.begin();
-    for (;it != _map.end(); ++it) {
-        delete it->second;
-    }
-}
-
-std::list< std::string > OperationStore::operationList()
+list< string > OperationStore::operationList()
 {
-    std::list< std::string > ret;
-    map<string, Operation*>::const_iterator it = _map.begin();
-    for (;it != _map.end(); ++it) {
-        ret.push_back(it->first);
-    }
-    return ret;
+  list< string > ret;
+  for (const auto &item: _map){
+    ret.push_back(item.first);
+  }
+  return ret;
 }
 
-void OperationStore::registerOperation( const string& serviceName, const string& operationName, answer::Operation* webMethodHandle ) {
+void OperationStore::registerOperation( const string& serviceName, const string& operationName, unique_ptr<Operation> webMethodHandle ) {
 	//This removes the Class:: part of Macro registration
 	size_t pos = operationName.rfind("::");
-	std::string filteredName(pos != operationName.npos ? operationName.substr(pos + 2) : operationName);
-	_map[serviceName + std::string("/") + filteredName] = webMethodHandle;
+	string filteredName(pos != operationName.npos ? operationName.substr(pos + 2) : operationName);
+	_map[serviceName + string("/") + filteredName] = move(webMethodHandle);
 }
 
 /*
 void OperationStore::removeOperation(const string& serviceName, const string& operationName) {
 	size_t pos = serviceName.rfind("::");
-	std::string filteredName(pos != serviceName.npos ? serviceName.substr(pos + 2) : serviceName);
+	string filteredName(pos != serviceName.npos ? serviceName.substr(pos + 2) : serviceName);
 	
 	map<string, Operation*>::iterator it = _map.find(filteredName);
 	if (it != _map.end()) {
@@ -49,9 +41,9 @@ OperationStore& OperationStore::Instance() {
 }
 
 Operation& OperationStore::operation(const string& serviceName, const string& operationName) const {
-	map<string, Operation*>::const_iterator it = _map.find(serviceName + "/" + operationName);
+	map<string, unique_ptr<Operation> >::const_iterator it = _map.find(serviceName + "/" + operationName);
 	if (it == _map.end()) {
-		throw runtime_error("Unregistered web method requested : [" + serviceName +']');
+		throw runtime_error("Unregistered web method requested : [" + serviceName + "::" + operationName + ']');
 	}
 	return *it->second;
 }

@@ -109,10 +109,11 @@ std::string convert ( const boost::posix_time::ptime& t )
 
 const std::string& Cookie::name() const{
 	return _name;
-};
+}
+
 void Cookie::name(const std::string& name){
 	_name = name;
-};
+}
 
 Cookie::Expires::Expires () : _expires() {}
 

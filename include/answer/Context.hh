@@ -9,17 +9,23 @@
 namespace answer {
 
 	class Context{
-	private:
-		static Context *_context;
+    static Context *_context;
+
+    Response _response;
 	protected:
 		Context();
 	public:
-		virtual Environment& environment()=0;
+    virtual ~Context();
 		virtual ProviderStore& providerStore()=0;
 		virtual OperationInfo& operationInfo()=0;
+    virtual Environment& environment()=0;
 		virtual CookieJar& cookieJar()=0;
 		virtual TransportInfo& transportInfo()=0;
-		
+
+    //TODO: add Request
+    Response& response();
+    void response(const Response &response);
+
 		static Context& Instance();
 	};
 
