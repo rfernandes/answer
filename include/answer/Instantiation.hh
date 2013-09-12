@@ -8,7 +8,6 @@ namespace answer{
 
 
 namespace instantiation{
-// enum InstantiationStrategyType {SINGLECALL, SINGLETON, LAZY_SINGLETON};
 
 class SingleCall{};
 

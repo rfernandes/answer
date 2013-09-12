@@ -239,11 +239,8 @@ public:
 
 template <typename Operation>
 class RegisterOperation{
-	std::string _operationName;
-	std::string _serviceName;
 public:
-	RegisterOperation(const std::string& serviceName, const std::string& operationName, const Operation &op):
-		_operationName(operationName), _serviceName(serviceName)
+	RegisterOperation(const std::string& serviceName, const std::string& operationName, const Operation &op)
 	{
 		typedef typename detail::class_<Operation>::type Type;
 

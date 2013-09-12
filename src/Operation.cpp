@@ -22,18 +22,6 @@ void OperationStore::registerOperation( const string& serviceName, const string&
 	_map[serviceName + string("/") + filteredName] = move(webMethodHandle);
 }
 
-/*
-void OperationStore::removeOperation(const string& serviceName, const string& operationName) {
-	size_t pos = serviceName.rfind("::");
-	string filteredName(pos != serviceName.npos ? serviceName.substr(pos + 2) : serviceName);
-	
-	map<string, Operation*>::iterator it = _map.find(filteredName);
-	if (it != _map.end()) {
-		delete it->second;
-		_map.erase(it);
-	}
-}*/
-
 //TODO: fix this
 OperationStore& OperationStore::Instance() {
 	static OperationStore inst;
