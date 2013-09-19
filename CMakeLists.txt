@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 project (answer)
 set (PROJECT_VERSION 0.1)
 
-list( APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
+list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
@@ -88,3 +88,8 @@ install (FILES ${headersHH} DESTINATION include/answer COMPONENT headers)
 install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT headers)
 
 add_subdirectory(examples)
+
+
+enable_testing()
+include(CTest)
+add_subdirectory(tests)

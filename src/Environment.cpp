@@ -19,12 +19,12 @@ void Response::contentType(const std::string &contentType){
   _contentType = contentType;
 }
 
-const std::string &Response::header(const std::string &key) const{
-  throw std::runtime_error("header unimplemented");
+const std::vector<Response::Header>& Response::headers() const{
+  return _headers;
 }
 
 void Response::header(const std::string &key, const std::string &value){
-  throw std::runtime_error("header unimplemented");
+  _headers.emplace_back(key, value);
 }
 
 }

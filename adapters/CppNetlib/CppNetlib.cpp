@@ -146,7 +146,7 @@ public:
 			Response serviceResponse = oper_ref.invoke(context.rawRequest());
 			
 			response = http_server::response::stock_reply(
-					http_server::response::ok, serviceResponse.response);
+					http_server::response::ok, serviceResponse.body());
 		}catch (std::exception& ex){
 			cerr << ex.what() << endl;
 		}

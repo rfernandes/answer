@@ -19,12 +19,7 @@
 #include "Instantiation.hh"
 
 namespace answer {
-/*
-struct Response{
-	std::string response;
-	std::string acceptType;
-};
-	*/
+
 class Operation {
 protected:
 	std::string _name;
@@ -268,12 +263,12 @@ public:
 		try{
 			OperationStore::Instance()
         .registerOperation(
-          _serviceName,
-          _operationName,
-          std::unique_ptr<Handler>( new Handler(op, _operationName) )
+          serviceName,
+          operationName,
+          std::unique_ptr<Handler>( new Handler(op, operationName) )
         );
 		}catch (std::exception &ex){
-			std::cerr << "Error initializing operation ["<< _serviceName << "::" << _operationName << "] : " << ex.what() << std::endl;
+			std::cerr << "Error initializing operation ["<< serviceName << "::" << operationName << "] : " << ex.what() << std::endl;
 		}
 	}
 

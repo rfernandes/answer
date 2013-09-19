@@ -29,10 +29,12 @@ namespace answer{
 	};
 
   class Response{
+	public:
+		typedef std::pair<std::string, std::string> Header;
   protected:
     std::string _body;
     std::string _contentType;
-    std::vector<std::pair<std::string, std::string>> _header;
+		std::vector<Header> _headers;
   public:
     //TODO: Add vector<char> data accessors for body
     const std::string &body() const;
@@ -40,8 +42,9 @@ namespace answer{
     const std::string &contentType() const;
     void contentType(const std::string &contentType);
 
+		//header
     void header(const std::string &key, const std::string &value);
-    const std::string & header(const std::string &key) const;
+    const std::vector<Header> & headers() const;
   };
 
 	class TransportInfo{
@@ -66,7 +69,7 @@ namespace answer{
 		
 		virtual std::list<Cookie> list(bool onlyNew) const = 0;
 		
-		virtual const Cookie& at(const std::string&cookieName) const = 0;
+		virtual const Cookie& cookie(const std::string &cookieName) const = 0;
 		virtual bool contains(const std::string &cookieName) const = 0;
 	};
 }
