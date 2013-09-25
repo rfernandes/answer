@@ -9,6 +9,7 @@
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // simple_log_archive.hpp
 
+#include <list>
 #include <ostream>
 #include <cstddef> // std::size_t
 
