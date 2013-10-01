@@ -12,7 +12,7 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
-find_package(Boost COMPONENTS serialization REQUIRED QUIET)
+find_package(Boost COMPONENTS serialization date_time REQUIRED QUIET)
 
 include_directories (
   include
@@ -37,14 +37,12 @@ file (GLOB headersArchiveHH
 # TARGET GENERATION
 ###########################################################
 #Module support
-
 add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
 set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}-module
 	${Boost_LIBRARIES}
 )
 
-find_package(Boost COMPONENTS serialization date_time REQUIRED QUIET)
 
 #Library
 add_library (${PROJECT_NAME} SHARED ${ADAPTER_SRC_FILES})

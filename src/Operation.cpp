@@ -22,7 +22,6 @@ void OperationStore::registerOperation( const string& serviceName, const string&
 	_map[serviceName + string("/") + filteredName] = move(webMethodHandle);
 }
 
-//TODO: fix this
 OperationStore& OperationStore::Instance() {
 	static OperationStore inst;
 	return inst;
