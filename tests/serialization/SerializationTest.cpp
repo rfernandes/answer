@@ -24,8 +24,6 @@ struct testInput{
 	}
 };
 
-
-
 BOOST_AUTO_TEST_CASE( serialization )
 {
   testInput testIntSet1;

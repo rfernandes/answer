@@ -27,7 +27,7 @@ public:
 	Operation(const std::string& name):_name(name){}
     virtual ~Operation() {};
     //The invocation wrapper
-    virtual Response invoke(const std::string&, const std::string & ="")=0;
+    virtual Response invoke(const std::string& params, const std::string & prefix="")=0;
 };
 
 template <typename RequestT>
