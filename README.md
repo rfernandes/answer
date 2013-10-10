@@ -7,6 +7,7 @@ Features
 
 While documentation is still a work in progress, if you would like to know more about Answer, follow the links below:
 
+* [Getting started](https://github.com/rfernandes/answer/wiki/Getting-Started)
 * [RPC/SOAP programming model](https://github.com/rfernandes/answer/wiki/RPC---SOAP-Programming-Model)
 * [Adapters](https://github.com/rfernandes/answer/wiki/Adapters)
 
