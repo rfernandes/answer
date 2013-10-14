@@ -25,6 +25,7 @@ namespace std{
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/equal_to.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/serialization/nvp.hpp>
 // #include <boost/serialization/collection_item.hpp>
 #include <boost/serialization/array.hpp>
@@ -126,8 +127,9 @@ class ws_json_oarchive:
 	}
 	#endif
 
-	void save(const std::string & str){
-		//TODO: Encode for json
+	void save(std::string str){
+		//TODO: Moving escaping to static type resolution will speed up all the non string types which are being cast to string
+		boost::replace_all(str, "\"", "\\\"");
 		_os << '"' << str << '"';
 	}
 

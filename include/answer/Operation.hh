@@ -62,7 +62,9 @@ void responsePart ( Response& ret, const ResponseT& response){
 	for (; it !=accept_headers_list.end(); ++it){
 		// Search for custom codecs
 		if(codec::Codec(encodedReponse, *it, response)) {
-			ret.contentType(*it);
+      if (*it != "*/*"){ // Otherwise the Codec should set the contentType via the context
+        ret.contentType(*it);
+      }
 			break;
 		}
 	}
@@ -70,7 +72,7 @@ void responsePart ( Response& ret, const ResponseT& response){
 	if (it == accept_headers_list.end() )
 	for (it = accept_headers_list.begin(); it !=accept_headers_list.end(); ++it){
 		if (codec::GenericCodec(encodedReponse, *it, response)){
-			ret.contentType(*it);
+      ret.contentType(*it);
 			break;
 		}
 	}

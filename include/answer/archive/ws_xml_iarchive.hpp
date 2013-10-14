@@ -63,7 +63,7 @@ protected:
 		bool result = this->This()->gimpl->parse_start_tag(this->This()->get_is());
 		if(true != result){
 			if (check_tag){
-				//Todo: replace this with proper EBNF grammar
+				//TODO: replace this with proper EBNF grammar
 				std::streampos failedPos = is.tellg();
 				is.seekg(beginPos);
 				std::string seekClosedTag = "<";
