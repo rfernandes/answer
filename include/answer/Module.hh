@@ -34,6 +34,7 @@ namespace answer{
   public:
     
     static ModuleStore& Instance();
+//     const StoreT& getStore() const;
     void registerModule(Module *const module);
 
     virtual FlowStatus inFlow(Context &context);

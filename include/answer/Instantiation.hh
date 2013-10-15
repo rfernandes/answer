@@ -46,15 +46,23 @@ class InstantiationStrategy<
   >::type
   >
 {
-	ObjectT *_webMethod;
-public:
-	InstantiationStrategy():_webMethod( new ObjectT() ){}
-	~InstantiationStrategy(){delete _webMethod;}
+	static ObjectT s_webMethod;
 
+public:
 	ObjectT& Instance() const{
-		return *_webMethod;
+		return s_webMethod;
 	}
 };
+
+//Static member initialization
+template <typename ObjectT>
+ObjectT
+InstantiationStrategy<
+  ObjectT,
+  typename std::enable_if<
+    std::is_base_of<instantiation::Singleton, ObjectT>::value
+  >::type
+  >::s_webMethod = ObjectT();
 
 template <typename ObjectT>
 class InstantiationStrategy<

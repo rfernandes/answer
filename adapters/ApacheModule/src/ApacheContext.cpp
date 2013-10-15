@@ -54,10 +54,10 @@ namespace apache{
     return _accepts;
   }
 
-  void ApacheTransport::addHeader(const string& key, const string& value, bool replace)
-  {
-    throw std::runtime_error("Apache addHeader");
-  }
+//   void ApacheTransport::addHeader(const string& key, const string& value, bool replace)
+//   {
+//     throw std::runtime_error("Apache addHeader");
+//   }
 
   const string& ApacheTransport::redirect() const
   {

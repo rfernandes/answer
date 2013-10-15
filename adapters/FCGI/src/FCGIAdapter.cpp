@@ -35,6 +35,18 @@ class FcgiAdapter: public Fastcgipp::Request<char>
       Module::FlowStatus status = store.inFlow(context);
 
       //TODO: This features (skip) in unimplemented in other adapters
+//       switch(status){
+//         case Module::SKIP:
+//         
+//         break;
+//         case Module::OK:
+//         
+//         break;
+//         case Module::ERROR:
+//         
+//         break;
+//       
+//       }
       if (status != Module::SKIP){
         string serviceRequest;
         string service = context.operationInfo().service();
@@ -58,7 +70,6 @@ class FcgiAdapter: public Fastcgipp::Request<char>
         boost::property_tree::write_xml(ss, pt);
         // Remove the xml header, header is always present
         serviceRequest = ss.str().substr(ss.str().find_first_of("\n") + 1);
-        cerr << "Request: "<< serviceRequest<<  endl; 
         Operation& oper_ref = OperationStore::Instance().operation(service, operation);
         //Doing context.response(response) would overwrite other data such as status headers and cookies
         //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
@@ -79,12 +90,18 @@ class FcgiAdapter: public Fastcgipp::Request<char>
       out << "Content-Type: " << context.response().contentType() << "\r\n";
       out << "Content-Length: " << context.response().body().size() << "\r\n";
       for (const auto &header: context.response().headers()){
-        cerr << "Response header " << header.first << ": " << header.second << std::endl;
         out << header.first << ": " << header.second << "\r\n";
       }
       out << "\r\n";
       out << context.response().body();
 
+      if (status != Module::SKIP){
+        
+        //TODO: look at return status and call outFlowFault if problem
+        store.outFlow(context);
+        
+      }
+      
     }catch(answer::WebMethodException &ex){
       out << "Content-Type: text/plain\r\n";
       out << "\r\n";
@@ -153,7 +170,6 @@ int main()
       //Symbol resolution must be GLOBAL due to implicit cast of Context
       // inherited object, otherwise called address will be wrong
       // http://gcc.gnu.org/faq.html#dso
-      cerr  << "Loading " << path << endl;
       dlOpen(path.c_str(), RTLD_LAZY);
     }
 

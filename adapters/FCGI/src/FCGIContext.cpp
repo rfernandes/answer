@@ -33,10 +33,10 @@ const list< string >& FCGITransport::accepts() const
   return _accepts;
 }
 
-void FCGITransport::addHeader(const string& key, const string& value, bool replace)
-{
-  throw std::runtime_error("FCGI addHeader unimplemented");
-}
+// void FCGITransport::addHeader(const string& key, const string& value, bool replace)
+// {
+//   throw std::runtime_error("FCGI addHeader unimplemented");
+// }
 
 const string& FCGITransport::redirect() const
 {

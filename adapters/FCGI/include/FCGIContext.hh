@@ -18,7 +18,7 @@ namespace fcgi{
 		FCGITransport(const Fastcgipp::Http::Environment< char >& env);
 		
 		virtual const std::list< std::string >& accepts() const;
-		virtual void addHeader(const std::string& key, const std::string& value = "", bool replace = true);
+// 		virtual void addHeader(const std::string& key, const std::string& value = "", bool replace = true);
 		virtual const std::string& redirect() const;
 		virtual const std::string& redirect(const std::string& uri);
 		virtual bool redirectSet() const;

@@ -12,9 +12,14 @@ ModuleStore& ModuleStore::Instance(){
 	return store;
 }
 
-void ModuleStore::registerModule(answer::Module*const module){
+// const ModuleStore::StoreT& ModuleStore::getStore() const{
+// 	return _store;
+// }
+
+void ModuleStore::registerModule(/*const string& name,*/ answer::Module*const module){
 	_store.push_back(module);
 }
+
 
 Module::FlowStatus ModuleStore::inFlow(Context &context)
 {

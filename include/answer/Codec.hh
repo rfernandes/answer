@@ -34,7 +34,7 @@ namespace answer{
 		}
 
 		template<typename T>
-		bool ResponseWrapper( std::ostream& out, const std::string& response, const std::string& /*mimeType*/, const answer::WebMethodException*)
+		bool ResponseWrapper( std::ostream& out, const std::string& response, const std::string& mimeType, const answer::WebMethodException*)
 		{
       out << response;
 			return true;
