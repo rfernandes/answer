@@ -33,11 +33,6 @@ const list< string >& FCGITransport::accepts() const
   return _accepts;
 }
 
-// void FCGITransport::addHeader(const string& key, const string& value, bool replace)
-// {
-//   throw std::runtime_error("FCGI addHeader unimplemented");
-// }
-
 const string& FCGITransport::redirect() const
 {
   throw std::runtime_error("FCGI redirect unimplemented");
@@ -61,10 +56,6 @@ Environment &FCGIContext::environment()
 {
   throw std::runtime_error("FCGI Environment unimplemented");
 }
-ProviderStore &FCGIContext::providerStore()
-{
-  throw std::runtime_error("ProviderStore unimplemented");
-}
 OperationInfo &FCGIContext::operationInfo()
 {
   return _operation;
@@ -73,9 +64,6 @@ TransportInfo &FCGIContext::transportInfo()
 {
   return _transport;
 }
-
-
-
 
 } //fcgi
 } //adapter

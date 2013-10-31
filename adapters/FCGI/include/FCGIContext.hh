@@ -18,16 +18,12 @@ namespace fcgi{
 		FCGITransport(const Fastcgipp::Http::Environment< char >& env);
 		
 		virtual const std::list< std::string >& accepts() const;
-// 		virtual void addHeader(const std::string& key, const std::string& value = "", bool replace = true);
 		virtual const std::string& redirect() const;
 		virtual const std::string& redirect(const std::string& uri);
 		virtual bool redirectSet() const;
 	};
 
 	class FCGIContext: public Context{
-// 		FCGICookieJarWrapper _cookies;
-// 		FCGIEnvironmentWrapper _environment;
-// 		FCGIProviderStoreFacility _providerStore;
 	
 		FCGITransport _transport;
 		FCGIOperationInfo _operation;
@@ -39,7 +35,6 @@ namespace fcgi{
 
 		virtual CookieJar& cookieJar();
 		virtual Environment& environment();
-		virtual ProviderStore& providerStore();
 		virtual OperationInfo& operationInfo();
 		virtual TransportInfo& transportInfo();
 	};

@@ -54,8 +54,6 @@ target_link_libraries (${PROJECT_NAME}
 option(APACHE_ADAPTER "compile the native apache module adapter" true)
 option(FCGI_ADAPTER "compile the fastcgi++ adapter" true)
 option(AXIS_ADAPTER "compile the axis2/C adapter" true)
-option(NETLIB_ADAPTER "compile the cpp-netlib adapter" true)
-option(REMOTING_ADAPTER "compile the remoting adapter" true)
 
 if (APACHE_ADAPTER)
 	add_subdirectory(adapters/ApacheModule)
@@ -67,16 +65,6 @@ endif()
 
 if (AXIS_ADAPTER)
 	add_subdirectory(adapters/Axis2c)
-endif()
-
-if (NETLIB_ADAPTER)
-	message(STATUS "Building Experimental CPPNETLIB adapter")
-	add_subdirectory(adapters/CppNetlib)
-endif()
-
-if (REMOTING_ADAPTER)
-	message(STATUS "Building Experimental REMOTING adapter")
-	add_subdirectory(adapters/Remote)
 endif()
 
 install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)

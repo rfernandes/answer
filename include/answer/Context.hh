@@ -16,7 +16,6 @@ namespace answer {
 		Context();
 	public:
     virtual ~Context();
-		virtual ProviderStore& providerStore()=0;
 		virtual OperationInfo& operationInfo()=0;
     virtual Environment& environment()=0;
 		virtual CookieJar& cookieJar()=0;

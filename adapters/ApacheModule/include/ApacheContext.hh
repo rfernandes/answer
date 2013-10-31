@@ -45,9 +45,6 @@ namespace apache{
     virtual Environment& environment(){
       throw std::runtime_error("Environment unimplemented");
     }
-    virtual ProviderStore& providerStore(){
-      throw std::runtime_error("ProviderStore unimplemented");
-    }
     virtual OperationInfo& operationInfo(){
       return _operation;
     }
