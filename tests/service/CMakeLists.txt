@@ -13,5 +13,4 @@ target_link_libraries(serviceTest
 	answer
 )
 
-add_test(service serviceTest)
-	
+add_test(NAME service COMMAND serviceTest)

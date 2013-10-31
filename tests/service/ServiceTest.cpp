@@ -16,8 +16,7 @@ public:
 	}
 };
 
-ANSWER_REGISTER_OPERATION(Operation::test);
-
+ANSWER_REGISTER_OPERATION(Operation::test)
 
 class TestContext: public
 		answer::Context,
@@ -43,9 +42,6 @@ public:
 	}
 	virtual answer::OperationInfo& operationInfo(){
 		return *this;
-	}
-	virtual answer::ProviderStore& providerStore(){
-		throw std::runtime_error("ProviderStore not implemented");
 	}
 	virtual answer::TransportInfo& transportInfo(){
 		return *this;
@@ -78,7 +74,6 @@ public:
 	virtual const string& url() const{
 		throw std::runtime_error("url not implemented");
 	}
-		
 };
 
 

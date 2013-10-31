@@ -288,9 +288,13 @@ public:
 // #endif //ANSWER_SERVICE_NAME
 // Service registration macros
 #define ANSWER_REGISTER_OPERATION(ServiceOperation) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation)
+namespace {\
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation);\
+}
 
 #define ANSWER_REGISTER_OPERATION_AS(ServiceOperation, ServiceName) \
-	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, ServiceName, &ServiceOperation)
+namespace {\
+	answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, ServiceName, &ServiceOperation);\
+}
 
 #endif //_OPERATION_HH_

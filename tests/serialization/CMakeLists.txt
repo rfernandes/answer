@@ -13,5 +13,4 @@ target_link_libraries(serializationTest
 	answer
 )
 
-add_test(serialization serializationTest)
-	
+add_test(NAME serialization COMMAND serializationTest)

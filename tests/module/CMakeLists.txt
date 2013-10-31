@@ -13,5 +13,5 @@ target_link_libraries(moduleTest
 	answer-module
 )
 
-add_test(module moduleTest)
+add_test(NAME module COMMAND moduleTest)
 	
