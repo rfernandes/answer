@@ -12,6 +12,7 @@
 #include <list>
 #include <ostream>
 #include <cstddef> // std::size_t
+#include <cmath>
 
 #include <boost/config.hpp>
 #if defined(BOOST_NO_STDC_NAMESPACE)
@@ -127,11 +128,19 @@ class ws_json_oarchive:
 	}
 	#endif
 
-	void save(std::string str){
-		//TODO: Moving escaping to static type resolution will speed up all the non string types which are being cast to string
-		boost::replace_all(str, "\"", "\\\"");
-		_os << '"' << str << '"';
-	}
+  void save(double d){
+    if (std::isfinite(d)){
+      _os << d;
+    }else{
+      _os << '"' << d << '"';
+    }
+  }
+
+  void save(std::string str){
+    //TODO: Moving escaping to static type resolution will speed up all the non string types which are being cast to string
+    boost::replace_all(str, "\"", "\\\"");
+    _os << '"' << str << '"';
+  }
 
 public:
 	///////////////////////////////////////////////////
