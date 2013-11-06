@@ -1,9 +1,12 @@
 # Answer - C++ Webservices framework
 
 Features 
-* Pure C++, no intermediate files, no "comment" meta language
-* Support for multiple adapters (FCGI, Apache native module, Axis2C, CPPNetLib)
-* Implement */RPC, SOAP webservices 
+- Pure C++, no intermediate files, no "comment" meta language
+- Support for multiple adapters (FCGI, Apache native module, Axis2C, CPPNetLib)
+- Implement */RPC, SOAP webservices 
+
+## More information
+
 
 * [Getting started](https://github.com/rfernandes/answer/wiki/Getting-Started)
 * [RPC/SOAP programming model](https://github.com/rfernandes/answer/wiki/RPC---SOAP-Programming-Model)
