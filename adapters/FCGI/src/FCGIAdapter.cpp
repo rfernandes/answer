@@ -48,20 +48,20 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 //       
 //       }
       if (status != Module::SKIP){
-        string serviceRequest;
-        string service = context.operationInfo().service();
-        string operation = context.operationInfo().operation();
+        string requestBody;
+        const string &service = context.operationInfo().service();
+        const string &operation = context.operationInfo().operation();
 
         boost::property_tree::ptree pt;
         if(!environment().posts.empty()){
           for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
             if(it->second.type== Http::Post<char>::form){
               pt.put(operation + "." + it->first, it->second.value);
-      // //           serviceRequest.append(it->second.value);
+      // //           requestBody.append(it->second.value);
       //          cerr << "Posted a form {" << it->second.value << "}" << endl;
       //        }else{
       //          cerr << "Posted data {" << it->first << string(it->second.data(), it->second.size()) << "}" << endl;
-      //          serviceRequest.append(string(it->second.data(), it->second.size()));
+      //          requestBody.append(string(it->second.data(), it->second.size()));
             }
           }
         }
@@ -69,11 +69,12 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 
         boost::property_tree::write_xml(ss, pt);
         // Remove the xml header, header is always present
-        serviceRequest = ss.str().substr(ss.str().find_first_of("\n") + 1);
+        requestBody = ss.str().substr(ss.str().find_first_of("\n") + 1);
+        
         Operation& oper_ref = OperationStore::Instance().operation(service, operation);
         //Doing context.response(response) would overwrite other data such as status headers and cookies
         //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-        Response response = oper_ref.invoke(serviceRequest);
+        Response response = oper_ref.invoke(requestBody);
         context.response().body(response.body());
         if (!response.contentType().empty()){
           context.response().contentType(response.contentType());
@@ -86,12 +87,16 @@ class FcgiAdapter: public Fastcgipp::Request<char>
               << Response::statusText.at(context.response().status()) << "\r\n";
         }
       }
-
+      
       out << "Content-Type: " << context.response().contentType() << "\r\n";
       out << "Content-Length: " << context.response().body().size() << "\r\n";
       for (const auto &header: context.response().headers()){
         out << header.first << ": " << header.second << "\r\n";
       }
+      for (const auto &cookie: context.cookies()){
+        out << "Set-Cookie: " << cookie.second << "\r\n";
+      }
+      
       out << "\r\n";
       out << context.response().body();
 
@@ -170,7 +175,7 @@ int main()
       //Symbol resolution must be GLOBAL due to implicit cast of Context
       // inherited object, otherwise called address will be wrong
       // http://gcc.gnu.org/faq.html#dso
-      dlOpen(path.c_str(), RTLD_LAZY);
+      dlOpen(path.c_str(), RTLD_GLOBAL | RTLD_NOW);
     }
 
     Fastcgipp::Manager<answer::adapter::fcgi::FcgiAdapter> fcgi;

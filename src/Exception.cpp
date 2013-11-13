@@ -5,16 +5,14 @@ using namespace std;
 
 namespace answer{
 
-WebMethodException::WebMethodException(const std::string& message, int error_level)
-	: std::runtime_error(message), _error_level(error_level) { }
-	
-	
-int WebMethodException::getErrorLevel() const { return _error_level; }
+WebMethodException::WebMethodException(const std::string& message)
+: std::runtime_error(message){ }
+
 
 WebMethodInvalidInput::WebMethodInvalidInput(const std::string& message)
-	: WebMethodException(message, 1003){ }
+: WebMethodException(message){ }
 
 WebMethodMissingParameter::WebMethodMissingParameter(const std::string& message)
-	: WebMethodException(message, 1010){ }
-	
+: WebMethodException(message){ }
+
 }

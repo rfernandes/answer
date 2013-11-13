@@ -6,7 +6,6 @@ namespace answer
 Context* Context::_context = nullptr;
 
 Context::Context(){
-//     std::cerr << "This base:" << this << std::endl;
   if (_context){
     throw std::runtime_error("A context already exists");
   }else{
@@ -35,6 +34,18 @@ Response &Context::response()
 void Context::response(const Response &response)
 {
   _response = response;
+}
+const Context::Map &Context::environment() const
+{
+  return _environment;
+}
+const Context::CookieMap &Context::cookies() const
+{
+  return _cookies;
+}
+void Context::insert(const Cookie &cookie)
+{
+  _cookies.insert(make_pair(cookie.name(), cookie));
 }
 
 

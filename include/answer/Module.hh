@@ -34,7 +34,6 @@ namespace answer{
   public:
     
     static ModuleStore& Instance();
-//     const StoreT& getStore() const;
     void registerModule(Module *const module);
 
     virtual FlowStatus inFlow(Context &context);
@@ -53,6 +52,7 @@ namespace answer{
 }
 
 #define ANSWER_REGISTER_MODULE(Module) \
-  answer::RegisterModule<Module> ANSWER_MAKE_UNIQUE(_registrator_)
-
+namespace{\
+  answer::RegisterModule<Module> ANSWER_MAKE_UNIQUE(_registrator_);\
+}
 #endif //_MODULE_H_

@@ -26,16 +26,14 @@ public:
 		
 		Expires& operator=(const Expires&);
 		
-		friend std::ostream& operator<< (std::ostream &out, const Expires& exp) {
-			out << exp._expires;
-			return out;
-		}
+		friend std::ostream& operator<< (std::ostream &out, const Expires& exp);
 		bool empty() const;
 	};
 	
 	Cookie(const std::string& name, const std::string& value, const std::string& path = "/", const Expires& expires = Expires(), bool secure = false, bool httponly = false);
 
-	operator std::string() const;
+	
+	explicit operator std::string() const;
 	
 	const std::string& name() const;
 	void name(const std::string & str);
@@ -51,6 +49,8 @@ public:
 	
 	bool httpOnly() const;
 	void httpOnly(bool httpOnly);
+	
+	friend std::ostream& operator<< (std::ostream &out, const Cookie& exp);
 
 private:
 	std::string	_name;
@@ -59,6 +59,9 @@ private:
 	Expires		_expires;
 	bool			_secure, _httpOnly;
 };
+
+std::ostream& operator<< (std::ostream &out, const Cookie& exp);
+
 
 }
 

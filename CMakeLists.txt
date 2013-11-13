@@ -14,7 +14,7 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
 ###########################################################
 find_package(Boost COMPONENTS serialization date_time REQUIRED QUIET)
 
-include_directories (
+include_directories (BEFORE
   include
 )
 

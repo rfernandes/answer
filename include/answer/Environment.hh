@@ -8,12 +8,12 @@
 #include "Cookie.hh"
 
 namespace answer{
-  class Environment{
-  public:
-    virtual void insert(const std::string& key, const std::string &value) = 0;
-    virtual std::string at(const std::string&key) const = 0;
-    virtual bool contains(const std::string &key) const = 0;
-  };
+//   class Environment{
+//   public:
+//     virtual void insert(const std::string& key, const std::string &value) = 0;
+//     virtual std::string at(const std::string&key) const = 0;
+//     virtual bool contains(const std::string &key) const = 0;
+//   };
   
   class ProviderStore{
   public:
@@ -67,7 +67,6 @@ namespace answer{
   protected:
   public:
     TransportInfo() : _binaryTransport(false) {}
-//     virtual void addHeader(const std::string &key, const std::string &value = "", bool replace = true) = 0;
     virtual const std::list<std::string>& accepts() const = 0;
     virtual const std::string& redirect(const std::string& uri) = 0;
     virtual const std::string& redirect() const = 0;
