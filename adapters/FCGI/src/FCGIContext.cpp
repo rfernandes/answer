@@ -22,6 +22,7 @@ FCGIContext::FCGIContext(const Fastcgipp::Http::Environment< char > &env):
   _transport(env),
   _operation(env)
 {
+  _environment.insert(env.env.begin(), env.env.end());
 }
 
 FCGIContext::~FCGIContext()
@@ -51,10 +52,6 @@ bool FCGITransport::redirectSet() const
 CookieJar &FCGIContext::cookieJar()
 {
   throw std::runtime_error("CookieJar unimplemented");
-}
-Environment &FCGIContext::environment()
-{
-  throw std::runtime_error("FCGI Environment unimplemented");
 }
 OperationInfo &FCGIContext::operationInfo()
 {

@@ -28,21 +28,6 @@ std::string UrlEncode ( const std::string& orig )
 	return ret;
 }
 
-Cookie::operator std::string() const
-{
-	std::stringstream ss;
-	ss << _name << "=" << _value << "; Path=" << _path;
-	if ( !_expires.empty() )
-		ss << "; Expires=" << _expires;
-	if ( _secure ) {
-		ss << "; Secure";
-	}
-	if ( _httpOnly ) {
-		ss << "; HttpOnly";
-	}
-	return ss.str();
-}
-
 const std::string& Cookie::value() const
 {
 	return _value;
@@ -82,7 +67,6 @@ void Cookie::httpOnly(bool httpOnly)
 {
 	_httpOnly = httpOnly;
 }
-
 
 Cookie::Cookie ( const std::string& name, const std::string& value, const std::string& path, const answer::Cookie::Expires& expires, bool secure, bool httpOnly) :
 	_name ( UrlEncode(name) ),
@@ -146,6 +130,29 @@ Cookie::Expires& Cookie::Expires::operator= ( const Expires& e )
 bool Cookie::Expires::empty() const
 {
 	return _expires.empty();
+}
+
+
+std::ostream &operator<<(std::ostream &out, const Cookie &cookie)
+{
+  out << cookie._name << "=" << cookie._value << "; Path=" << cookie._path;
+  if ( !cookie._expires.empty() ){
+    out << "; Expires=" << cookie._expires;
+  }
+  if ( cookie._secure ) {
+    out << "; Secure";
+  }
+  if ( cookie._httpOnly ) {
+    out << "; HttpOnly";
+  }
+  return out;
+}
+
+
+std::ostream &operator<<(std::ostream &out, const Cookie::Expires &exp)
+{
+  out << exp._expires;
+  return out;
 }
 
 }

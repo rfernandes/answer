@@ -24,7 +24,7 @@ answer::Module::FlowStatus TestModule::outFlowFault ( answer::Context& context )
 	return OK;
 }
 
-ANSWER_REGISTER_MODULE(TestModule);
+ANSWER_REGISTER_MODULE(TestModule)
 
 BOOST_AUTO_TEST_CASE( module )
 {

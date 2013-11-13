@@ -33,10 +33,9 @@ namespace fcgi{
 		
 		~FCGIContext();
 
-		virtual CookieJar& cookieJar();
-		virtual Environment& environment();
-		virtual OperationInfo& operationInfo();
-		virtual TransportInfo& transportInfo();
+    virtual OperationInfo& operationInfo();
+    virtual CookieJar& cookieJar();
+    virtual TransportInfo& transportInfo();
 	};
 
 } //fcgi
