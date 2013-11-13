@@ -25,7 +25,7 @@ namespace answer{
 namespace adapter{
 namespace fcgi{
 
-class FcgiAdapter: public Fastcgipp::Request<char>
+class FcgiAdapter: public Fastcgipp::Request
 {
   bool response(){
     try{
@@ -34,19 +34,6 @@ class FcgiAdapter: public Fastcgipp::Request<char>
       ModuleStore & store = ModuleStore::Instance();
       Module::FlowStatus status = store.inFlow(context);
 
-      //TODO: This features (skip) in unimplemented in other adapters
-//       switch(status){
-//         case Module::SKIP:
-//         
-//         break;
-//         case Module::OK:
-//         
-//         break;
-//         case Module::ERROR:
-//         
-//         break;
-//       
-//       }
       if (status != Module::SKIP){
         string requestBody;
         const string &service = context.operationInfo().service();
@@ -54,19 +41,13 @@ class FcgiAdapter: public Fastcgipp::Request<char>
 
         boost::property_tree::ptree pt;
         if(!environment().posts.empty()){
-          for(Http::Environment<char>::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
-            if(it->second.type== Http::Post<char>::form){
+          for(Http::Environment::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
+            if(it->second.type== Http::Post::form){
               pt.put(operation + "." + it->first, it->second.value);
-      // //           requestBody.append(it->second.value);
-      //          cerr << "Posted a form {" << it->second.value << "}" << endl;
-      //        }else{
-      //          cerr << "Posted data {" << it->first << string(it->second.data(), it->second.size()) << "}" << endl;
-      //          requestBody.append(string(it->second.data(), it->second.size()));
             }
           }
         }
         stringstream ss;
-
         boost::property_tree::write_xml(ss, pt);
         // Remove the xml header, header is always present
         requestBody = ss.str().substr(ss.str().find_first_of("\n") + 1);
@@ -101,10 +82,8 @@ class FcgiAdapter: public Fastcgipp::Request<char>
       out << context.response().body();
 
       if (status != Module::SKIP){
-        
         //TODO: look at return status and call outFlowFault if problem
         store.outFlow(context);
-        
       }
       
     }catch(answer::WebMethodException &ex){

@@ -8,17 +8,13 @@ namespace answer{
 namespace adapter{
 namespace fcgi{
 
-FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment< char >& env)
+FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment& env)
 {
   //Get service and operation values, if available
   map< string, string >::const_iterator it;
 
-  it = env.gets.find("service");
-  if (it != env.gets.end())
-    _service = it->second;
-  it = env.gets.find("operation");
-  if (it != env.gets.end())
-    _operation = it->second;
+  _service = env.findGet("service");
+  _operation = env.findGet("operation");
   _url = env.requestUri;
 }
 

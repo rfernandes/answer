@@ -15,7 +15,6 @@ public:
   virtual ~Context();
   virtual OperationInfo& operationInfo()=0;
   
-  virtual CookieJar& cookieJar()=0;
   virtual TransportInfo& transportInfo()=0;
 
   //TODO: add Request

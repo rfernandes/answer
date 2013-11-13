@@ -8,7 +8,7 @@ namespace fcgi{
 
 using namespace std;
 
-FCGITransport::FCGITransport(const Fastcgipp::Http::Environment< char >& env){
+FCGITransport::FCGITransport(const Fastcgipp::Http::Environment& env){
   boost::split(_accepts, env.acceptContentTypes, boost::is_any_of(","), boost::token_compress_on);
   // discards "quality"
   for (list< string >::iterator itr = _accepts.begin(); itr != _accepts.end(); ++itr) {
@@ -18,11 +18,11 @@ FCGITransport::FCGITransport(const Fastcgipp::Http::Environment< char >& env){
   }
 }
 
-FCGIContext::FCGIContext(const Fastcgipp::Http::Environment< char > &env):
+FCGIContext::FCGIContext(const Fastcgipp::Http::Environment &env):
   _transport(env),
   _operation(env)
 {
-  _environment.insert(env.env.begin(), env.env.end());
+  _environment.insert(env.environment.begin(), env.environment.end());
 }
 
 FCGIContext::~FCGIContext()
@@ -49,10 +49,6 @@ bool FCGITransport::redirectSet() const
   return false;
 }
 
-CookieJar &FCGIContext::cookieJar()
-{
-  throw std::runtime_error("CookieJar unimplemented");
-}
 OperationInfo &FCGIContext::operationInfo()
 {
   return _operation;

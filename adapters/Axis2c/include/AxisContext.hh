@@ -14,8 +14,8 @@ namespace answer{
 		namespace axis{
 
 	class AxisContext: public Context {
-		axis::AxisCookieJarWrapper _cookies;
-		axis::AxisEnvironmentWrapper _environment;
+// 		axis::AxisCookieJarWrapper _cookies;
+// 		axis::AxisEnvironmentWrapper _environment;
 		axis::AxisOperation _operation;
 		axis::AxisTransport _transport;
 		
@@ -27,12 +27,6 @@ namespace answer{
 
 		~AxisContext();
 
-		virtual CookieJar& cookieJar() {
-			return _cookies;
-		}
-		virtual Environment& environment() {
-			return _environment;
-		}
 		virtual OperationInfo& operationInfo() {
 			return _operation;
 		}

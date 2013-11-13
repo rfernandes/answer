@@ -34,9 +34,6 @@ public:
 	}
 	
 	//Context
-	virtual answer::CookieJar& cookieJar(){
-		throw std::runtime_error("CookieJar not implemented");
-	}
 	virtual answer::OperationInfo& operationInfo(){
 		return *this;
 	}

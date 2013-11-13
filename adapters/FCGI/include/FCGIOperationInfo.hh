@@ -13,7 +13,7 @@ class FCGIOperationInfo: public OperationInfo{
 	std::string _operation;
   std::string _url;
 public:
-	FCGIOperationInfo(const Fastcgipp::Http::Environment< char > &env);
+	FCGIOperationInfo(const Fastcgipp::Http::Environment &env);
 
 	virtual const std::string& operation() const;
 	virtual const std::string& service() const;

@@ -17,16 +17,12 @@ namespace apache{
     ApacheTransport(request_rec* r, const answer_conf_t& conf);
     
     virtual const std::list< std::string >& accepts() const;
-//     virtual void addHeader(const std::string& key, const std::string& value = "", bool replace = true);
     virtual const std::string& redirect() const;
     virtual const std::string& redirect(const std::string& uri);
     virtual bool redirectSet() const;
   };
 
   class ApacheContext: public Context {
-//    ApacheCookieJarWrapper _cookies;
-//    ApacheEnvironmentWrapper _environment;
-//    ApacheProviderStoreFacility _providerStore;
   
     void queryRequestFormat(apreq_handle_t* apr);
     void axisRequestFormat(request_rec* r);
@@ -39,12 +35,6 @@ namespace apache{
     
     ~ApacheContext();
 
-    virtual CookieJar& cookieJar(){
-      throw std::runtime_error("CookieJar unimplemented");
-    }
-    virtual Environment& environment(){
-      throw std::runtime_error("Environment unimplemented");
-    }
     virtual OperationInfo& operationInfo(){
       return _operation;
     }

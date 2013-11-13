@@ -8,20 +8,7 @@
 #include "Cookie.hh"
 
 namespace answer{
-//   class Environment{
-//   public:
-//     virtual void insert(const std::string& key, const std::string &value) = 0;
-//     virtual std::string at(const std::string&key) const = 0;
-//     virtual bool contains(const std::string &key) const = 0;
-//   };
-  
-  class ProviderStore{
-  public:
-    virtual void addProvider(const std::string& key, const boost::any& value) = 0;
-    virtual const boost::any& getProvider(const std::string& key) const = 0;
-    virtual bool contains(const std::string &key) const = 0;
-  };
-  
+	
   class OperationInfo{
   public:
     virtual const std::string& service() const = 0;
@@ -75,16 +62,6 @@ namespace answer{
     virtual inline void setBinaryTransport() { _binaryTransport = true; }
   };
 
-  class CookieJar{
-  public:
-    virtual void insert(const Cookie& cookie, bool isNew = true) = 0;
-    virtual void remove(const std::string&cookieName) = 0;
-    
-    virtual std::list<Cookie> list(bool onlyNew) const = 0;
-    
-    virtual const Cookie& cookie(const std::string &cookieName) const = 0;
-    virtual bool contains(const std::string &cookieName) const = 0;
-  };
 }
 
 #endif

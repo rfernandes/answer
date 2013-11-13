@@ -15,7 +15,7 @@ namespace fcgi{
 		std::list< std::string > _accepts;
 	public:
 		
-		FCGITransport(const Fastcgipp::Http::Environment< char >& env);
+		FCGITransport(const Fastcgipp::Http::Environment& env);
 		
 		virtual const std::list< std::string >& accepts() const;
 		virtual const std::string& redirect() const;
@@ -29,12 +29,11 @@ namespace fcgi{
 		FCGIOperationInfo _operation;
 
 	public:
-		FCGIContext (const Fastcgipp::Http::Environment< char > &env);
+		FCGIContext (const Fastcgipp::Http::Environment&env);
 		
 		~FCGIContext();
-
+		
     virtual OperationInfo& operationInfo();
-    virtual CookieJar& cookieJar();
     virtual TransportInfo& transportInfo();
 	};
 
