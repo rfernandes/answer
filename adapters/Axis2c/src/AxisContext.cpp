@@ -9,7 +9,6 @@ namespace answer{
 								struct axis2_msg_ctx * msg_ctx ) :
 			_cookies ( axis_env,msg_ctx ),
 			_environment ( axis_env,msg_ctx ),
-			_providerStore ( axis_env, msg_ctx ),
 			_operation ( axis_env,msg_ctx ),
 			_transport( axis_env,msg_ctx ),
 			_axis_env( axis_env ),

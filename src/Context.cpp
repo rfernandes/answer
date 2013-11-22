@@ -31,9 +31,9 @@ Response &Context::response()
   return _response;
 }
 
-void Context::response(const Response &response)
+void Context::response(const Response &val)
 {
-  _response = response;
+  _response = val;
 }
 const Context::Map &Context::environment() const
 {
@@ -46,6 +46,10 @@ const Context::CookieMap &Context::cookies() const
 void Context::insert(const Cookie &cookie)
 {
   _cookies.insert(make_pair(cookie.name(), cookie));
+}
+const Context::Accepts &Context::accepts() const
+{
+  return _accepts;
 }
 
 

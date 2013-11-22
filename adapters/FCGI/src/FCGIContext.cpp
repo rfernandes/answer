@@ -8,54 +8,23 @@ namespace fcgi{
 
 using namespace std;
 
-FCGITransport::FCGITransport(const Fastcgipp::Http::Environment& env){
-  boost::split(_accepts, env.acceptContentTypes, boost::is_any_of(","), boost::token_compress_on);
-  // discards "quality"
-  for (list< string >::iterator itr = _accepts.begin(); itr != _accepts.end(); ++itr) {
-    size_t pos = itr->find(";");
-    if (pos != string::npos)
-      *itr = itr->substr(0,pos);
-  }
-}
-
 FCGIContext::FCGIContext(const Fastcgipp::Http::Environment &env):
-  _transport(env),
   _operation(env)
 {
   _environment.insert(env.environment.begin(), env.environment.end());
-}
-
-FCGIContext::~FCGIContext()
-{
-}
-
-const list< string >& FCGITransport::accepts() const
-{
-  return _accepts;
-}
-
-const string& FCGITransport::redirect() const
-{
-  throw std::runtime_error("FCGI redirect unimplemented");
-}
-
-const string& FCGITransport::redirect(const string& uri)
-{
-  throw std::runtime_error("FCGI redirect unimplemented");
-}
-
-bool FCGITransport::redirectSet() const
-{
-  return false;
+  
+  boost::split(_accepts, env.acceptContentTypes, boost::is_any_of(","), boost::token_compress_on);
+  // discards "quality"
+  for (vector< string >::iterator itr = _accepts.begin(); itr != _accepts.end(); ++itr) {
+    size_t pos = itr->find(";");
+    if (pos != string::npos)
+      *itr = itr->substr(0,pos);
+  } 
 }
 
 OperationInfo &FCGIContext::operationInfo()
 {
   return _operation;
-}
-TransportInfo &FCGIContext::transportInfo()
-{
-  return _transport;
 }
 
 } //fcgi

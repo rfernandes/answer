@@ -207,7 +207,6 @@ public:
 				isItem = true;
 				if (_complex_object_begin) // Not a complex object, just a item
 					_complex_object_begin = false;
-				
 
 				if (m_collectionStack.back().newEntry){
 					m_collectionStack.back().newEntry = false;
@@ -256,6 +255,10 @@ public:
 	///////////////////////////////////////////////
 
 	~ws_json_oarchive(){
+    //TODO: This is probably an error condition (or empty collection) being returned
+    if (_complex_object_begin && _complex_object_end){
+      _os << '{';
+    }
     if (_complex_object_end){
       _os << '}';
     }

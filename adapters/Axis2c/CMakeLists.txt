@@ -1,9 +1,9 @@
 
 #Axis Adapter
-set (AXIS_ADAPTER_FILES "src/AxisTransportInfo.cpp" "src/AxisContext.cpp" "src/AxisAdapter.cpp" "src/XmlParams.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp" "src/AxisProviderStore.cpp" "src/AxisCookieWrapper.cpp")
+set (AXIS_ADAPTER_FILES "src/AxisTransportInfo.cpp" "src/AxisContext.cpp" "src/AxisAdapter.cpp" "src/XmlParams.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp" "src/AxisCookieWrapper.cpp")
 
 #Axis module adapter
-set (AXIS_MODULE_SRC_FILES "src/AxisTransportInfo.cpp" "src/AxisModule.cpp" "src/XmlParams.cpp" "src/AxisProviderStore.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp")
+set (AXIS_MODULE_SRC_FILES "src/AxisTransportInfo.cpp" "src/AxisModule.cpp" "src/XmlParams.cpp" "src/AxisEnvironmentWrapper.cpp" "src/AxisCookieWrapper.cpp")
 # set (AXIS_MODULE_LIBRARIES "")
 
 set (AXIS2C_BASE  /usr/axis2c/ )

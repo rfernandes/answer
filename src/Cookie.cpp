@@ -33,9 +33,9 @@ const std::string& Cookie::value() const
 	return _value;
 }
 
-void Cookie::value(const std::string& value)
+void Cookie::value(const std::string& val)
 {
-	_value = value;
+	_value = val;
 }
 
 const Cookie::Expires& Cookie::expires() const
@@ -43,9 +43,9 @@ const Cookie::Expires& Cookie::expires() const
 	return _expires;
 }
 
-void Cookie::expires(const answer::Cookie::Expires& expires)
+void Cookie::expires(const answer::Cookie::Expires& exp)
 {
-	_expires = expires;
+	_expires = exp;
 }
 
 bool Cookie::secure() const

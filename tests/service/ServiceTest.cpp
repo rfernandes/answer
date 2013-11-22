@@ -20,42 +20,20 @@ ANSWER_REGISTER_OPERATION(Operation::test)
 
 class TestContext: public
 		answer::Context,
-		answer::TransportInfo,
 		answer::OperationInfo{
 	
 	string _service;
 	string _operation;
-	string _accept;
-	list<string> _accepts;
 	
 public:
 	TestContext(const string &serviceName, const string &operationName, const string& acceptsType):
-		_service(serviceName), _operation(operationName), _accepts({acceptsType}){
+		_service(serviceName), _operation(operationName){
+		_accepts = {acceptsType};
 	}
 	
 	//Context
 	virtual answer::OperationInfo& operationInfo(){
 		return *this;
-	}
-	virtual answer::TransportInfo& transportInfo(){
-		return *this;
-	}
-	
-	//TransportInfo
-	virtual const list<string>& accepts() const{
-		return _accepts;
-	}
-	virtual void addHeader ( const string& /*key*/, const string& /*value*/ = "", bool /*replace*/ = true ){
-		throw std::runtime_error("addHeader not implemented");
-	}
-	virtual const string& redirect() const{
-		throw std::runtime_error("redirect not implemented");
-	}
-	virtual const string& redirect ( const string& /*uri*/ ){
-		throw std::runtime_error("redirect (set) not implemented");
-	}
-	virtual bool redirectSet() const{
-		return false;
 	}
 
 	//OperationInfo

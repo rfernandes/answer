@@ -34,41 +34,48 @@ class FcgiAdapter: public Fastcgipp::Request
       ModuleStore & store = ModuleStore::Instance();
       Module::FlowStatus status = store.inFlow(context);
 
-      if (status != Module::SKIP){
-        string requestBody;
-        const string &service = context.operationInfo().service();
-        const string &operation = context.operationInfo().operation();
+      switch (status){
+        // Request the webservice
+        case Module::OK:{
+          string requestBody;
+          const string &service = context.operationInfo().service();
+          const string &operation = context.operationInfo().operation();
 
-        boost::property_tree::ptree pt;
-        if(!environment().posts.empty()){
-          for(Http::Environment::Posts::const_iterator it=environment().posts.begin(); it!=environment().posts.end(); ++it){
-            if(it->second.type== Http::Post::form){
-              pt.put(operation + "." + it->first, it->second.value);
+          boost::property_tree::ptree pt;
+          if(!environment().posts.empty()){
+            for(const auto &env: environment().posts){
+              if(env.second.type== Http::Post::form){
+                pt.put(operation + "." + env.first, env.second.value);
+              }
             }
           }
+          stringstream ss;
+          boost::property_tree::write_xml(ss, pt);
+          // Remove the xml header, header is always present
+          requestBody = ss.str().substr(ss.str().find_first_of("\n") + 1);
+          
+          Operation& oper_ref = OperationStore::Instance().operation(service, operation);
+          //Doing context.response(response) would overwrite other data such as status headers and cookies
+          //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
+          Response response = oper_ref.invoke(requestBody);
+          //If status is the original, overwrite with the returned on (which might still be 
+          if (context.response().status() == Response::Status::OK){
+            context.response().status(response.status());
+          }
+          context.response().body(response.body());
+          if (!response.contentType().empty()){
+            context.response().contentType(response.contentType());
+          }
         }
-        stringstream ss;
-        boost::property_tree::write_xml(ss, pt);
-        // Remove the xml header, header is always present
-        requestBody = ss.str().substr(ss.str().find_first_of("\n") + 1);
-        
-        Operation& oper_ref = OperationStore::Instance().operation(service, operation);
-        //Doing context.response(response) would overwrite other data such as status headers and cookies
-        //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-        Response response = oper_ref.invoke(requestBody);
-        context.response().body(response.body());
-        if (!response.contentType().empty()){
-          context.response().contentType(response.contentType());
-        }
-      }else{ // Read from context and return
-        if (context.response().status() != Response::Status::OK_){
-          out << "Status: "
-              << static_cast<underlying_type<Response::Status>::type>(context.response().status())
-              << ' '
-              << Response::statusText.at(context.response().status()) << "\r\n";
-        }
+        break;
+        case Module::ERROR:
+        case Module::SKIP:
+          break;
       }
-      
+      out << "Status: "
+      << static_cast<underlying_type<Response::Status>::type>(context.response().status())
+      << ' '
+      << Response::statusText.at(context.response().status()) << "\r\n";
       out << "Content-Type: " << context.response().contentType() << "\r\n";
       out << "Content-Length: " << context.response().body().size() << "\r\n";
       for (const auto &header: context.response().headers()){
@@ -80,12 +87,17 @@ class FcgiAdapter: public Fastcgipp::Request
       
       out << "\r\n";
       out << context.response().body();
+      cerr << context.response().body() << endl;
 
-      if (status != Module::SKIP){
-        //TODO: look at return status and call outFlowFault if problem
-        store.outFlow(context);
+      switch (status){
+        case Module::OK:
+        case Module::SKIP:
+          store.outFlow(context);
+          break;
+        case Module::ERROR:      
+          store.outFlowFault(context);
+          break;
       }
-      
     }catch(answer::WebMethodException &ex){
       out << "Content-Type: text/plain\r\n";
       out << "\r\n";

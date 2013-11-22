@@ -21,10 +21,13 @@ namespace answer{
     typedef std::pair<std::string, std::string> Header;
     //TODO: Complete this list
     enum class Status {
-      OK_,
+      OK = 200,
       CREATED = 201,
       ACCEPTED = 202,
-      NOT_FOUND = 404
+      FOUND = 302,
+      FORBIDDEN = 403,
+      NOT_FOUND = 404,
+      INTERNAL_SERVER_ERROR = 500
     };
     const static std::map<Status, std::string> statusText;
 
@@ -32,7 +35,7 @@ namespace answer{
     std::string _body;
     std::string _contentType;
     std::vector<Header> _headers;
-    Status _status = Status::OK_;
+    Status _status = Status::OK;
   public:
     //TODO: Add vector<char> data accessors for body
     const std::string &body() const;
@@ -46,20 +49,6 @@ namespace answer{
 
     void status(Status status);
     Status status() const;
-  };
-
-  class TransportInfo{
-  private:
-    bool _binaryTransport;
-  protected:
-  public:
-    TransportInfo() : _binaryTransport(false) {}
-    virtual const std::list<std::string>& accepts() const = 0;
-    virtual const std::string& redirect(const std::string& uri) = 0;
-    virtual const std::string& redirect() const = 0;
-    virtual bool redirectSet() const = 0;
-    virtual inline bool isBinaryTransport() const { return _binaryTransport; }
-    virtual inline void setBinaryTransport() { _binaryTransport = true; }
   };
 
 }

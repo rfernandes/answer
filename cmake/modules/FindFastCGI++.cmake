@@ -15,4 +15,3 @@ ${FastCGI++_ROOT}/include
 set (FastCGI++_LIBRARIES
 ${FastCGI++_ROOT}/lib/libfastcgipp.so
 )
-# liboms-php.so pyoms.so
