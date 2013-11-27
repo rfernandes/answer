@@ -11,30 +11,12 @@ namespace answer{
 namespace adapter{
 namespace fcgi{
 
-	class FCGITransport: public TransportInfo{
-		std::list< std::string > _accepts;
-	public:
-		
-		FCGITransport(const Fastcgipp::Http::Environment& env);
-		
-		virtual const std::list< std::string >& accepts() const;
-		virtual const std::string& redirect() const;
-		virtual const std::string& redirect(const std::string& uri);
-		virtual bool redirectSet() const;
-	};
-
 	class FCGIContext: public Context{
-	
-		FCGITransport _transport;
 		FCGIOperationInfo _operation;
 
 	public:
 		FCGIContext (const Fastcgipp::Http::Environment&env);
-		
-		~FCGIContext();
-		
     virtual OperationInfo& operationInfo();
-    virtual TransportInfo& transportInfo();
 	};
 
 } //fcgi

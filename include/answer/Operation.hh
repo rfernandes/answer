@@ -53,13 +53,12 @@ RequestT requestPart (const std::string& name, const std::string& params, const 
 
 template <typename ResponseT>
 void responsePart ( Response& ret, const ResponseT& response){
-	// TODO: we only look at the first accept. if it fails, we'll default to xml immediately
-	const std::list<std::string>& accept_headers_list = answer::Context::Instance().transportInfo().accepts();
-	std::list<std::string>::const_iterator it = accept_headers_list.begin();
+
+	const answer::Context::Accepts& accept_headers_list = answer::Context::Instance().accepts();
+	answer::Context::Accepts::const_iterator it = accept_headers_list.begin();
 	
 	std::ostringstream encodedReponse;
-	std::ostringstream wrappedReponse;
-	for (; it !=accept_headers_list.end(); ++it){
+	for (; it != accept_headers_list.end(); ++it){
 		// Search for custom codecs
 		if(codec::Codec(encodedReponse, *it, response)) {
       if (*it != "*/*"){ // Otherwise the Codec should set the contentType via the context
@@ -69,13 +68,14 @@ void responsePart ( Response& ret, const ResponseT& response){
 		}
 	}
 	// Use a generic codec
-	if (it == accept_headers_list.end() )
-	for (it = accept_headers_list.begin(); it !=accept_headers_list.end(); ++it){
-		if (codec::GenericCodec(encodedReponse, *it, response)){
-      ret.contentType(*it);
-			break;
-		}
-	}
+  if (it == accept_headers_list.end() ){
+    for (it = accept_headers_list.begin(); it !=accept_headers_list.end(); ++it){
+      if (codec::GenericCodec(encodedReponse, *it, response)){
+        ret.contentType(*it);
+        break;
+      }
+    }
+  }
 	if (it == accept_headers_list.end() ){
 		throw std::runtime_error("No appropriate codec available");
 	}
@@ -83,11 +83,15 @@ void responsePart ( Response& ret, const ResponseT& response){
 	// TODO: Rework this interface
 	//  If void is overwritten and returns false, use the default
 	//  implementation (Assumes no char template is defined)
-	if (!codec::ResponseWrapper<void>( wrappedReponse, encodedReponse.str(), ret.contentType(), NULL)){
-		codec::ResponseWrapper<char>( wrappedReponse, encodedReponse.str(), ret.contentType(), NULL);
+	std::ostringstream wrappedReponse;
+	if (!codec::ResponseWrapper<void>( wrappedReponse, encodedReponse.str(), ret.contentType(), nullptr)){
+		codec::ResponseWrapper<char>( wrappedReponse, encodedReponse.str(), ret.contentType(), nullptr);
 	}
 	ret.body(wrappedReponse.str());
 }
+
+//Empty responsePart
+void responsePart ( Response& ret );
 
 //The default template is request / response
 template <typename Type, typename OperationType, typename RequestT, typename ResponseT, class Strategy  >
@@ -105,15 +109,16 @@ public:
 			ResponseT response( (type.*_op)(request) );
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
+			ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			std::ostringstream wrappedReponse;
 			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex)){
 				codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
 			}
 			ret.body(wrappedReponse.str());
+      std::cerr << "WebException: " << ex.what() << std::endl;
 		} catch (const std::exception &ex) {
+      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			std::cerr << "Exception: " << ex.what() << std::endl;
-		} catch (...){
-			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 		return ret;
 	}
@@ -135,14 +140,15 @@ public:
 			responsePart(ret, response);
 		} catch (const WebMethodException &ex) {
 			std::ostringstream wrappedReponse;
+      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex)){
 				codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
 			}
 			ret.body(wrappedReponse.str());
+      std::cerr << "WebException: " << ex.what() << std::endl;
 		} catch (const std::exception &ex) {
+      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			std::cerr << "Exception: " << ex.what() << std::endl;
-		} catch (...){
-			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 		return ret;
 	}
@@ -163,14 +169,14 @@ public:
 			RequestT request = requestPart<RequestT>(_name, params, prefix);
 			Type &type(_methodHandle.Instance());
 			(type.*_op)(request);
-// 			codec::ResponseWrapper<void>(wrappedReponse, "", "", NULL);
+			//TODO: Add empty return concept (JSON needs null or {}) xml needs empty node
+			responsePart(ret);
 		} catch (const WebMethodException &ex) {
-			//TODO: Tricky case, no response expected but webexception thrown. Loggin for now
+      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			std::cerr << "WebException: " << ex.what() << std::endl;
 		} catch (const std::exception &ex) {
+      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
 			std::cerr << "Exception: " << ex.what() << std::endl;
-		} catch (...){
-			std::cerr << "Catastrophic error, attempting to proceed" <<std::endl;
 		}
 		return ret;
 	}

@@ -8,16 +8,16 @@ const string &Response::body() const{
   return _body;
 }
 
-void Response::body(const string &body){
-  _body = body;
+void Response::body(const string &val){
+  _body = val;
 }
 
 const string &Response::contentType() const{
   return _contentType;
 }
 
-void Response::contentType(const string &contentType){
-  _contentType = contentType;
+void Response::contentType(const string &val){
+  _contentType = val;
 }
 
 const vector<Response::Header>& Response::headers() const{
@@ -28,9 +28,9 @@ void Response::header(const string &key, const string &value){
   _headers.emplace_back(key, value);
 }
 
-void Response::status(Response::Status status)
+void Response::status(Response::Status val)
 {
-  _status = status;
+  _status = val;
 }
 Response::Status Response::status() const
 {
@@ -38,9 +38,12 @@ Response::Status Response::status() const
 }
 
 const map<Response::Status, string> Response::statusText = {
-  {Status::OK_, "OK"},
+  {Status::OK, "OK"},
   {Status::ACCEPTED, "Accepted"},
-  {Status::NOT_FOUND, "Not Found"}
+  {Status::FOUND, "Found"},
+  {Status::FORBIDDEN, "Forbiden"},
+  {Status::NOT_FOUND, "Not Found"},
+  {Status::INTERNAL_SERVER_ERROR, "Internal Server Error"}
 };
 
 }

@@ -28,7 +28,7 @@ namespace std{
 #include <boost/mpl/equal_to.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/serialization/nvp.hpp>
-// #include <boost/serialization/collection_item.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/access.hpp>
@@ -190,7 +190,6 @@ public:
 		collectionEntry aux;
 		aux.itemName = m_currentName;
 		aux.size = t.value();
-		aux.newEntry = true;
 		m_collectionStack.push_back(aux);
 		return * this;
 	}
@@ -201,18 +200,22 @@ public:
 		bool isLastEntry = false;
 		bool isItem = false;
 		if (!m_collectionStack.empty() ){
-			if (itemName == "item_version")
+			if (itemName == "item_version"){
+        _os << '[';
+        //An empty collection
+        if (m_collectionStack.back().size == 0){
+          m_collectionStack.pop_back();
+          _os << ']';
+          _wasLastEntry = true;
+        }
 				return * this;
+      }
 			if (itemName == "item"){
 				isItem = true;
-				if (_complex_object_begin) // Not a complex object, just a item
+				if (_complex_object_begin){ // Not a complex object, just a item
 					_complex_object_begin = false;
-				
-
-				if (m_collectionStack.back().newEntry){
-					m_collectionStack.back().newEntry = false;
-					_os << "[";
-				}
+					_complex_object_end = false;
+        }
 				itemName = m_collectionStack.back().itemName;
 				if (--m_collectionStack.back().size == 0){
 					m_collectionStack.pop_back();

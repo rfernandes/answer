@@ -34,5 +34,57 @@ Operation& OperationStore::operation(const string& serviceName, const string& op
 	}
 	return *it->second;
 }
+void responsePart(Response &ret)
+{
+
+  const answer::Context::Accepts &accept_headers_list = answer::Context::Instance().accepts();
+  answer::Context::Accepts::const_iterator it = accept_headers_list.begin();
+
+  std::ostringstream encodedReponse;
+
+  for (; it != accept_headers_list.end(); ++it)
+  {
+    // Search for custom codecs
+    if (codec::Codec(encodedReponse, *it))
+    {
+      if (*it != "*/*")  // Otherwise the Codec should set the contentType via the context
+      {
+        ret.contentType(*it);
+      }
+
+      break;
+    }
+  }
+
+  // Use a generic codec
+  if (it == accept_headers_list.end())
+  {
+    for (it = accept_headers_list.begin(); it != accept_headers_list.end(); ++it)
+    {
+      if (codec::GenericCodec(encodedReponse, *it))
+      {
+        ret.contentType(*it);
+        break;
+      }
+    }
+  }
+
+  if (it == accept_headers_list.end())
+  {
+    throw std::runtime_error("No appropriate codec available");
+  }
+
+  // TODO: Rework this interface
+  //  If void is overwritten and returns false, use the default
+  //  implementation (Assumes no char template is defined)
+  std::ostringstream wrappedReponse;
+
+  if (!codec::ResponseWrapper<void>(wrappedReponse, encodedReponse.str(), ret.contentType(), nullptr))
+  {
+    codec::ResponseWrapper<char>(wrappedReponse, encodedReponse.str(), ret.contentType(), nullptr);
+  }
+
+  ret.body(wrappedReponse.str());
+}
 
 }

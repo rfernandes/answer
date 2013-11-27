@@ -16,6 +16,9 @@ namespace answer{
 			return false;
 		}
 
+    //Empty response
+    bool Codec ( std::ostream&, const std::string&);
+
 		template<typename T>
 		bool GenericCodec ( std::ostream& out, const std::string& mimeType, const T& data)
 		{
@@ -33,10 +36,17 @@ namespace answer{
 			return false;
 		}
 
+    //A conformant request only operation must still return something depending on mimeType
+    bool GenericCodec ( std::ostream& out, const std::string& mimeType);
+
 		template<typename T>
-		bool ResponseWrapper( std::ostream& out, const std::string& response, const std::string& mimeType, const answer::WebMethodException*)
+		bool ResponseWrapper( std::ostream& out, const std::string& response, const std::string& /*mimeType*/, const answer::WebMethodException *ex)
 		{
-      out << response;
+      if (ex){
+        out << ex->what();
+      }else{
+        out << response; 
+      }
 			return true;
 		}
 		
