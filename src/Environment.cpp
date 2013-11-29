@@ -36,6 +36,14 @@ Response::Status Response::status() const
 {
   return _status;
 }
+void Request::body(const string &value)
+{
+  _body = value;
+}
+const string &Request::body() const
+{
+  return _body;
+}
 
 const map<Response::Status, string> Response::statusText = {
   {Status::OK, "OK"},

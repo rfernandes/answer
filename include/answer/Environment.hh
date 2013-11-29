@@ -16,6 +16,14 @@ namespace answer{
     virtual const std::string& url() const = 0;
   };
 
+  class Request{
+    std::string _body;
+  public:
+    //TODO: Add vector<char> data accessors for body
+    const std::string &body() const;
+    void body(const std::string &body);
+  };
+
   class Response{
   public:
     typedef std::pair<std::string, std::string> Header;
