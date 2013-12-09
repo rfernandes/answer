@@ -1,9 +1,7 @@
-#include "answer/OperationStore.hh"
-#include "AxisEnvironmentWrapper.hh"
+#include "answer/Operation.hh"
 #include "answer/Environment.hh"
 
 #include "AxisContext.hh"
-#include "AxisTransportInfo.hh"
 
 #include <stdio.h>
 #include <iostream>
@@ -96,7 +94,7 @@ extern "C"
 // 			cerr << "Params: " << params << endl;
 
 			Operation& oper_ref = OperationStore::Instance().operation (prefix, operationName );
-			string xmlResponse = oper_ref.invoke ( params, prefix);
+			Response response = oper_ref.invoke ( params, prefix);
 
 			// Response Node preparation
 			axiom_element_t *parent_element = NULL;
@@ -110,7 +108,7 @@ extern "C"
 			axiom_data_source_t *data_source = axiom_data_source_create ( env, parent, &current_node );
 			axutil_stream_t *stream = axiom_data_source_get_stream ( data_source, env );
 
-			int written = axutil_stream_write ( stream, env, xmlResponse.c_str(), xmlResponse.size() );
+			int written = axutil_stream_write ( stream, env, response.body().c_str(), response.body().size() );
 			AXIS2_LOG_DEBUG(env->log, AXIS2_LOG_SI, "Bytes written: %d", written);
 		} catch ( exception &ex ) {
 
@@ -207,7 +205,7 @@ extern "C"
 		/* Allocate memory for the structs */
 
 		Dl_info dl_info;
-		dladdr ( ( void * ) myfunc, &dl_info );
+		dladdr ( ( const void * ) myfunc, &dl_info );
 		if ( ( error = dlerror() ) != NULL )  {
 			cerr << "module '" << dl_info.dli_fname << "' could not be loaded: " << error << endl;
 			return NULL;

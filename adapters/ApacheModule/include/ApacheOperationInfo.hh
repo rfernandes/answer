@@ -1,7 +1,6 @@
 #ifndef _APACHE_OPERATION_INFO_HH_
 #define _APACHE_OPERATION_INFO_HH_
 
-#include <httpd.h>
 #include <apreq.h>
 #include <apreq_module.h>
 

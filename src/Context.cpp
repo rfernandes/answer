@@ -31,11 +31,7 @@ Response &Context::response()
   return _response;
 }
 
-<<<<<<< Updated upstream
 void Context::response(const Response &val)
-=======
-void Context::response(const answer::Response &response)
->>>>>>> Stashed changes
 {
   _response = val;
 }
@@ -55,8 +51,6 @@ const Context::Accepts &Context::accepts() const
 {
   return _accepts;
 }
-<<<<<<< Updated upstream
-=======
 
 void Context::request(const Request &request)
 {
@@ -74,7 +68,6 @@ void Context::accepts(const Context::Accepts &accepts)
 {
   _accepts = accepts;
 }
->>>>>>> Stashed changes
 
 
 }

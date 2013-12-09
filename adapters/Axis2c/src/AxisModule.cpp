@@ -12,9 +12,6 @@
 
 #include "answer/Module.hh"
 #include <answer/Context.hh>
-#include "AxisEnvironmentWrapper.hh"
-#include "AxisCookieWrapper.hh"
-#include "XmlParams.hh"
 
 #include "AxisInFlowContext.hh"
 #include "AxisOutFlowContext.hh"
@@ -59,38 +56,50 @@ extern "C"
 #endif
 
 	axis2_status_t AXIS2_CALL
+	
 	axutil_module_in_handler_invoke (
 		struct axis2_handler * /*handler*/,
 		const axutil_env_t * env,
 		struct axis2_msg_ctx * msg_ctx ) {
 
-		AxisInFlowContext flowContext ( env, msg_ctx );
+		AxisInFlowContext context ( env, msg_ctx );
 
-		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
-		ModuleStore::StoreT::const_iterator it = store.begin();
-		try {
-			for ( ; it != store.end(); ++it ) {
-				if ( (*it)->inFlow ( flowContext ) != Module::OK ) {
-					return AXIS2_FAILURE;
-				}
-			}
-		} catch ( ModuleAuthenticationException &ex ) {
-			cerr << "Authentication IN module exception error :" << flowContext.operationInfo().service()
-					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
-			axis2_msg_ctx_set_status_code ( msg_ctx, env, 401 );
-			return AXIS2_FAILURE;
-		} catch ( ModuleAuthorizationException &ex ) {
-				cerr << "Authorization IN module exception error :" << flowContext.operationInfo().service()
-						<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
-			axis2_msg_ctx_set_status_code ( msg_ctx, env, 403 );
-			return AXIS2_FAILURE;
-		} catch ( ModuleException &ex ) {
-			cerr << "General IN module exception error :" << flowContext.operationInfo().service()
-					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
-
-			return AXIS2_FAILURE;
+		ModuleStore & store = ModuleStore::Instance();
+		Module::FlowStatus status = store.inFlow(context);
+		
+		switch (status){
+			case answer::Module::OK:
+				return AXIS2_FAILURE;
+			//FIXME: Implement skip
+			default:
+				return AXIS2_FAILURE;
 		}
-		return AXIS2_SUCCESS;
+		
+		return AXIS2_FAILURE;
+// 		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
+// 		ModuleStore::StoreT::const_iterator it = store.begin();
+// 		try {
+// 			for ( ; it != store.end(); ++it ) {
+// 				if ( (*it)->inFlow ( flowContext ) != Module::OK ) {
+// 					return AXIS2_FAILURE;
+// 				}
+// 			}
+// 		} catch ( ModuleAuthenticationException &ex ) {
+// 			cerr << "Authentication IN module exception error :" << flowContext.operationInfo().service()
+// 					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
+// 			axis2_msg_ctx_set_status_code ( msg_ctx, env, 401 );
+// 			return AXIS2_FAILURE;
+// 		} catch ( ModuleAuthorizationException &ex ) {
+// 				cerr << "Authorization IN module exception error :" << flowContext.operationInfo().service()
+// 						<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
+// 			axis2_msg_ctx_set_status_code ( msg_ctx, env, 403 );
+// 			return AXIS2_FAILURE;
+// 		} catch ( ModuleException &ex ) {
+// 			cerr << "General IN module exception error :" << flowContext.operationInfo().service()
+// 					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
+// 
+// 			return AXIS2_FAILURE;
+// 		}
 	}
 	
 	AXIS2_EXTERN axis2_handler_t *AXIS2_CALL
@@ -116,21 +125,19 @@ extern "C"
 		struct axis2_handler * /*handler*/,
 		const axutil_env_t * env,
 		struct axis2_msg_ctx * msg_ctx ) {
-		AxisOutFlowContext flowContext ( env, msg_ctx );
-		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
-		ModuleStore::StoreT::const_iterator it = store.begin();
-		try {
-			for ( ; it != store.end(); ++it ) {
-				if ( (*it)->outFlow ( flowContext ) != Module::OK ) {
-					return AXIS2_FAILURE;
-				}
-			}
-		} catch ( ModuleException &ex ) {
-			cerr << "General OUT module exception error:" << flowContext.operationInfo().service()
-					<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
-			return AXIS2_FAILURE;
+		AxisOutFlowContext context ( env, msg_ctx );
+
+		ModuleStore & store = ModuleStore::Instance();
+		Module::FlowStatus status = store.outFlow(context);
+		
+		switch (status){
+			case answer::Module::OK:
+				return AXIS2_FAILURE;
+			//FIXME: Implement skip
+			default:
+				return AXIS2_FAILURE;
 		}
-		return AXIS2_SUCCESS;
+		return AXIS2_FAILURE;
 	}
 
 	AXIS2_EXTERN axis2_handler_t *AXIS2_CALL
@@ -165,7 +172,6 @@ extern "C"
 				AXIS2_FREE ( env->allocator, module );
 		}
 
-
 		return AXIS2_SUCCESS;
 	}
 
@@ -196,24 +202,20 @@ extern "C"
 		const axutil_env_t * env,
 		struct axis2_msg_ctx * msg_ctx ) {
 		AXIS2_LOG_INFO ( env->log, "[Generic Module] out FAULT handler" );
-		AxisOutFlowContext flowContext ( env, msg_ctx );
-		const ModuleStore::StoreT & store = ModuleStore::Instance().getStore();
-		ModuleStore::StoreT::const_iterator it = store.begin();
-		try {
-				for ( ; it != store.end(); ++it ) {
-						if ( (*it)->outFlowFault ( flowContext ) != Module::OK ) {
-								cerr << "General OUT FAULT module error:" << flowContext.operationInfo().service()
-																	<< "/" << flowContext.operationInfo().operation() << endl;
+		AxisOutFlowContext context ( env, msg_ctx );
 
-								return AXIS2_FAILURE;
-						}
-				}
-		} catch ( ModuleException &ex ) {
-				cerr << "General OUT FAULT module exception error:" << flowContext.operationInfo().service()
-													<< "/" << flowContext.operationInfo().operation() << ":" << ex.what() << endl;
+		
+		ModuleStore & store = ModuleStore::Instance();
+		Module::FlowStatus status = store.outFlow(context);
+		
+		switch (status){
+			case answer::Module::OK:
+				return AXIS2_FAILURE;
+			//FIXME: Implement skip
+			default:
 				return AXIS2_FAILURE;
 		}
-		return AXIS2_SUCCESS;
+		return AXIS2_FAILURE;
 	}
 
 	AXIS2_EXTERN axis2_handler_t *AXIS2_CALL
@@ -246,9 +248,10 @@ extern "C"
 
 		/* add in handler */
 		axutil_hash_set ( module->handler_create_func_map, "ModuleInHandler",
-											AXIS2_HASH_KEY_STRING, ( const void * ) axutil_module_in_handler_create );
+											AXIS2_HASH_KEY_STRING, ( const void* ) axutil_module_in_handler_create );
 
-		/* add out handler, for successfull authentications */
+		/* add out handler, for successfull authentication
+		 *s */
 		axutil_hash_set ( module->handler_create_func_map, "ModuleOutHandler",
 											AXIS2_HASH_KEY_STRING, ( const void * ) axutil_module_out_handler_create );
 

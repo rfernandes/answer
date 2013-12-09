@@ -2,10 +2,7 @@
 #define _AXIS_CONTEXT_HH_
 
 #include "answer/Context.hh"
-#include "AxisEnvironmentWrapper.hh"
 #include "AxisOperation.hh"
-#include "AxisCookieWrapper.hh"
-#include "AxisTransportInfo.hh"
 #include <axis2_http_header.h>
 #include <axis2_http_transport.h>
 
@@ -14,10 +11,7 @@ namespace answer{
 		namespace axis{
 
 	class AxisContext: public Context {
-// 		axis::AxisCookieJarWrapper _cookies;
-// 		axis::AxisEnvironmentWrapper _environment;
 		axis::AxisOperation _operation;
-		axis::AxisTransport _transport;
 		
 		const axutil_env_t * _axis_env;
 		struct axis2_msg_ctx * _msg_ctx;
@@ -29,9 +23,6 @@ namespace answer{
 
 		virtual OperationInfo& operationInfo() {
 			return _operation;
-		}
-    virtual TransportInfo& transportInfo(){
-			return _transport;
 		}
 	};
 

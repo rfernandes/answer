@@ -10,24 +10,11 @@ namespace answer{
 namespace adapter{
 namespace apache{
 
-  class ApacheTransport: public TransportInfo{
-    std::list< std::string > _accepts;
-  public:
-
-    ApacheTransport(request_rec* r, const answer_conf_t& conf);
-    
-    virtual const std::list< std::string >& accepts() const;
-    virtual const std::string& redirect() const;
-    virtual const std::string& redirect(const std::string& uri);
-    virtual bool redirectSet() const;
-  };
-
   class ApacheContext: public Context {
   
     void queryRequestFormat(apreq_handle_t* apr);
     void axisRequestFormat(request_rec* r);
 
-    ApacheTransport _transport;
     ApacheOperationInfo _operation;
 
   public:
@@ -37,9 +24,6 @@ namespace apache{
 
     virtual OperationInfo& operationInfo(){
       return _operation;
-    }
-    virtual TransportInfo& transportInfo(){
-      return _transport;
     }
   };
 

@@ -18,8 +18,10 @@ namespace answer{
 namespace adapter{
 namespace apache{
  
-  ApacheTransport::ApacheTransport(request_rec* r, const answer_conf_t& conf){
-    // Read the accepts
+  ApacheContext::ApacheContext(request_rec* r, const answer_conf_t& conf):
+    _operation(r,conf)
+  {
+		// Read the accepts
     apr_table_do(
       [](void *acceptsRaw, const char* key, const char* value) -> int {
         list<string>& accepts = *static_cast<list<string>*>(acceptsRaw);
@@ -39,39 +41,8 @@ namespace apache{
     );
   }
 
-  ApacheContext::ApacheContext(request_rec* r, const answer_conf_t& conf):
-    _transport(r,conf),
-    _operation(r,conf)
-  {
-  }
-
   ApacheContext::~ApacheContext()
   {
-  }
-
-  const list< string >& ApacheTransport::accepts() const
-  {
-    return _accepts;
-  }
-
-//   void ApacheTransport::addHeader(const string& key, const string& value, bool replace)
-//   {
-//     throw std::runtime_error("Apache addHeader");
-//   }
-
-  const string& ApacheTransport::redirect() const
-  {
-    throw std::runtime_error("Apache redirect");
-  }
-
-  const string& ApacheTransport::redirect(const string& uri)
-  {
-    throw std::runtime_error("Apache redirect");
-  }
-
-  bool ApacheTransport::redirectSet() const
-  {
-    return false;
   }
 
 } //apache

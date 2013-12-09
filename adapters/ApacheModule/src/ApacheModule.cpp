@@ -81,7 +81,6 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
       ++itr )
     {
       if ( extension(itr->path()) == ".so"){
-        cerr << "Loading module: "<< itr->path() << endl;
         dlOpen(itr->path().c_str(), RTLD_GLOBAL);
       }
     }
@@ -95,7 +94,6 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
       ++itr )
     {
       if ( extension(itr->path()) == ".so"){
-        cerr << "Loading service: "<< itr->path() << endl;
         dlOpen(itr->path().c_str(), RTLD_GLOBAL);
       }
     }

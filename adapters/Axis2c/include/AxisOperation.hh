@@ -3,6 +3,8 @@
 
 #include "answer/Environment.hh"
 #include <axis2_msg_ctx.h>
+#include <axis2_op.h>
+#include <axis2_op_ctx.h>
 
 namespace answer{
 	namespace adapter{
@@ -15,6 +17,7 @@ namespace answer{
 			public:
 					AxisOperation ( const axutil_env_t * axis_env, struct axis2_msg_ctx * msg_ctx ) {
 						//TODO: unprotected code: to protect pointers access
+							
 							axis2_op_ctx_t *operation_ctx = axis2_msg_ctx_get_op_ctx ( msg_ctx, axis_env );
 							axis2_op_t *operation = axis2_op_ctx_get_op ( operation_ctx, axis_env );
 							axutil_qname_t *op_qname = ( axutil_qname_t * ) axis2_op_get_qname ( operation, axis_env );

@@ -35,19 +35,6 @@ class FcgiAdapter: public Fastcgipp::Request
       switch (status){
         // Request the webservice
         case Module::OK:{
-<<<<<<< Updated upstream
-          string requestBody;
-          const string &service = context.operationInfo().service();
-          const string &operation = context.operationInfo().operation();
-
-          boost::property_tree::ptree pt;
-          if(!environment().posts.empty()){
-            for(const auto &env: environment().posts){
-              if(env.second.type== Http::Post::form){
-                pt.put(operation + "." + env.first, env.second.value);
-              }
-            }
-=======
           const string &service = context.operationInfo().service();
           const string &operation = context.operationInfo().operation();
           
@@ -62,25 +49,8 @@ class FcgiAdapter: public Fastcgipp::Request
           context.response().body(response.body());
           if (!response.contentType().empty()){
             context.response().contentType(response.contentType());
->>>>>>> Stashed changes
           }
-          stringstream ss;
-          boost::property_tree::write_xml(ss, pt);
-          // Remove the xml header, header is always present
-          requestBody = ss.str().substr(ss.str().find_first_of("\n") + 1);
-          
-          Operation& oper_ref = OperationStore::Instance().operation(service, operation);
-          //Doing context.response(response) would overwrite other data such as status headers and cookies
-          //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-          Response response = oper_ref.invoke(requestBody);
-          //If status is the original, overwrite with the returned on (which might still be 
-          if (context.response().status() == Response::Status::OK){
-            context.response().status(response.status());
-          }
-          context.response().body(response.body());
-          if (!response.contentType().empty()){
-            context.response().contentType(response.contentType());
-          }
+
         }
         break;
         case Module::ERROR:
