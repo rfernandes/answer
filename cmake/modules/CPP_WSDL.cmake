@@ -1,10 +1,5 @@
 MACRO(CPP_WSDL)
 
-add_definitions(-DANSWER_SERVICE_NAME="${PROJECT_NAME}")
-#get_property(INCLUDE_DIRS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#if(${ARGC} GREATER 0)
-#	message("Using extra include dir ${ARGN}")
-#endif()
 add_custom_command(
 	TARGET ${PROJECT_NAME}
 	POST_BUILD

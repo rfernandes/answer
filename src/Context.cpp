@@ -3,25 +3,33 @@
 namespace answer
 {
 
-Context* Context::_context = nullptr;
+Context *Context::_context = nullptr;
 
-Context::Context(){
-  if (_context){
+Context::Context()
+{
+  if (_context)
+  {
     throw std::runtime_error("A context already exists");
-  }else{
+  }
+  else
+  {
     _context = this;
   }
 }
 
-Context& Context::Instance() {
-  if ( !_context ) {
-    throw std::runtime_error ( "Uninitialized context" );
+Context &Context::Instance()
+{
+  if (!_context)
+  {
+    throw std::runtime_error("Uninitialized context");
   }
   return *_context;
 }
 
-Context::~Context(){
-  if (_context){
+Context::~Context()
+{
+  if (_context)
+  {
     _context = nullptr;
   }
 }
@@ -60,7 +68,7 @@ const Request &Context::request() const
 {
   return _request;
 }
-const Context::QueryMap& Context::query() const
+const Context::QueryMap &Context::query() const
 {
   return _query;
 }

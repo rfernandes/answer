@@ -3,20 +3,25 @@
 #include "AxisOperation.hh"
 
 
-namespace answer{
-	namespace adapter{
-		namespace axis{
+namespace answer
+{
+namespace adapter
+{
+namespace axis
+{
 
-class AxisOutFlowContext: public Context {
-    AxisOperation _operation;
+class AxisOutFlowContext: public Context
+{
+  AxisOperation _operation;
 public:
-    AxisOutFlowContext ( const axutil_env_t * axis_env,
-                         struct axis2_msg_ctx * msg_ctx ) :
-        _operation (axis_env, msg_ctx) {}
+  AxisOutFlowContext(const axutil_env_t *axis_env,
+                     struct axis2_msg_ctx *msg_ctx) :
+    _operation(axis_env, msg_ctx) {}
 
-    virtual OperationInfo& operationInfo() {
-        return _operation;
-    }
+  virtual OperationInfo &operationInfo()
+  {
+    return _operation;
+  }
 };
 
 }

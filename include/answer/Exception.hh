@@ -3,22 +3,26 @@
 
 #include <stdexcept>
 
-namespace answer {
+namespace answer
+{
 
-class WebMethodException: public std::runtime_error {
+class WebMethodException: public std::runtime_error
+{
 
 public:
-  WebMethodException(const std::string& message);
+  WebMethodException(const std::string &message);
 };
 
-class WebMethodInvalidInput: public WebMethodException {
+class WebMethodInvalidInput: public WebMethodException
+{
 public:
-  WebMethodInvalidInput(const std::string& message);
+  WebMethodInvalidInput(const std::string &message);
 };
 
-class WebMethodMissingParameter: public WebMethodException {
+class WebMethodMissingParameter: public WebMethodException
+{
 public:
-  WebMethodMissingParameter(const std::string& message);
+  WebMethodMissingParameter(const std::string &message);
 };
 }
 

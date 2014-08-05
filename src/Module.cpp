@@ -3,24 +3,29 @@
 
 using namespace std;
 
-namespace answer{
+namespace answer
+{
 
-ModuleStore::ModuleStore(){}
+ModuleStore::ModuleStore() {}
 
-ModuleStore& ModuleStore::Instance(){
-	static ModuleStore store;
-	return store;
+ModuleStore &ModuleStore::Instance()
+{
+  static ModuleStore store;
+  return store;
 }
 
-void ModuleStore::registerModule(answer::Module*const module){
-	_store.push_back(module);
+void ModuleStore::registerModule(answer::Module *const module)
+{
+  _store.push_back(module);
 }
 
 Module::FlowStatus ModuleStore::inFlow(Context &context)
 {
-  for (auto &module: _store){
-    FlowStatus status = module->inFlow( context );
-    if (status != OK){
+  for (auto & module : _store)
+  {
+    FlowStatus status = module->inFlow(context);
+    if (status != OK)
+    {
       return status;
     }
   }
@@ -29,9 +34,11 @@ Module::FlowStatus ModuleStore::inFlow(Context &context)
 
 Module::FlowStatus ModuleStore::outFlow(Context &context)
 {
-  for (auto &module: _store){
-    FlowStatus status = module->outFlow( context );
-    if (status != OK){
+  for (auto & module : _store)
+  {
+    FlowStatus status = module->outFlow(context);
+    if (status != OK)
+    {
       return status;
     }
   }
@@ -40,9 +47,11 @@ Module::FlowStatus ModuleStore::outFlow(Context &context)
 
 Module::FlowStatus ModuleStore::outFlowFault(Context &context)
 {
-  for (auto &module: _store){
-    FlowStatus status = module->outFlowFault( context );
-    if (status != OK){
+  for (auto & module : _store)
+  {
+    FlowStatus status = module->outFlowFault(context);
+    if (status != OK)
+    {
       return status;
     }
   }

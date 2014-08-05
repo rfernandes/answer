@@ -7,25 +7,29 @@
 #include "answer/Environment.hh"
 #include "ApacheModule.hh"
 
-namespace answer{
-namespace adapter{
-namespace apache{
+namespace answer
+{
+namespace adapter
+{
+namespace apache
+{
 
-class ApacheOperationInfo: public OperationInfo{
+class ApacheOperationInfo: public OperationInfo
+{
   std::string _service;
   std::string _operation;
   std::string _rawRequest;
-  
-  void queryRequestFormat(apreq_handle_t* apr);
-  void axisRequestFormat(request_rec* r);
-  
-public:
-  ApacheOperationInfo(request_rec* r, const answer_conf_t& conf);
 
-  virtual const std::string& getRawRequest() const;
-  virtual const std::string& operation() const;
-  virtual const std::string& service() const;
-  virtual const std::string& url() const;
+  void queryRequestFormat(apreq_handle_t *apr);
+  void axisRequestFormat(request_rec *r);
+
+public:
+  ApacheOperationInfo(request_rec *r, const answer_conf_t &conf);
+
+  virtual const std::string &getRawRequest() const;
+  virtual const std::string &operation() const;
+  virtual const std::string &service() const;
+  virtual const std::string &url() const;
 };
 
 }

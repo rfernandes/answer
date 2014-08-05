@@ -4,10 +4,8 @@ namespace answer
 {
 namespace codec
 {
-bool GenericCodec(std::ostream &out, const std::string &mimeType)
+bool GenericCodec(std::ostream &out, const std::string &mimeType, const std::string &operationName)
 {
-  const std::string &operationName = Context::Instance().operationInfo().operation();
-
   if (mimeType == "application/json")
   {
     out << "null";
@@ -20,7 +18,6 @@ bool GenericCodec(std::ostream &out, const std::string &mimeType)
     outA << boost::serialization::make_nvp(operationName.c_str(), "");
     return true;
   }
-
   return false;
 }
 bool Codec(std::ostream &, const std::string &)

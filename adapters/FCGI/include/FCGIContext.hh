@@ -7,17 +7,21 @@
 
 #include "FCGIOperationInfo.hh"
 
-namespace answer{
-namespace adapter{
-namespace fcgi{
+namespace answer
+{
+namespace adapter
+{
+namespace fcgi
+{
 
-	class FCGIContext: public Context{
-		FCGIOperationInfo _operation;
+class FCGIContext: public Context
+{
+  FCGIOperationInfo _operation;
 
-	public:
-		FCGIContext (const Fastcgipp::Http::Environment&env);
-    virtual OperationInfo& operationInfo();
-	};
+public:
+  FCGIContext(const Fastcgipp::Http::Environment &env);
+  virtual OperationInfo &operationInfo();
+};
 
 } //fcgi
 } //adapter

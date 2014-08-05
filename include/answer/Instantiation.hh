@@ -4,97 +4,109 @@
 #include <type_traits>
 
 class Object;
-namespace answer{
+namespace answer
+{
 
 
-namespace instantiation{
+namespace instantiation
+{
 
-class SingleCall{};
+class SingleCall {};
 
-class Singleton{};
+class Singleton {};
 
-class LazySingleton{};
+class LazySingleton {};
 
 // template <unsigned MIN_THREADS, unsigned MAX_THREADS>
 // class WorkerPool{
 // public:
-// 	enum {min_threads = MIN_THREADS};
-// 	enum {max_threads = MAX_THREADS};
+//  enum {min_threads = MIN_THREADS};
+//  enum {max_threads = MAX_THREADS};
 // };
 // }
 
 //The default strategy is singleCall
 template <typename ObjectT, class InstantiationStrategyType = void>
-class InstantiationStrategy{
+class InstantiationStrategy
+{
   mutable ObjectT *_webMethod; //Keep the last (cache -> justifies mutable)
 public:
-  InstantiationStrategy():_webMethod(0){}
-  ~InstantiationStrategy(){if (_webMethod) delete _webMethod;}
+  InstantiationStrategy(): _webMethod(0) {}
+  ~InstantiationStrategy()
+  {
+    if (_webMethod) delete _webMethod;
+  }
 
-  ObjectT& Instance() const{
-    if (_webMethod){ delete _webMethod; }
+  ObjectT &Instance() const
+  {
+    if (_webMethod)
+    {
+      delete _webMethod;
+    }
     _webMethod = new ObjectT();
     return *_webMethod;
   }
 };
 
 template <typename ObjectT>
-class InstantiationStrategy<
+class InstantiationStrategy <
   ObjectT,
-  typename std::enable_if<
-    std::is_base_of<instantiation::Singleton, ObjectT>::value
+  typename std::enable_if <
+  std::is_base_of<instantiation::Singleton, ObjectT>::value
   >::type
   >
 {
-	static ObjectT s_webMethod;
+  static ObjectT s_webMethod;
 
 public:
-	ObjectT& Instance() const{
-		return s_webMethod;
-	}
+  ObjectT &Instance() const
+  {
+    return s_webMethod;
+  }
 };
 
 //Static member initialization
 template <typename ObjectT>
 ObjectT
-InstantiationStrategy<
-  ObjectT,
-  typename std::enable_if<
-    std::is_base_of<instantiation::Singleton, ObjectT>::value
-  >::type
-  >::s_webMethod = ObjectT();
+InstantiationStrategy <
+ObjectT,
+typename std::enable_if <
+std::is_base_of<instantiation::Singleton, ObjectT>::value
+>::type
+>::s_webMethod = ObjectT();
 
 template <typename ObjectT>
-class InstantiationStrategy<
+class InstantiationStrategy <
   ObjectT,
-  typename std::enable_if<
-    std::is_base_of<instantiation::LazySingleton, ObjectT>::value
-  >::type>
+  typename std::enable_if <
+  std::is_base_of<instantiation::LazySingleton, ObjectT>::value
+  >::type >
 {
 public:
-	ObjectT& Instance() const{
-		static ObjectT webMethod;
-		return webMethod;
-	}
+  ObjectT &Instance() const
+  {
+    static ObjectT webMethod;
+    return webMethod;
+  }
 };
 
 // template <typename ObjectT, unsigned MIN, unsigned MAX>
 // class InstantiationStrategy<
 //   typename std::enable_if<
 //     std::is_base_of<instantiation::WorkerPool<MIN, MAX>, ObjectT>::value
-//   >::type, 
+//   >::type,
 //   ObjectT>
 // {
 // public:
-// 	InstantiationStrategy(){
-// 		std::cerr << "Min Workers: " << MIN << std::endl;
-// 		std::cerr << "Max Workers: " << MAX << std::endl;
-// 	}
-// 	
-// 	ObjectT& Instance() const{ // Incomplete
-// 		static ObjectT webMethod;
-// 		return webMethod;
-// 	}
+//  InstantiationStrategy(){
+//      std::cerr << "Min Workers: " << MIN << std::endl;
+//      std::cerr << "Max Workers: " << MAX << std::endl;
+//  }
+//
+//  ObjectT& Instance() const{ // Incomplete
+//      static ObjectT webMethod;
+//      return webMethod;
+//  }
 // };
 }
 

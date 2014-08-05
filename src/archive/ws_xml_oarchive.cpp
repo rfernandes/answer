@@ -6,8 +6,10 @@
 #include <boost/archive/impl/basic_xml_oarchive.ipp>
 #include <boost/archive/impl/xml_oarchive_impl.ipp>
 
-namespace boost {
-namespace archive {
+namespace boost
+{
+namespace archive
+{
 
 template class detail::archive_serializer_map<answer::archive::ws_xml_oarchive>;
 template class basic_xml_oarchive<answer::archive::ws_xml_oarchive> ;

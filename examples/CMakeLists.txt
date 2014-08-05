@@ -1,5 +1,3 @@
-project(examples)
-
 include_directories("include")
 
 add_library(Calculator SHARED EXCLUDE_FROM_ALL
@@ -12,12 +10,12 @@ add_library(BasicService SHARED EXCLUDE_FROM_ALL
 )
 target_link_libraries (BasicService answer)
 
-# add_library(LogModule SHARED EXCLUDE_FROM_ALL
-# 	"src/LogModule.cpp"
-# )
+add_library(LogModule SHARED EXCLUDE_FROM_ALL
+	"src/LogModule.cpp"
+)
 target_link_libraries (BasicService answer-module)
 
-add_custom_target(examples DEPENDS Calculator BasicService LogModule)
+add_custom_target(examples DEPENDS BasicService Calculator)
 
 # Generate WSDL and services XML based on specified header
 include (CPP_WSDL)
