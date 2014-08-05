@@ -35,22 +35,23 @@
 /* Configuration structure populated by apache2.conf */
 // typedef struct answer_config_rec
 // {
-// 
+//
 // } answer_config_rec_t;
 
 // Configuration struct for directory or locations with MPSSession
-typedef struct  {
-// 	char *directory;
-	bool axisRequestFormat;
+typedef struct
+{
+//  char *directory;
+  bool axisRequestFormat;
   std::string servicesDir;
   std::string modulesDir;
-// 	const char *cookie_name;
-// 	const char *cookie_header;
-// 	const char *uri_location;
-// 	const char *uri_prelocation;
-// 	const char *forbidden_location;
-// 	const char *unauthorized_location;
-// 	std::set<std::string> *session_allow_always;
+//  const char *cookie_name;
+//  const char *cookie_header;
+//  const char *uri_location;
+//  const char *uri_prelocation;
+//  const char *forbidden_location;
+//  const char *unauthorized_location;
+//  std::set<std::string> *session_allow_always;
 } answer_conf_t;
 
 

@@ -54,6 +54,7 @@ target_link_libraries (${PROJECT_NAME}
 option(APACHE_ADAPTER "compile the native apache module adapter" true)
 option(FCGI_ADAPTER "compile the fastcgi++ adapter" true)
 option(AXIS_ADAPTER "compile the axis2/C adapter" true)
+option(MONGOOSE_ADAPTER "compile the Mongoose adapter" false)
 
 if (APACHE_ADAPTER)
 	add_subdirectory(adapters/ApacheModule)
@@ -67,6 +68,10 @@ if (AXIS_ADAPTER)
 	add_subdirectory(adapters/Axis2c)
 endif()
 
+if (MONGOOSE_ADAPTER)
+  add_subdirectory(adapters/Mongoose)
+endif()
+
 install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)
 install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)
 
@@ -74,7 +79,6 @@ install (FILES ${headersHH} DESTINATION include/answer COMPONENT headers)
 install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT headers)
 
 add_subdirectory(examples)
-
 
 enable_testing()
 include(CTest)

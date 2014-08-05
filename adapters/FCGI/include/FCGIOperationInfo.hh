@@ -4,20 +4,24 @@
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
 
-namespace answer{
-namespace adapter{
-namespace fcgi{
+namespace answer
+{
+namespace adapter
+{
+namespace fcgi
+{
 
-class FCGIOperationInfo: public OperationInfo{
-	std::string _service;
-	std::string _operation;
+class FCGIOperationInfo: public OperationInfo
+{
+  std::string _service;
+  std::string _operation;
   std::string _url;
 public:
-	FCGIOperationInfo(const Fastcgipp::Http::Environment &env);
+  FCGIOperationInfo(const Fastcgipp::Http::Environment &env);
 
-	virtual const std::string& operation() const;
-	virtual const std::string& service() const;
-	virtual const std::string& url() const;
+  virtual const std::string &operation() const;
+  virtual const std::string &service() const;
+  virtual const std::string &url() const;
 
 };
 

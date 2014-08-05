@@ -6,26 +6,31 @@
 #include <httpd.h>
 #include "ApacheModule.hh"
 
-namespace answer{
-namespace adapter{
-namespace apache{
+namespace answer
+{
+namespace adapter
+{
+namespace apache
+{
 
-  class ApacheContext: public Context {
-  
-    void queryRequestFormat(apreq_handle_t* apr);
-    void axisRequestFormat(request_rec* r);
+class ApacheContext: public Context
+{
 
-    ApacheOperationInfo _operation;
+  void queryRequestFormat(apreq_handle_t *apr);
+  void axisRequestFormat(request_rec *r);
 
-  public:
-    ApacheContext (request_rec* r, const answer_conf_t& conf);
-    
-    ~ApacheContext();
+  ApacheOperationInfo _operation;
 
-    virtual OperationInfo& operationInfo(){
-      return _operation;
-    }
-  };
+public:
+  ApacheContext(request_rec *r, const answer_conf_t &conf);
+
+  ~ApacheContext();
+
+  virtual OperationInfo &operationInfo()
+  {
+    return _operation;
+  }
+};
 
 } //apache
 } //adapter

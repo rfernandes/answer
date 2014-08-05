@@ -4,31 +4,36 @@
 #include <string>
 #include <set>
 
-namespace WebServices{
+namespace WebServices
+{
 
 ///Define request and response types
-struct Data{
-	double result;
+struct Data
+{
+  double result;
 
-	template<class Archive>
-	void serialize(Archive &ar, const unsigned int /*version*/){
-		ar & BOOST_SERIALIZATION_NVP(result);
-	}
+  template<class Archive>
+  void serialize(Archive &ar, const unsigned int /*version*/)
+  {
+    ar &BOOST_SERIALIZATION_NVP(result);
+  }
 };
 
 ///Complex type service testing
-class Instantiation: public answer::instantiation::Singleton{
-	public:
-		Data calculator(const Data &request);
+class Instantiation: public answer::instantiation::Singleton
+{
+public:
+  Data calculator(const Data &request);
 };
 
 ///Complex type service testing
-class Instantiation{
-	public:
-		Data calculator(const Data &request);
+class Instantiation
+{
+public:
+  Data calculator(const Data &request);
 };
 
-ANSWER_REGISTER_OPERATION(MyService::calculator);
+ANSWER_REGISTER(MyService::calculator, "examples")
 
 }
 

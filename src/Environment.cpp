@@ -2,29 +2,36 @@
 
 using namespace std;
 
-namespace answer{
+namespace answer
+{
 
-const string &Response::body() const{
+const string &Response::body() const
+{
   return _body;
 }
 
-void Response::body(const string &val){
+void Response::body(const string &val)
+{
   _body = val;
 }
 
-const string &Response::contentType() const{
+const string &Response::contentType() const
+{
   return _contentType;
 }
 
-void Response::contentType(const string &val){
+void Response::contentType(const string &val)
+{
   _contentType = val;
 }
 
-const vector<Response::Header>& Response::headers() const{
+const vector<Response::Header> &Response::headers() const
+{
   return _headers;
 }
 
-void Response::header(const string &key, const string &value){
+void Response::header(const string &key, const string &value)
+{
   _headers.emplace_back(key, value);
 }
 
@@ -45,7 +52,8 @@ const string &Request::body() const
   return _body;
 }
 
-const map<Response::Status, string> Response::statusText = {
+const map<Response::Status, string> Response::statusText =
+{
   {Status::OK, "OK"},
   {Status::ACCEPTED, "Accepted"},
   {Status::FOUND, "Found"},

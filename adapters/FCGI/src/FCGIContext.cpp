@@ -4,9 +4,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-namespace answer{
-namespace adapter{
-namespace fcgi{
+namespace answer 
+{
+namespace adapter
+{
+namespace fcgi
+{
 
 using namespace std;
 using namespace Fastcgipp;
@@ -16,19 +19,23 @@ FCGIContext::FCGIContext(const Fastcgipp::Http::Environment &env):
 {
   _query = env.gets;
   _environment.insert(env.environment.begin(), env.environment.end());
-  
+
   boost::split(_accepts, env.acceptContentTypes, boost::is_any_of(","), boost::token_compress_on);
   // discards "quality"
-  for (vector< string >::iterator itr = _accepts.begin(); itr != _accepts.end(); ++itr) {
+  for (vector< string >::iterator itr = _accepts.begin(); itr != _accepts.end(); ++itr)
+  {
     size_t pos = itr->find(";");
     if (pos != string::npos)
-      *itr = itr->substr(0,pos);
+      *itr = itr->substr(0, pos);
   }
-  
+
   boost::property_tree::ptree pt;
-  if(!env.posts.empty()){
-    for(const auto &envPost: env.posts){
-      if(envPost.second.type== Http::Post::form){
+  if (!env.posts.empty())
+  {
+    for (const auto & envPost : env.posts)
+    {
+      if (envPost.second.type == Http::Post::form)
+      {
         pt.put(_operation.operation() + "." + envPost.first, envPost.second.value);
       }
     }

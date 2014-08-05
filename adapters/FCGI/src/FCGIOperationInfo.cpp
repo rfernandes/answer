@@ -4,31 +4,31 @@
 
 using namespace std;
 
-namespace answer{
-namespace adapter{
-namespace fcgi{
-
-FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment& env)
+namespace answer
 {
-  //Get service and operation values, if available
-  map< string, string >::const_iterator it;
+namespace adapter
+{
+namespace fcgi
+{
 
+FCGIOperationInfo::FCGIOperationInfo(const Fastcgipp::Http::Environment &env)
+{
   _service = env.findGet("service");
   _operation = env.findGet("operation");
   _url = env.requestUri;
 }
 
-const string& FCGIOperationInfo::operation() const
+const string &FCGIOperationInfo::operation() const
 {
-	return _operation;
+  return _operation;
 }
 
-const string& FCGIOperationInfo::service() const
+const string &FCGIOperationInfo::service() const
 {
-	return _service;
+  return _service;
 }
 
-const string& FCGIOperationInfo::url() const
+const string &FCGIOperationInfo::url() const
 {
   return _url;
 }
