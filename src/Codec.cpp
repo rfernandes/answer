@@ -20,9 +20,5 @@ bool GenericCodec(std::ostream &out, const std::string &mimeType, const std::str
   }
   return false;
 }
-bool Codec(std::ostream &, const std::string &)
-{
-  return false;
-}
 }
 }

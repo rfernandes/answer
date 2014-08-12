@@ -18,9 +18,6 @@ bool Codec(std::ostream &, const std::string &, const T &)
   return false;
 }
 
-//Empty response
-bool Codec(std::ostream &, const std::string &);
-
 template<typename T>
 bool GenericCodec(std::ostream &out, const std::string &mimeType, const std::string &operationName, const T &data)
 {

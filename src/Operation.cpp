@@ -45,19 +45,6 @@ void responsePart(answer::Response &ret, const string &operationName, const answ
 {
   std::ostringstream encodedReponse;
 
-  // Use specific codec if available
-  for (const auto & accept : accepts)
-  {
-    if (codec::Codec(encodedReponse, accept))
-    {
-      if (accept != "*/*")   // Otherwise the Codec should set the contentType via the context
-      {
-        ret.contentType(accept);
-      }
-      break;
-    }
-  }
-
   // Use generic codec
   for (const auto & accept : accepts)
   {
