@@ -1,6 +1,7 @@
 #ifndef _OPERATION_HH_
 #define _OPERATION_HH_
 
+#include <type_traits>
 #include <sstream>
 #include <string>
 #include <stdexcept>
@@ -39,8 +40,6 @@ public:
 template <typename RequestT>
 RequestT requestPart(const std::string &name, const std::string &params, const std::string &prefix)
 {
-
-
   std::string operationName(prefix);
   if (!operationName.empty())
   {
@@ -280,7 +279,7 @@ public:
   void registerOperation(const std::string &serviceName, const std::string &operationName, std::unique_ptr< answer::Operation > webMethodHandle);
   Operation &operation(const std::string &serviceName, const std::string &operationName) const;
 
-  std::list<std::string> operationList();
+  std::vector<std::string> operationList();
 };
 
 template <typename Operation>
@@ -296,22 +295,12 @@ public:
 
     typedef typename boost::mpl::at_c<boost::function_types::parameter_types<Operation>, 1>::type response_type;
 
-    typedef typename
-    std::remove_reference <
-    response_type
-    >::type const_request;
-
-    typedef typename
-    std::remove_const <
-    const_request
-    >::type request;
-
+    using request = typename std::decay<response_type>::type;
+    
     typedef
     OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type>>
         Handler;
 
-// Check operation signature (must have at least one of [response] operator()([request])
-//      BOOST_MPL_ASSERT(( boost::is_same<typex,void> ));
     try
     {
       OperationStore::Instance()
@@ -331,30 +320,14 @@ public:
 
 }
 
-// The ANSWER_SERVICE_NAME definition should be provided on a per project basis,
-//  the provided answer .cmake automatically set it to the project name
-// #ifndef ANSWER_SERVICE_NAME
-// #error "Answer: ANSWER_SERVICE_NAME has to be defined, usually done in the build definition"
-// #endif //ANSWER_SERVICE_NAME
-// Service registration macros
-#define ANSWER_REGISTER_OPERATION(ServiceOperation) \
-  namespace {\
-  answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, #ServiceOperation, &ServiceOperation);\
-  }
-
 #define ANSWER_REGISTER(ServiceOperation, ServiceName) \
-  namespace {\
-  answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ServiceName, #ServiceOperation, &ServiceOperation);\
-  }
+namespace {\
+answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ServiceName, #ServiceOperation, &ServiceOperation);\
+}
 
-#define ANSWER_REGISTER_OPERATION_AS(ServiceOperation, OperationName) \
-  namespace {\
-  answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ANSWER_SERVICE_NAME, OperationName, &ServiceOperation);\
-  }
-
-  #define ANSWER_REGISTER_AS(ServiceOperation, OperationName, ServiceName) \
-  namespace {\
-  answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ServiceName, OperationName, &ServiceOperation);\
-  }
+#define ANSWER_REGISTER_AS(ServiceOperation, OperationName, ServiceName) \
+namespace {\
+answer::RegisterOperation<BOOST_TYPEOF(&ServiceOperation)> ANSWER_MAKE_UNIQUE(_registrator_)(ServiceName, OperationName, &ServiceOperation);\
+}
 
 #endif //_OPERATION_HH_

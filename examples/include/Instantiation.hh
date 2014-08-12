@@ -4,9 +4,6 @@
 #include <string>
 #include <set>
 
-namespace WebServices
-{
-
 ///Define request and response types
 struct Data
 {
@@ -34,7 +31,5 @@ public:
 };
 
 ANSWER_REGISTER(MyService::calculator, "examples")
-
-}
 
 #endif // _CALCULATOR_HH_

@@ -4,10 +4,6 @@
 #include <string>
 #include <boost/serialization/list.hpp>
 
-///Basic type service testing
-namespace WebServices
-{
-
 bool responseWrapper(std::ostream &out, const std::string &response, const std::string &mimetype, const answer::WebMethodException *ex)
 {
   if (mimetype != "application/xml") return false;
@@ -59,11 +55,11 @@ public:
   void testOperation(const testInput &test);
   BasicOperationResponse simple_operation();
 };
-}
 
-ANSWER_RESPONSE_WRAPPER(WebServices::responseWrapper)
-ANSWER_REGISTER(WebServices::BasicService::hello_world, "examples")
-ANSWER_REGISTER(WebServices::BasicService::simple_operation, "examples")
-ANSWER_REGISTER(WebServices::BasicService::testOperation, "examples")
+
+ANSWER_RESPONSE_WRAPPER(responseWrapper)
+ANSWER_REGISTER(BasicService::hello_world, "examples")
+ANSWER_REGISTER(BasicService::simple_operation, "examples")
+ANSWER_REGISTER(BasicService::testOperation, "examples")
 
 #endif //_BASIC_SERVICE_HH_

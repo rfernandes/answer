@@ -7,12 +7,13 @@ namespace answer
 
 OperationStore::OperationStore() {}
 
-list< string > OperationStore::operationList()
+vector< string > OperationStore::operationList()
 {
-  list< string > ret;
+  vector< string > ret;
+  ret.reserve(_map.size());
   for (const auto & item : _map)
   {
-    ret.push_back(item.first);
+    ret.emplace_back(item.first);
   }
   return ret;
 }
