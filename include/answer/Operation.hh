@@ -77,6 +77,7 @@ void responsePart(Response &ret, const ResponseT &response, const std::string &o
   }
 
   // Use generic codec
+  if (ret.contentType().empty())
   for (const auto & accept : accepts)
   {
     if (codec::GenericCodec(encodedReponse, accept, operationName, response))

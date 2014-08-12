@@ -4,7 +4,10 @@
 #include <dlfcn.h>
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "answer/Operation.hh"
 #include "answer/Module.hh"
@@ -57,33 +60,110 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
       return MG_TRUE;   // Authorize all requests
     case MG_REQUEST:
     {
-      for (auto i : OperationStore::Instance().operationList())
-      {
-        cout << i << endl;
-      }
       try
       {
         MongooseOperationInfo info(conn);
+        if (!boost::starts_with(info.url(), "services/"))
+        {
+          return MG_FALSE;
+        }
+
         Operation &oper_ref = OperationStore::Instance().operation(info.service(), info.operation());
         
         std::string params;
         // Check for POST
-        if (conn->content)
+        if (conn->content && conn->content_len)
         {
-          params.append(conn->content, conn->content_len);
-          cerr << params << endl;
+          // Assume form-encoded
+          boost::property_tree::ptree pt;
+
+          string name, value;
+          string post(conn->content, conn->content_len);
+          for (auto c: post)
+          {
+            switch (c)
+            {
+              case '=':
+                name = value;
+                value.clear();
+                break;
+              case '&':
+                pt.put(info.operation() + "." + name, value);
+                value.clear();
+                name.clear();
+                break;
+              default:
+                value.push_back(c);
+                break;
+            }
+          }
+          pt.put(info.operation() + "." + name, value);
+
+          stringstream ss;
+          boost::property_tree::write_xml(ss, pt);
+          params = ss.str().substr(ss.str().find_first_of("\n") + 1);
+          cerr << "Params "<< params << endl;
         }
+
+        vector<string> accepts;
+        if (mg_get_header(conn, "Accept"))
+        {
+          string accept(mg_get_header(conn, "Accept"));
+          string mime;
+          for (auto c: accept)
+          {
+            switch (c)
+            {
+              case ' ': // trim
+                break;
+              case ';': // ignore accept-params
+                mime.clear();
+                break;
+              case ',':
+                accepts.emplace_back(mime);
+                cerr << mime << endl;
+                mime.clear();
+                break;
+              default:
+                mime.push_back(c);
+                break;
+            }
+          }
+          accepts.emplace_back(mime);
+          cerr << mime << endl;
+        }
+        else
+        {
+          // XML encoder is acting up, default to app/json for now
+          accepts.emplace_back("application/json");
+        }
+
         //Doing context.response(response) would overwrite other data such as status headers and cookies
         //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-        Response response = oper_ref.invoke(params, "", {"application/xml"});
+        Response response = oper_ref.invoke(params, "", accepts);
         mg_send_header(conn, "Content-Type", response.contentType().c_str());
         mg_printf_data(conn, "%s", response.body().c_str());
-        return MG_TRUE;   // Mark as processed
       }
-      catch (std::runtime_error &ex)
+      catch (answer::WebMethodException &ex)
       {
-        cerr << ex.what() << endl;
+        mg_send_status(conn, 302);
+        mg_send_header(conn, "Content-Type", "text/plain");
+        mg_printf_data(conn, "%s", ex.what());
       }
+      catch (answer::ModuleException &ex)
+      {
+        mg_send_status(conn, 302);
+        mg_send_header(conn, "Content-Type", "text/plain");
+        mg_printf_data(conn, "%s", ex.what());
+        cerr << "ModuleException: " << ex.what();
+      }
+      catch (exception &ex)
+      {
+        mg_send_status(conn, 302);
+        mg_send_header(conn, "Content-Type", "text/plain");
+        cerr << "Exception: " << ex.what();
+      }
+      return MG_TRUE;   // Mark as processed
     }
     default:
       break;
