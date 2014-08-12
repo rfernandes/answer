@@ -1,9 +1,6 @@
 #define BOOST_TEST_MODULE RegistrationTest
 #include <boost/test/included/unit_test.hpp>
 
-//Normally this is defined in the build file, it's usually the project name
-#define ANSWER_SERVICE_NAME "RegistrationTest"
-
 #include "answer/Operation.hh"
 #include <boost/algorithm/string.hpp>
 
@@ -18,17 +15,17 @@ public:
   }
 };
 
-ANSWER_REGISTER_OPERATION(Operation::test)
+ANSWER_REGISTER(Operation::test, "Registration")
 
 BOOST_AUTO_TEST_CASE(registration)
 {
-  list<string> operations = answer::OperationStore::Instance().operationList();
-  BOOST_CHECK(operations.front() == string("RegistrationTest/test"));
+  const auto operations = answer::OperationStore::Instance().operationList();
+  BOOST_CHECK(operations.front() == string("Registration/test"));
 }
 
 BOOST_AUTO_TEST_CASE(request_response)
 {
-  answer::Operation &operation = answer::OperationStore::Instance().operation("RegistrationTest", "test");
+  answer::Operation &operation = answer::OperationStore::Instance().operation("Registration", "test");
   answer::Response response = operation.invoke("<test>foobar</test>", "", {"application/xml"});
   string body = response.body();
   boost::trim(body);
@@ -37,7 +34,7 @@ BOOST_AUTO_TEST_CASE(request_response)
 
 BOOST_AUTO_TEST_CASE(request_response_codec)
 {
-  answer::Operation &operation = answer::OperationStore::Instance().operation("RegistrationTest", "test");
+  answer::Operation &operation = answer::OperationStore::Instance().operation("Registration", "test");
   answer::Response response = operation.invoke("<test>foobar</test>", "", {"application/json"});
   string body = response.body();
   cerr << body << endl;
