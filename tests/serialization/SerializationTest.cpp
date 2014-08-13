@@ -3,6 +3,10 @@
 
 #include "answer/archive/ws_xml_oarchive.hpp"
 #include "answer/archive/ws_xml_iarchive.hpp"
+
+#include "answer/archive/ws_json_oarchive.hpp"
+
+#include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 #include <boost/serialization/set.hpp>
 #include <map>
@@ -47,4 +51,33 @@ BOOST_AUTO_TEST_CASE(serialization)
   }
 
   BOOST_CHECK(testIntSet1 == testIntSet2);
+}
+
+BOOST_AUTO_TEST_CASE(xml_empty)
+{
+  stringstream ss;
+  {
+    string empty;
+    answer::archive::ws_xml_oarchive oarchive(ss);
+    oarchive << boost::serialization::make_nvp("test", empty);
+  }
+  
+  const auto xml = boost::trim_copy(ss.str());
+
+  BOOST_CHECK( xml == "<test></test>");
+}
+
+BOOST_AUTO_TEST_CASE(json_empty)
+{
+
+  stringstream ss;
+  {
+    string empty;
+    answer::archive::ws_json_oarchive oarchive(ss);
+    oarchive << boost::serialization::make_nvp("test", empty);
+  }
+  
+  const auto json = boost::trim_copy(ss.str());
+
+  BOOST_CHECK( json == "\"test\":\"\"");
 }
