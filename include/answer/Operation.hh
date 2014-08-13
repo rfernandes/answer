@@ -26,6 +26,7 @@ class Operation
 {
 protected:
   std::string _name;
+  virtual void process(Response&, const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts) = 0;
 public:
   Operation(const std::string &name)
   {
@@ -33,8 +34,9 @@ public:
     _name = (pos != name.npos ? name.substr(pos + 2) : name);
   }
   virtual ~Operation() {};
-  //The invocation wrapper
-  virtual Response invoke(const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts) = 0;
+
+  // The invocation wrapper
+  Response invoke(const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts);
 };
 
 template <typename RequestT>
@@ -113,33 +115,13 @@ class OperationHandler: public Operation
 public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
-  virtual Response invoke(const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts)
+protected:
+  void process(Response &ret, const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts) override
   {
-    Response ret;
-    try
-    {
-      RequestT request = requestPart<RequestT>(_name, params, prefix);
-      Type &type(_methodHandle.Instance());
-      ResponseT response((type.*_op)(request));
-      responsePart(ret, response, _name, accepts);
-    }
-    catch (const WebMethodException &ex)
-    {
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      std::ostringstream wrappedReponse;
-      if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex))
-      {
-        codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
-      }
-      ret.body(wrappedReponse.str());
-      std::cerr << "WebException: " << ex.what() << std::endl;
-    }
-    catch (const std::exception &ex)
-    {
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      std::cerr << "Exception: " << ex.what() << std::endl;
-    }
-    return ret;
+    RequestT request = requestPart<RequestT>(_name, params, prefix);
+    Type &type(_methodHandle.Instance());
+    ResponseT response((type.*_op)(request));
+    responsePart(ret, response, _name, accepts);
   }
 };
 
@@ -152,32 +134,12 @@ class OperationHandler<Type, OperationType, boost::mpl::void_, ResponseT, Strate
 public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
-  virtual Response invoke(const std::string & , const std::string &, const answer::Context::Accepts &accepts)
+protected:
+  void process(Response &ret, const std::string &, const std::string &, const answer::Context::Accepts &accepts) override
   {
-    Response ret;
-    try
-    {
-      Type &type(_methodHandle.Instance());
-      ResponseT response((type.*_op)());
-      responsePart(ret, response, _name, accepts);
-    }
-    catch (const WebMethodException &ex)
-    {
-      std::ostringstream wrappedReponse;
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex))
-      {
-        codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
-      }
-      ret.body(wrappedReponse.str());
-      std::cerr << "WebException: " << ex.what() << std::endl;
-    }
-    catch (const std::exception &ex)
-    {
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      std::cerr << "Exception: " << ex.what() << std::endl;
-    }
-    return ret;
+    Type &type(_methodHandle.Instance());
+    ResponseT response((type.*_op)());
+    responsePart(ret, response, _name, accepts);
   }
 };
 
@@ -190,29 +152,14 @@ class OperationHandler<Type, OperationType, RequestT, void, Strategy>: public Op
 public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
-  virtual Response invoke(const std::string &params , const std::string &prefix, const answer::Context::Accepts &accepts)
+protected:
+  void process(Response &ret, const std::string &params , const std::string &prefix, const answer::Context::Accepts &accepts) override
   {
-    Response ret; //Empty ret
-    std::ostringstream wrappedReponse;
-    try
-    {
-      RequestT request = requestPart<RequestT>(_name, params, prefix);
-      Type &type(_methodHandle.Instance());
-      (type.*_op)(request);
-      //TODO: Add empty return concept (JSON needs null or {}) xml needs empty node
-      responsePart(ret, _name, accepts);
-    }
-    catch (const WebMethodException &ex)
-    {
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      std::cerr << "WebException: " << ex.what() << std::endl;
-    }
-    catch (const std::exception &ex)
-    {
-      ret.status(Response::Status::INTERNAL_SERVER_ERROR);
-      std::cerr << "Exception: " << ex.what() << std::endl;
-    }
-    return ret;
+    RequestT request = requestPart<RequestT>(_name, params, prefix);
+    Type &type(_methodHandle.Instance());
+    (type.*_op)(request);
+    //TODO: Add empty return concept (JSON needs null or {}) xml needs empty node
+    responsePart(ret, _name, accepts);
   }
 };
 

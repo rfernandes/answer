@@ -31,7 +31,7 @@ public:
 class ModuleStore: public Module
 {
 public:
-  typedef std::list<Module *> StoreT;
+  typedef std::vector<Module *> StoreT;
 private:
   StoreT _store;
   ModuleStore();

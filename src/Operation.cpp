@@ -41,6 +41,7 @@ Operation &OperationStore::operation(const string &serviceName, const string &op
   }
   return *it->second;
 }
+
 void responsePart(answer::Response &ret, const string &operationName, const answer::Context::Accepts &accepts)
 {
   std::ostringstream encodedReponse;
@@ -69,5 +70,32 @@ void responsePart(answer::Response &ret, const string &operationName, const answ
 
   ret.body(wrappedReponse.str());
 }
+
+Response Operation::invoke(const string &params, const string &prefix, const Context::Accepts &accepts)
+{
+  Response ret;
+  try
+  {
+    process(ret, params, prefix, accepts);
+  }
+  catch (const WebMethodException &ex)
+  {
+    ret.status(Response::Status::INTERNAL_SERVER_ERROR);
+    std::ostringstream wrappedReponse;
+    if (!codec::ResponseWrapper<void>(wrappedReponse, "", ret.contentType(), &ex))
+    {
+      codec::ResponseWrapper<char>(wrappedReponse, "", ret.contentType(), &ex);
+    }
+    ret.body(wrappedReponse.str());
+    std::cerr << "WebException: " << ex.what() << std::endl;
+  }
+  catch (const std::exception &ex)
+  {
+    ret.status(Response::Status::INTERNAL_SERVER_ERROR);
+    std::cerr << "Exception: " << ex.what() << std::endl;
+  }
+  return ret;
+}
+
 
 }

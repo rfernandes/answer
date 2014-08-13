@@ -38,15 +38,11 @@ BOOST_AUTO_TEST_CASE(singleton)
   const auto operations = answer::OperationStore::Instance().operationList();
   auto &operation = answer::OperationStore::Instance().operation("singleton", "test");
   
-  cerr << boolalpha << is_base_of<answer::instantiation::Singleton, SingletonTest>::value << endl;
-  
   auto response1 = operation.invoke("<test>second</test>", "", {"application/xml"}).body();
   auto response2 = operation.invoke("<test></test>", "", {"application/xml"}).body();
 
   boost::trim(response1);
   boost::trim(response2);
-  
-  cerr << response2 << endl;
   
   BOOST_CHECK(response1 == "<test>first</test>");
   BOOST_CHECK(response2 == "<test>second</test>");
