@@ -71,12 +71,12 @@ void responsePart(answer::Response &ret, const string &operationName, const answ
   ret.body(wrappedReponse.str());
 }
 
-Response Operation::invoke(const string &params, const string &prefix, const Context::Accepts &accepts)
+Response Operation::invoke(const string &params, const Context::Accepts &accepts)
 {
   Response ret;
   try
   {
-    process(ret, params, prefix, accepts);
+    process(ret, params, accepts);
   }
   catch (const WebMethodException &ex)
   {

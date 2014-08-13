@@ -47,7 +47,7 @@ class FcgiAdapter: public Fastcgipp::Request
             Operation &oper_ref = OperationStore::Instance().operation(service, operation);
             //Doing context.response(response) would overwrite other data such as status headers and cookies
             //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-            Response response = oper_ref.invoke(context.request().body(), "", context.accepts());
+            Response response = oper_ref.invoke(context.request().body(), context.accepts());
             //If status is the original, overwrite with the returned on (which might still be
             if (context.response().status() == Response::Status::OK)
             {

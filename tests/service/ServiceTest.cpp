@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(registration)
 BOOST_AUTO_TEST_CASE(request_response)
 {
   answer::Operation &operation = answer::OperationStore::Instance().operation("Registration", "test");
-  answer::Response response = operation.invoke("<test>foobar</test>", "", {"application/xml"});
+  answer::Response response = operation.invoke("<test>foobar</test>", {"application/xml"});
   string body = response.body();
   boost::trim(body);
   BOOST_CHECK(body == "<test>6</test>");
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(request_response)
 BOOST_AUTO_TEST_CASE(request_response_codec)
 {
   answer::Operation &operation = answer::OperationStore::Instance().operation("Registration", "test");
-  answer::Response response = operation.invoke("<test>foobar</test>", "", {"application/json"});
+  answer::Response response = operation.invoke("<test>foobar</test>", {"application/json"});
   string body = response.body();
   cerr << body << endl;
   boost::trim(body);

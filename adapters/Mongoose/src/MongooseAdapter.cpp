@@ -140,7 +140,7 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
 
         //Doing context.response(response) would overwrite other data such as status headers and cookies
         //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-        Response response = oper_ref.invoke(params, "", accepts);
+        Response response = oper_ref.invoke(params, accepts);
         mg_send_header(conn, "Content-Type", response.contentType().c_str());
         mg_printf_data(conn, "%s", response.body().c_str());
       }

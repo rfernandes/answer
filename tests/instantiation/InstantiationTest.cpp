@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(singleton)
   const auto operations = answer::OperationStore::Instance().operationList();
   auto &operation = answer::OperationStore::Instance().operation("singleton", "test");
   
-  auto response1 = operation.invoke("<test>second</test>", "", {"application/xml"}).body();
-  auto response2 = operation.invoke("<test></test>", "", {"application/xml"}).body();
+  auto response1 = operation.invoke("<test>second</test>", {"application/xml"}).body();
+  auto response2 = operation.invoke("<test></test>", {"application/xml"}).body();
 
   boost::trim(response1);
   boost::trim(response2);
@@ -65,8 +65,8 @@ BOOST_AUTO_TEST_CASE(singlecall)
 {
   const auto operations = answer::OperationStore::Instance().operationList();
   auto &operation = answer::OperationStore::Instance().operation("singlecall", "test");
-  auto response1 = operation.invoke("<test>second</test>", "", {"application/xml"}).body();
-  auto response2 = operation.invoke("<test>second</test>", "", {"application/xml"}).body();
+  auto response1 = operation.invoke("<test>second</test>", {"application/xml"}).body();
+  auto response2 = operation.invoke("<test>second</test>", {"application/xml"}).body();
 
   boost::trim(response1);
   boost::trim(response2);

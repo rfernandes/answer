@@ -26,7 +26,7 @@ class Operation
 {
 protected:
   std::string _name;
-  virtual void process(Response&, const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts) = 0;
+  virtual void process(Response&, const std::string &params, const answer::Context::Accepts &accepts) = 0;
 public:
   Operation(const std::string &name)
   {
@@ -36,24 +36,17 @@ public:
   virtual ~Operation() {};
 
   // The invocation wrapper
-  Response invoke(const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts);
+  Response invoke(const std::string &params, const answer::Context::Accepts &accepts);
 };
 
 template <typename RequestT>
-RequestT requestPart(const std::string &name, const std::string &params, const std::string &prefix)
+RequestT requestPart(const std::string &name, const std::string &params)
 {
-  std::string operationName(prefix);
-  if (!operationName.empty())
-  {
-    operationName.append(":");
-  }
-  operationName.append(name);
-
   RequestT request;
   std::istringstream ssIn(params);
   {
     answer::archive::ws_xml_iarchive inA(ssIn);
-    inA >> boost::serialization::make_nvp(operationName.c_str(), request);
+    inA >> boost::serialization::make_nvp(name.c_str(), request);
   }
 
   return request;
@@ -116,9 +109,9 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &params, const std::string &prefix, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &params, const answer::Context::Accepts &accepts) override
   {
-    RequestT request = requestPart<RequestT>(_name, params, prefix);
+    RequestT request = requestPart<RequestT>(_name, params);
     Type &type(_methodHandle.Instance());
     ResponseT response((type.*_op)(request));
     responsePart(ret, response, _name, accepts);
@@ -153,9 +146,9 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &params , const std::string &prefix, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &params , const answer::Context::Accepts &accepts) override
   {
-    RequestT request = requestPart<RequestT>(_name, params, prefix);
+    RequestT request = requestPart<RequestT>(_name, params);
     Type &type(_methodHandle.Instance());
     (type.*_op)(request);
     //TODO: Add empty return concept (JSON needs null or {}) xml needs empty node
