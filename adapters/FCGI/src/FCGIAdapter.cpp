@@ -38,7 +38,7 @@ class FcgiAdapter: public Fastcgipp::Request
 
       switch (status)
       {
-          // Request the webservice
+        // Request the webservice
         case Module::OK:
           {
             const string &service = context.operationInfo().service();
@@ -137,26 +137,10 @@ int main()
 
   try
   {
-    char *modulesDir = getenv("modulesDir");
     char *servicesDir = getenv("servicesDir");
 
     std::set<std::string> modulePath;
     //Load modules
-    if (modulesDir)
-    {
-      directory_iterator end_itr;
-      for (directory_iterator itr(modulesDir);
-           itr != end_itr;
-           ++itr)
-      {
-        if (extension(itr->path()) == ".so")
-        {
-          modulePath.insert(itr->path().string());
-        }
-      }
-    }
-
-    //Services
     if (servicesDir)
     {
       directory_iterator end_itr;

@@ -58,7 +58,7 @@ public:
 
 
 ANSWER_RESPONSE_WRAPPER(responseWrapper)
-ANSWER_REGISTER(BasicService::hello_world, "examples")
+ANSWER_REGISTER(BasicService::hello_world, "test/examples")
 ANSWER_REGISTER(BasicService::simple_operation, "examples")
 ANSWER_REGISTER(BasicService::testOperation, "examples")
 

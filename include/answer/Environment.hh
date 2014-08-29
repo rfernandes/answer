@@ -12,17 +12,21 @@ namespace answer
 
 class OperationInfo
 {
+  std::string _operation;
+  std::string _service;
+  std::string _url;
 public:
-  virtual const std::string &service() const = 0;
-  virtual const std::string &operation() const = 0;
-  virtual const std::string &url() const = 0;
+  OperationInfo(const std::string url);
+  
+  const std::string &operation() const;
+  const std::string &service() const;
+  const std::string &url() const;
 };
 
 class Request
 {
   std::string _body;
 public:
-  //TODO: Add vector<char> data accessors for body
   const std::string &body() const;
   void body(const std::string &body);
 };
@@ -31,7 +35,7 @@ class Response
 {
 public:
   typedef std::pair<std::string, std::string> Header;
-  //TODO: Complete this list
+
   enum class Status
   {
     OK = 200,
@@ -50,7 +54,6 @@ protected:
   std::vector<Header> _headers;
   Status _status = Status::OK;
 public:
-  //TODO: Add vector<char> data accessors for body
   const std::string &body() const;
   void body(const std::string &body);
   const std::string &contentType() const;

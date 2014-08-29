@@ -12,7 +12,7 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
-find_package(Boost COMPONENTS serialization date_time REQUIRED QUIET)
+find_package(Boost COMPONENTS serialization date_time filesystem REQUIRED QUIET)
 
 include_directories (BEFORE
   include

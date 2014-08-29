@@ -1,13 +1,14 @@
-#include <mongoose.h>
 #include <string>
-#include <boost/filesystem.hpp>
 #include <dlfcn.h>
 #include <stdexcept>
+
+#include <MongooseContext.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
 
 #include "answer/Operation.hh"
 #include "answer/Module.hh"
@@ -25,33 +26,9 @@ static void dlOpen(const std::string &path, int mode = RTLD_LAZY) {
   }
 }
 
-class MongooseOperationInfo: public OperationInfo
-{
-  std::string _operation;
-  std::string _service;
-  std::string _url;
-
-public:
-  MongooseOperationInfo(mg_connection *conn):
-    _url(conn->uri+1) 
-  {
-    char buffer[256];
-    mg_get_var(conn, "service", buffer, sizeof(buffer));
-    _service = buffer;
-    mg_get_var(conn, "operation", buffer, sizeof(buffer));
-    _operation = buffer;
-  }
-
-  virtual const string &operation() const{
-    return _operation;
-  }
-  virtual const string &service() const{
-    return _service;
-  }
-  virtual const string &url() const{
-    return _url;
-  }
-};
+namespace {
+  std::string baseUri;
+}
 
 static int event_handler(struct mg_connection *conn, enum mg_event ev)
 {
@@ -62,13 +39,15 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
     {
       try
       {
-        MongooseOperationInfo info(conn);
-        if (!boost::starts_with(info.url(), "services/"))
+        if (!boost::starts_with(string(conn->uri), baseUri))
         {
           return MG_FALSE;
         }
+        
+        // Initialize context
+        answer::adapter::mongoose::MongooseContext context(*conn);
 
-        Operation &oper_ref = OperationStore::Instance().operation(info.service(), info.operation());
+        Operation &oper_ref = OperationStore::Instance().operation(context.operationInfo().service(), context.operationInfo().operation());
         
         std::string params;
         // Check for POST
@@ -88,7 +67,7 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
                 value.clear();
                 break;
               case '&':
-                pt.put(info.operation() + "." + name, value);
+                pt.put(context.operationInfo().operation() + "." + name, value);
                 value.clear();
                 name.clear();
                 break;
@@ -97,7 +76,7 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
                 break;
             }
           }
-          pt.put(info.operation() + "." + name, value);
+          pt.put(context.operationInfo().operation() + "." + name, value);
 
           stringstream ss;
           boost::property_tree::write_xml(ss, pt);
@@ -105,42 +84,9 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
           cerr << "Params "<< params << endl;
         }
 
-        vector<string> accepts;
-        if (mg_get_header(conn, "Accept"))
-        {
-          string accept(mg_get_header(conn, "Accept"));
-          string mime;
-          for (auto c: accept)
-          {
-            switch (c)
-            {
-              case ' ': // trim
-                break;
-              case ';': // ignore accept-params
-                mime.clear();
-                break;
-              case ',':
-                accepts.emplace_back(mime);
-                cerr << mime << endl;
-                mime.clear();
-                break;
-              default:
-                mime.push_back(c);
-                break;
-            }
-          }
-          accepts.emplace_back(mime);
-          cerr << mime << endl;
-        }
-        else
-        {
-          // XML encoder is acting up, default to app/json for now
-          accepts.emplace_back("application/json");
-        }
-
         //Doing context.response(response) would overwrite other data such as status headers and cookies
         //TODO: Perhaps invoke should return a ProtoResponse or take Reponse as a parameter.
-        Response response = oper_ref.invoke(params, accepts);
+        Response response = oper_ref.invoke(params, context.accepts());
         mg_send_header(conn, "Content-Type", response.contentType().c_str());
         mg_printf_data(conn, "%s", response.body().c_str());
       }
@@ -174,13 +120,16 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
 int main(int argc, char *argv[]) {
 
   unsigned port;
-  vector<string> servicePaths;
+  std::string mongoosePath;
+  vector<string> servicesDir;
   
   options_description desc("Allowed options");
   desc.add_options()
-      ("help", "Display help")
+      ("help,h", "Display help")
       ("port,p", value(&port)->default_value(8080), "Http port")
-      ("services,s", value(&servicePaths), "Services path")
+      ("root,r", value(&mongoosePath)->implicit_value("."), "Path to document root")
+      ("services,s", value(&servicesDir), "Services library directories")
+      ("base,b", value(&baseUri)->default_value("/services"), "Services base directory")
   ;
 
   if (argc == 1) {
@@ -192,21 +141,18 @@ int main(int argc, char *argv[]) {
   p.add("services", -1);
 
   variables_map vm;
-  store(command_line_parser(argc, argv).
-            options(desc).positional(p).run(), vm);
+  store(command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
   notify(vm);
   
-  
   struct mg_server *server = mg_create_server(NULL, event_handler);
-  mg_set_option(server, "document_root", ".");
+  if (!mongoosePath.empty())
+    mg_set_option(server, "document_root", mongoosePath.c_str());
   mg_set_option(server, "listening_port", to_string(port).c_str());
   
   //Load services
-  for (const auto &servicePath: servicePaths) {
+  for (const auto &servicePath: servicesDir) {
     directory_iterator end_itr;
-    for (directory_iterator itr(servicePath);
-        itr != end_itr;
-        ++itr){
+    for (directory_iterator itr(servicePath); itr != end_itr; ++itr){
       if (extension(itr->path()) == ".so")
       {
         cout << "Loading " << itr->path() << endl;

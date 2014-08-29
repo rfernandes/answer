@@ -128,7 +128,7 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &, const std::string &, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &, const answer::Context::Accepts &accepts) override
   {
     Type &type(_methodHandle.Instance());
     ResponseT response((type.*_op)());
@@ -146,7 +146,7 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &params , const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &params, const answer::Context::Accepts &accepts) override
   {
     RequestT request = requestPart<RequestT>(_name, params);
     Type &type(_methodHandle.Instance());

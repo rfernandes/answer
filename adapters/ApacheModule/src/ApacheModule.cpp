@@ -33,10 +33,6 @@ static int answer_handler(request_rec *r)
   {
     return DECLINED;
   }
-//  answer_conf_t *conf = static_cast<answer_conf_t *>(ap_get_module_config(r->server->module_config, &answer_module));
-//  if (!conf){
-//      return DECLINED;
-//  }
 
   try
   {
@@ -44,8 +40,20 @@ static int answer_handler(request_rec *r)
 
     Operation &oper_ref = OperationStore::Instance().operation(context.operationInfo().service(), context.operationInfo().operation());
 
-    context.response(oper_ref.invoke(static_cast<answer::adapter::apache::ApacheOperationInfo &>(context.operationInfo()).getRawRequest()));
-
+    std::string rawRequest;
+    ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK);
+    if (ap_should_client_block(r))
+    {
+      char buffer[1024];
+      int len;
+      while ((len = ap_get_client_block(r, buffer, 1024)) > 0)
+      {
+        rawRequest.append(buffer, len);
+      }
+    }
+    
+    context.response(oper_ref.invoke(rawRequest, context.accepts()));
+    
 //      ap_set_content_type(r, response_context.getContentType().c_str());
 //      for (list< pair< string, string > >::const_iterator it = response_context.getAdditionalHeaders().begin(); it != response_context.getAdditionalHeaders().end(); ++it) {
 //          apr_table_add (r->headers_out, it->first.c_str(), it->second.c_str());
@@ -83,10 +91,9 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
   using namespace boost::filesystem;
 
   //Load modules
-  if (!config.modulesDir.empty())
-  {
+  for (const auto &dir: config.answerModulesDir){
     directory_iterator end_itr;
-    for (directory_iterator itr(config.modulesDir);
+    for (directory_iterator itr(dir);
          itr != end_itr;
          ++itr)
     {
@@ -96,22 +103,6 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
       }
     }
   }
-
-  //Services
-  if (!config.servicesDir.empty())
-  {
-    directory_iterator end_itr;
-    for (directory_iterator itr(config.servicesDir);
-         itr != end_itr;
-         ++itr)
-    {
-      if (extension(itr->path()) == ".so")
-      {
-        dlOpen(itr->path().c_str(), RTLD_GLOBAL);
-      }
-    }
-  }
-
 
   return OK;
 }
@@ -122,43 +113,21 @@ static void answer_hooks(apr_pool_t * /*pool*/)
   ap_hook_post_config(answer_init_handler, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
-
 extern "C"
 {
-// Creates server-wide config structures
-// static void * create_answer_config( apr_pool_t * p, server_rec * /*s*/)
-// {
-//  answer_conf_t *conf = static_cast<answer_conf_t *>(apr_palloc(p, sizeof(answer_conf_t)));
-//  conf->axisRequestFormat = false;
-//  return conf;
-// }
 
-  const char *set_axis_request_format(cmd_parms *cmd, void */*cfg*/, int flag)
+  APLOG_USE_MODULE(answer);
+
+  const char *set_answer_dir(cmd_parms *cmd, void */*cfg*/, char *dir)
   {
-    ap_log_error(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, cmd->server, "%s AXIS REQUEST FORMAT ENABLED", LOGNAME);
-
-    config.axisRequestFormat = flag;
-    return NULL;
-  }
-
-  const char *set_services_dir(cmd_parms *cmd, void */*cfg*/, char *dir)
-  {
-    config.servicesDir = dir;
-    return NULL;
-  }
-
-  const char *set_modules_dir(cmd_parms *cmd, void */*cfg*/, char *dir)
-  {
-    config.modulesDir = dir;
+    config.answerModulesDir.push_back(dir);
     return NULL;
   }
 
 // Module commands
   static const command_rec cmds[] =
   {
-    AP_INIT_FLAG("AnswerAxisRequestFormat", (cmd_func) set_axis_request_format, NULL, RSRC_CONF, "Recognize axis2c requests (/service/operation/)"),
-    AP_INIT_TAKE1("AnswerServicesDir", (cmd_func) set_services_dir, NULL, RSRC_CONF, "Path to modules directory"),
-    AP_INIT_TAKE1("AnswerModulesDir", (cmd_func) set_modules_dir, NULL, RSRC_CONF, "Path to modules directory"),
+    AP_INIT_ITERATE("AnswersDir", (cmd_func) set_answer_dir, NULL, RSRC_CONF, "Path to answer modules directory"),
     { NULL }
   };
 

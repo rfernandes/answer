@@ -1,5 +1,7 @@
 #include "answer/Context.hh"
 
+using namespace std;
+
 namespace answer
 {
 
@@ -9,7 +11,7 @@ Context::Context()
 {
   if (_context)
   {
-    throw std::runtime_error("A context already exists");
+    throw runtime_error("A context already exists");
   }
   else
   {
@@ -21,7 +23,7 @@ Context &Context::Instance()
 {
   if (!_context)
   {
-    throw std::runtime_error("Uninitialized context");
+    throw runtime_error("Uninitialized context");
   }
   return *_context;
 }
@@ -75,6 +77,41 @@ const Context::QueryMap &Context::query() const
 void Context::accepts(const Context::Accepts &accepts)
 {
   _accepts = accepts;
+}
+
+void Context::accepts(const string &accepts)
+{
+  string mime;
+  bool params = false;
+  for (auto c : accepts)
+  {
+    switch (c)
+    {
+      case ' ': // trim
+        break;
+      case ';': // ignore accept-params
+        _accepts.emplace_back(mime);
+        params = true;
+        mime.clear();
+        break;
+      case ',':
+        if (params)
+        {
+          params = false;
+          mime.clear();
+          continue;
+        }
+        _accepts.emplace_back(mime);
+        cerr << mime << endl;
+        mime.clear();
+        break;
+      default:
+        mime.push_back(c);
+        break;
+    }
+  }
+  if (!params)
+    _accepts.emplace_back(mime);
 }
 
 

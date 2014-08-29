@@ -1,7 +1,6 @@
 set (APACHEMODULE_SRC_FILES
 "src/ApacheModule.cpp"
 "src/ApacheContext.cpp"
-"src/ApacheOperationInfo.cpp"
 )
 
 set (APACHEMODULE_LIBRARIES "dl" "aprutil-1" "apr-1" "apreq2")

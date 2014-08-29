@@ -1,5 +1,7 @@
 #include "answer/Environment.hh"
 
+#include <boost/filesystem.hpp>
+
 using namespace std;
 
 namespace answer
@@ -50,6 +52,33 @@ void Request::body(const string &value)
 const string &Request::body() const
 {
   return _body;
+}
+
+namespace{
+  
+}// anonymous namespace
+
+OperationInfo::OperationInfo(string url):
+  _url(std::move(url))
+{
+  //TODO: Determine if the url is in query or SEF/REST mode
+  boost::filesystem::path path(_url);
+  _service = path.parent_path().string();
+  _service = _service.substr(_service.find("/", 1) + 1);
+  _operation = path.filename().string(); 
+}
+
+const string &OperationInfo::url() const
+{
+  return _url;
+}
+const string &OperationInfo::service() const
+{
+  return _service;
+}
+const string &OperationInfo::operation() const
+{
+  return _operation;
 }
 
 const map<Response::Status, string> Response::statusText =

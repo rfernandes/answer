@@ -23,7 +23,7 @@ void OperationStore::registerOperation(const string &serviceName, const string &
   //This removes the Class:: part of Macro registration
   size_t pos = operationName.rfind("::");
   string filteredName(pos != operationName.npos ? operationName.substr(pos + 2) : operationName);
-  _map[serviceName + string("/") + filteredName] = move(webMethodHandle);
+  _map.emplace(serviceName + string("/") + filteredName, move(webMethodHandle));
 }
 
 OperationStore &OperationStore::Instance()
@@ -34,12 +34,7 @@ OperationStore &OperationStore::Instance()
 
 Operation &OperationStore::operation(const string &serviceName, const string &operationName) const
 {
-  map<string, unique_ptr<Operation> >::const_iterator it = _map.find(serviceName + "/" + operationName);
-  if (it == _map.end())
-  {
-    throw runtime_error("Unregistered web method requested : [" + serviceName + "::" + operationName + ']');
-  }
-  return *it->second;
+  return *_map.at(serviceName + "/" + operationName);
 }
 
 void responsePart(answer::Response &ret, const string &operationName, const answer::Context::Accepts &accepts)

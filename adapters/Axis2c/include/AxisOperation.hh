@@ -15,9 +15,6 @@ namespace axis
 
 class AxisOperation: public OperationInfo
 {
-  std::string _service_name;
-  std::string _operation_name;
-  std::string _url;
 public:
   AxisOperation(const axutil_env_t *axis_env, struct axis2_msg_ctx *msg_ctx)
   {
@@ -38,19 +35,6 @@ public:
         _url = url;
       }
     }
-  }
-
-  virtual const std::string &service() const
-  {
-    return _service_name;
-  }
-  virtual const std::string &operation() const
-  {
-    return _operation_name;
-  }
-  virtual const std::string &url() const
-  {
-    return _url;
   }
 };
 

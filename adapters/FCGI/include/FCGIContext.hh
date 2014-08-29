@@ -5,8 +5,6 @@
 #include <fastcgi++/request.hpp>
 #include <fastcgi++/manager.hpp>
 
-#include "FCGIOperationInfo.hh"
-
 namespace answer
 {
 namespace adapter
@@ -16,7 +14,7 @@ namespace fcgi
 
 class FCGIContext: public Context
 {
-  FCGIOperationInfo _operation;
+  OperationInfo _operation;
 
 public:
   FCGIContext(const Fastcgipp::Http::Environment &env);

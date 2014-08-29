@@ -12,7 +12,6 @@ include_directories(
 add_executable (${PROJECT_NAME}.fcgi
   "src/FCGIAdapter.cpp"
   "src/FCGIContext.cpp"
-  "src/FCGIOperationInfo.cpp"
 )
 
 target_link_libraries (${PROJECT_NAME}.fcgi

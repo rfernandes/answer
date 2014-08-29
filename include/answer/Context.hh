@@ -14,6 +14,7 @@ class Context
   static Context *_context;
   Response _response;
   Request _request;
+  
 public:
   virtual ~Context();
   virtual OperationInfo &operationInfo() = 0;
@@ -36,6 +37,7 @@ public:
 
   const Accepts &accepts() const;
   void accepts(const answer::Context::Accepts &accepts);
+  void accepts(const std::string &accepts);
   const QueryMap &query() const;
 
   static Context &Instance();

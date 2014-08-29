@@ -22,7 +22,7 @@ namespace apache
 {
 
 ApacheContext::ApacheContext(request_rec *r, const answer_conf_t &conf):
-  _operation(r, conf)
+  _operation(r->uri)
 {
   // Read the accepts
   apr_table_do(

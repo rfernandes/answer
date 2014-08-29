@@ -1,5 +1,6 @@
 set (MONGOOSE_SRC_FILES
 "src/MongooseAdapter.cpp"
+"src/MongooseContext.cpp"
 )
 
 set (MONGOOSE_LIBRARIES "dl" "mongoose")
@@ -8,6 +9,7 @@ set (MONGOOSE_LIBRARIES "dl" "mongoose")
 find_package(Boost COMPONENTS filesystem program_options system REQUIRED QUIET)
 
 include_directories(
+  include
   ${Boost_INCLUDE_DIRS}
 )
 
@@ -23,3 +25,5 @@ target_link_libraries (mongoose_answer
 )
 
 install (TARGETS mongoose_answer DESTINATION bin)
+
+add_subdirectory(include)
