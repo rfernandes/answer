@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -22,8 +22,11 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
 )
 
+enable_testing()
+include(CTest)
+
 #Generic adapter files
-set (ADAPTER_SRC_FILES "src/Codec.cpp" "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Operation.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Environment.cpp" "src/Context.cpp")
+set (ADAPTER_SRC_FILES "src/Adapter.cpp" "src/Codec.cpp" "src/archive/ws_xml_iarchive.cpp" "src/archive/ws_xml_oarchive.cpp" "src/Operation.cpp" "src/Exception.cpp" "src/Cookie.cpp" "src/Environment.cpp" "src/Context.cpp")
 
 #Module support files
 set (MODULE_SRC_FILES "src/Cookie.cpp" "src/Module.cpp" "src/Exception.cpp" "src/Environment.cpp" "src/Context.cpp")
@@ -48,8 +51,11 @@ target_link_libraries (${PROJECT_NAME}-module
 add_library (${PROJECT_NAME} SHARED ${ADAPTER_SRC_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
 target_link_libraries (${PROJECT_NAME}
+  "dl"
 	${Boost_LIBRARIES}
 )
+
+add_subdirectory(examples)
 
 option(APACHE_ADAPTER "compile the native apache module adapter" true)
 option(FCGI_ADAPTER "compile the fastcgi++ adapter" true)
@@ -77,11 +83,6 @@ install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)
 
 install (FILES ${headersHH} DESTINATION include/answer COMPONENT headers)
 install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT headers)
-
-add_subdirectory(examples)
-
-enable_testing()
-include(CTest)
 
 option(CodeCoverage "Build support for code coverage (requires -DCMAKE_BUILD_TYPE=Debug)" OFF)
 

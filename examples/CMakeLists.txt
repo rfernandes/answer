@@ -15,8 +15,8 @@ add_library(LogModule SHARED EXCLUDE_FROM_ALL
 )
 target_link_libraries (BasicService answer-module)
 
-add_custom_target(examples DEPENDS BasicService Calculator)
+add_custom_target(examples DEPENDS BasicService Calculator LogModule)
 
 # Generate WSDL and services XML based on specified header
 include (CPP_WSDL)
-CPP_WSDL(examples)
+# CPP_WSDL(examples)

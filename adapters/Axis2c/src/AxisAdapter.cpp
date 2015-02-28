@@ -229,7 +229,7 @@ axis2_svc_skel_answer_create(const axutil_env_t *env)
   string wsSo(dirname(soPath));
   wsSo.append("/service.so");
 
-  dlopen(wsSo.c_str(), RTLD_LAZY | RTLD_LOCAL);
+  dlopen(wsSo.c_str());
 
   if ((error = dlerror()) != NULL)
   {

@@ -243,12 +243,7 @@ public:
 
     try
     {
-      OperationStore::Instance()
-      .registerOperation(
-        serviceName,
-        operationName,
-        std::unique_ptr<Handler>(new Handler(op, operationName))
-      );
+      OperationStore::Instance() .registerOperation(serviceName, operationName, std::unique_ptr<Handler>(new Handler(op, operationName)));
     }
     catch (std::exception &ex)
     {

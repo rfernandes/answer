@@ -1,10 +1,10 @@
-MACRO(CPP_WSDL)
+MACRO(CPP_WSDL name)
 
 add_custom_command(
-	TARGET ${PROJECT_NAME}
+	TARGET ${name}
 	POST_BUILD
 	#OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/services.xml ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.js
-	COMMAND PROJECT_NAME=${PROJECT_NAME} INPUT_PATH='${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}' doxygen ${CMAKE_CURRENT_SOURCE_DIR}/../tools/doxygen_cpp_wsdl/Doxyfile 2>&1 >/dev/null
+	COMMAND PROJECT_NAME=${name} INPUT_PATH='${CMAKE_CURRENT_SOURCE_DIR} ${ARGN}' doxygen ${CMAKE_CURRENT_SOURCE_DIR}/../tools/doxygen_cpp_wsdl/Doxyfile 2>&1 >/dev/null
 	COMMAND xsltproc --stringparam project_name ${PROJECT_NAME} --path "${CMAKE_CURRENT_BINARY_DIR}/xml" ${CMAKE_CURRENT_SOURCE_DIR}/../tools/doxygen_cpp_wsdl/services.xml.xslt namespace_web_services.xml > ${CMAKE_CURRENT_BINARY_DIR}/services.xml
 	COMMAND xsltproc --path "${CMAKE_CURRENT_BINARY_DIR}/xml" ${CMAKE_CURRENT_SOURCE_DIR}/../tools/doxygen_cpp_wsdl/json_payloads.xslt namespace_web_services.xml > ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.js
 	COMMAND xsltproc --stringparam project_name ${PROJECT_NAME} --path "${CMAKE_CURRENT_BINARY_DIR}/xml" ${CMAKE_CURRENT_SOURCE_DIR}/../tools/doxygen_cpp_wsdl/documentation.xslt namespace_web_services.xml > ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_documentation.html

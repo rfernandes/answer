@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE SerializationTest
+#define BOOST_TEST_MODULE CodecTest
 #include <boost/test/included/unit_test.hpp>
 
 #include "answer/archive/ws_xml_oarchive.hpp"
@@ -29,6 +29,8 @@ struct testInput
     ar & BOOST_SERIALIZATION_NVP(test);
   }
 };
+
+
 
 BOOST_AUTO_TEST_CASE(serialization)
 {

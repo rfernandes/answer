@@ -1,5 +1,4 @@
 #include <string>
-#include <dlfcn.h>
 #include <stdexcept>
 
 #include <MongooseContext.h>
@@ -10,6 +9,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
 
+#include "answer/Adapter.hh"
 #include "answer/Operation.hh"
 #include "answer/Module.hh"
 
@@ -17,14 +17,6 @@ using namespace std;
 using namespace answer;
 using namespace boost::filesystem;
 using namespace boost::program_options;
-
-static void dlOpen(const std::string &path, int mode = RTLD_LAZY) {
-  void *handle = dlopen(path.c_str(), mode);
-  if (!handle)
-  {
-    throw runtime_error(dlerror());
-  }
-}
 
 namespace {
   std::string baseUri;
@@ -47,6 +39,9 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
         // Initialize context
         answer::adapter::mongoose::MongooseContext context(*conn);
 
+        ModuleStore &store = ModuleStore::Instance();
+        store.inFlow(context);
+        
         Operation &oper_ref = OperationStore::Instance().operation(context.operationInfo().service(), context.operationInfo().operation());
         
         std::string params;
@@ -92,21 +87,22 @@ static int event_handler(struct mg_connection *conn, enum mg_event ev)
       }
       catch (answer::WebMethodException &ex)
       {
-        mg_send_status(conn, 302);
+        mg_send_status(conn, 500);
         mg_send_header(conn, "Content-Type", "text/plain");
         mg_printf_data(conn, "%s", ex.what());
       }
       catch (answer::ModuleException &ex)
       {
-        mg_send_status(conn, 302);
+        mg_send_status(conn, 500);
         mg_send_header(conn, "Content-Type", "text/plain");
         mg_printf_data(conn, "%s", ex.what());
         cerr << "ModuleException: " << ex.what();
       }
       catch (exception &ex)
       {
-        mg_send_status(conn, 302);
+        mg_send_status(conn, 500);
         mg_send_header(conn, "Content-Type", "text/plain");
+        mg_printf_data(conn, "");
         cerr << "Exception: " << ex.what();
       }
       return MG_TRUE;   // Mark as processed
@@ -126,22 +122,24 @@ int main(int argc, char *argv[]) {
   options_description desc("Allowed options");
   desc.add_options()
       ("help,h", "Display help")
-      ("port,p", value(&port)->default_value(8080), "Http port")
-      ("root,r", value(&mongoosePath)->implicit_value("."), "Path to document root")
+      ("port,p", value(&port)->default_value(8080), "HTTP port")
+      ("root,r", value(&mongoosePath)->implicit_value("."), "Enable document serving at path")
       ("services,s", value(&servicesDir), "Services library directories")
       ("base,b", value(&baseUri)->default_value("/services"), "Services base directory")
   ;
-
-  if (argc == 1) {
-    cout << desc << endl;
-    return 0;
-  }
   
   positional_options_description p;
   p.add("services", -1);
 
   variables_map vm;
   store(command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+  
+  if (argc == 1 || vm.count("help"))
+  {
+    cout << desc << endl;
+    return 0;
+  }  
+  
   notify(vm);
   
   struct mg_server *server = mg_create_server(NULL, event_handler);
@@ -150,18 +148,20 @@ int main(int argc, char *argv[]) {
   mg_set_option(server, "listening_port", to_string(port).c_str());
   
   //Load services
-  for (const auto &servicePath: servicesDir) {
+  for (const auto &servicePath: servicesDir)
+  {
     directory_iterator end_itr;
     for (directory_iterator itr(servicePath); itr != end_itr; ++itr){
       if (extension(itr->path()) == ".so")
       {
         cout << "Loading " << itr->path() << endl;
-        dlOpen(itr->path().string(), RTLD_GLOBAL | RTLD_NOW);
+        dlOpen(itr->path().string());
       }
     }
   }
 
-  for (;;) {
+  while (true)
+  {
     mg_poll_server(server, 1000);  // Infinite loop, Ctrl-C to stop
   }
   mg_destroy_server(&server);

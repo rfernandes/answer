@@ -3,7 +3,7 @@ set (MONGOOSE_SRC_FILES
 "src/MongooseContext.cpp"
 )
 
-set (MONGOOSE_LIBRARIES "dl" "mongoose")
+set (MONGOOSE_LIBRARIES "mongoose")
 
 
 find_package(Boost COMPONENTS filesystem program_options system REQUIRED QUIET)
@@ -13,17 +13,17 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
-add_executable(mongoose_answer
+add_executable(answer_mongoose
 ${MONGOOSE_SRC_FILES}
 )
 
-target_link_libraries (mongoose_answer
+target_link_libraries (answer_mongoose
   ${PROJECT_NAME}
   ${PROJECT_NAME}-module
   ${Boost_LIBRARIES}
   ${MONGOOSE_LIBRARIES}
 )
 
-install (TARGETS mongoose_answer DESTINATION bin)
+install (TARGETS answer_mongoose DESTINATION bin)
 
-add_subdirectory(include)
+add_subdirectory(tests)

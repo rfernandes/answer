@@ -4,14 +4,12 @@
 
 BasicOperationResponse BasicService::simple_operation()
 {
-  BasicOperationResponse ret;
-
-  ret.items = {
+  BasicOperationResponse ret = {{
     "Ennie",
     "Meenie",
     "Miney",
     "Moe"
-  };
+  }};
 
   return ret;
 }

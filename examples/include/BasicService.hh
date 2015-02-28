@@ -2,6 +2,7 @@
 #define _BASIC_SERVICE_HH_
 #include <answer/Operation.hh>
 #include <string>
+#include <boost/serialization/set.hpp>
 #include <boost/serialization/list.hpp>
 
 bool responseWrapper(std::ostream &out, const std::string &response, const std::string &mimetype, const answer::WebMethodException *ex)
@@ -24,7 +25,7 @@ struct BasicOperationResponse
   template<class Archive>
   void serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &BOOST_SERIALIZATION_NVP(items);
+    ar & BOOST_SERIALIZATION_NVP(items);
   }
 };
 
@@ -35,7 +36,7 @@ struct testInput
   template<class Archive>
   void serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &BOOST_SERIALIZATION_NVP(test);
+    ar & BOOST_SERIALIZATION_NVP(test);
   }
 };
 
@@ -58,7 +59,7 @@ public:
 
 
 ANSWER_RESPONSE_WRAPPER(responseWrapper)
-ANSWER_REGISTER(BasicService::hello_world, "test/examples")
+ANSWER_REGISTER(BasicService::hello_world, "examples")
 ANSWER_REGISTER(BasicService::simple_operation, "examples")
 ANSWER_REGISTER(BasicService::testOperation, "examples")
 

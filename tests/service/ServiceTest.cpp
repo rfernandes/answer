@@ -20,7 +20,7 @@ ANSWER_REGISTER(Operation::test, "Registration")
 BOOST_AUTO_TEST_CASE(registration)
 {
   const auto operations = answer::OperationStore::Instance().operationList();
-  BOOST_CHECK(operations.front() == string("Registration/test"));
+  BOOST_CHECK(operations.front() == "Registration/test");
 }
 
 BOOST_AUTO_TEST_CASE(request_response)

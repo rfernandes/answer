@@ -1,6 +1,7 @@
 #include "answer/Operation.hh"
 #include "answer/Module.hh"
 #include "answer/Context.hh"
+#include "answer/Adapter.hh"
 
 #include "ApacheModule.hh"
 #include "ApacheContext.hh"
@@ -74,15 +75,6 @@ static int answer_handler(request_rec *r)
   return OK;
 }
 
-static void dlOpen(const char *path, int mode = RTLD_LAZY)
-{
-  void *handle = dlopen(path, mode);
-  if (!handle)
-  {
-    throw runtime_error(dlerror());
-  }
-}
-
 static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t */*ptemp*/, server_rec */*s*/)
 {
   ap_add_version_component(p, "Answer");
@@ -99,7 +91,7 @@ static int answer_init_handler(apr_pool_t *p, apr_pool_t */*plog*/, apr_pool_t *
     {
       if (extension(itr->path()) == ".so")
       {
-        dlOpen(itr->path().c_str(), RTLD_GLOBAL);
+        dlOpen(itr->path().c_str());
       }
     }
   }

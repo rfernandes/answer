@@ -7,6 +7,7 @@
 #endif
 
 #include <sstream>
+#include <list>
 
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/concept_check.hpp>

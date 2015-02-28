@@ -25,11 +25,11 @@ public:
   Response &response();
   void response(const Response &response);
 
-  typedef std::vector<std::pair<std::string, std::string>> OrderedPairs;
-  typedef std::map<std::string, std::string> Map;
-  typedef std::map<std::string, Cookie> CookieMap;
-  typedef OrderedPairs QueryMap;
-  typedef std::vector<std::string> Accepts;
+  using OrderedPairs = std::vector<std::pair<std::string, std::string>>;
+  using Map = std::map<std::string, std::string>;
+  using CookieMap = std::map<std::string, Cookie>;
+  using QueryMap = OrderedPairs;
+  using Accepts = std::vector<std::string>;
   const Map &environment() const;
 
   void insert(const Cookie &cookie);

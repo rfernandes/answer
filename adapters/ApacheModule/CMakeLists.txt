@@ -3,7 +3,7 @@ set (APACHEMODULE_SRC_FILES
 "src/ApacheContext.cpp"
 )
 
-set (APACHEMODULE_LIBRARIES "dl" "aprutil-1" "apr-1" "apreq2")
+set (APACHEMODULE_LIBRARIES "aprutil-1" "apr-1" "apreq2")
 
 include_directories (include /usr/include/apreq2 /usr/include/apache2 /usr/include/httpd /usr/include/apr-1.0 /usr/include/apr-1 /opt/wps/include)
 
