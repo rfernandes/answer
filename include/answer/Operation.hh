@@ -11,7 +11,6 @@
 #include <boost/function_types/parameter_types.hpp>
 #include <boost/function_types/result_type.hpp>
 
-#include "archive/ws_xml_oarchive.hpp"
 #include "archive/ws_xml_iarchive.hpp"
 #include "Macros.hh"
 #include "Exception.hh"
@@ -26,7 +25,7 @@ class Operation
 {
 protected:
   std::string _name;
-  virtual void process(Response&, const std::string &params, const answer::Context::Accepts &accepts) = 0;
+  virtual void process(Response&, const std::string &params, const Context::Accepts &accepts) = 0;
 public:
   Operation(const std::string &name)
   {
@@ -36,7 +35,7 @@ public:
   virtual ~Operation() {};
 
   // The invocation wrapper
-  Response invoke(const std::string &params, const answer::Context::Accepts &accepts);
+  Response invoke(const std::string &params, const Context::Accepts &accepts);
 };
 
 template <typename RequestT>
@@ -45,7 +44,7 @@ RequestT requestPart(const std::string &name, const std::string &params)
   RequestT request;
   std::istringstream ssIn(params);
   {
-    answer::archive::ws_xml_iarchive inA(ssIn);
+    archive::ws_xml_iarchive inA(ssIn);
     inA >> boost::serialization::make_nvp(name.c_str(), request);
   }
 
@@ -53,7 +52,7 @@ RequestT requestPart(const std::string &name, const std::string &params)
 }
 
 template <typename ResponseT>
-void responsePart(Response &ret, const ResponseT &response, const std::string &operationName, const answer::Context::Accepts &accepts)
+void responsePart(Response &ret, const ResponseT &response, const std::string &operationName, const Context::Accepts &accepts)
 {
   std::ostringstream encodedReponse;
 
@@ -74,7 +73,7 @@ void responsePart(Response &ret, const ResponseT &response, const std::string &o
   if (ret.contentType().empty())
   for (const auto & accept : accepts)
   {
-    if (codec::GenericCodec(encodedReponse, accept, operationName, response))
+    if (codec::GenericEncoder(encodedReponse, accept, operationName, response))
     {
       ret.contentType(accept);
       break;
@@ -97,7 +96,7 @@ void responsePart(Response &ret, const ResponseT &response, const std::string &o
 }
 
 //Empty responsePart
-void responsePart(Response &ret, const std::string &operationName, const answer::Context::Accepts &accepts);
+void responsePart(Response &ret, const std::string &operationName, const Context::Accepts &accepts);
 
 //The default template is request / response
 template <typename Type, typename OperationType, typename RequestT, typename ResponseT, class Strategy  >
@@ -109,7 +108,7 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &params, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &params, const Context::Accepts &accepts) override
   {
     RequestT request = requestPart<RequestT>(_name, params);
     Type &type(_methodHandle.Instance());
@@ -128,7 +127,7 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &, const Context::Accepts &accepts) override
   {
     Type &type(_methodHandle.Instance());
     ResponseT response((type.*_op)());
@@ -146,7 +145,7 @@ public:
   OperationHandler(OperationType op, const std::string &name): Operation(name), _op(op) {}
 
 protected:
-  void process(Response &ret, const std::string &params, const answer::Context::Accepts &accepts) override
+  void process(Response &ret, const std::string &params, const Context::Accepts &accepts) override
   {
     RequestT request = requestPart<RequestT>(_name, params);
     Type &type(_methodHandle.Instance());
@@ -216,7 +215,7 @@ public:
 
   static OperationStore &Instance();
 
-  void registerOperation(const std::string &serviceName, const std::string &operationName, std::unique_ptr< answer::Operation > webMethodHandle);
+  void registerOperation(const std::string &serviceName, const std::string &operationName, std::unique_ptr< Operation > webMethodHandle);
   Operation &operation(const std::string &serviceName, const std::string &operationName) const;
 
   std::vector<std::string> operationList();
@@ -237,9 +236,7 @@ public:
 
     using request = typename std::decay<response_type>::type;
     
-    typedef
-    OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type>>
-        Handler;
+    typedef OperationHandler<Type, Operation, request, response, instantiation::InstantiationStrategy<Type>> Handler;
 
     try
     {

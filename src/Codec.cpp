@@ -4,7 +4,7 @@ namespace answer
 {
 namespace codec
 {
-bool GenericCodec(std::ostream &out, const std::string &mimeType, const std::string &operationName)
+bool GenericEncoder(std::ostream &out, const std::string &mimeType, const std::string &operationName)
 {
   if (mimeType == "application/json")
   {
@@ -20,5 +20,20 @@ bool GenericCodec(std::ostream &out, const std::string &mimeType, const std::str
   }
   return false;
 }
+
+bool GenericDecoder(std::ostream &in, const std::string &mimeType, const std::string &operationName)
+{
+  if (mimeType == "application/json")
+  {
+    return true;
+  }
+
+  if (mimeType == "application/xml" || mimeType == "*/*")
+  {
+    return true;
+  }
+  return false;
+}
+
 }
 }

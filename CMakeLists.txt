@@ -98,7 +98,7 @@ INCLUDES DESTINATION include
 )
 
 install (TARGETS answer-module EXPORT AnswerTargets
-DESTINATION lib
+LIBRARY DESTINATION lib
 COMPONENT library)
 
 install (FILES ${headersHH} DESTINATION include/answer COMPONENT Devel)
