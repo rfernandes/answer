@@ -6,17 +6,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 # PROJECT SPECIFIC INFO
 ###########################################################
 project (answer)
-set (PROJECT_VERSION 0.1)
+set (PROJECT_VERSION 0.2)
+set (PROJECT_VERSION_SO 0)
 
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -pedantic -Wall")
+add_definitions("-std=c++11 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
-find_package(Boost COMPONENTS serialization date_time filesystem REQUIRED QUIET)
-
-include_directories (BEFORE
-  include
-)
+find_package(Boost COMPONENTS system serialization date_time filesystem REQUIRED QUIET)
 
 include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
@@ -40,19 +37,33 @@ file (GLOB headersArchiveHH
 # TARGET GENERATION
 ###########################################################
 #Module support
-add_library (${PROJECT_NAME}-module SHARED ${MODULE_SRC_FILES})
-set_target_properties(${PROJECT_NAME}-module PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
-target_link_libraries (${PROJECT_NAME}-module
+add_library (answer-module SHARED ${MODULE_SRC_FILES})
+set_target_properties(answer-module PROPERTIES
+VERSION ${PROJECT_VERSION}
+SOVERSION ${PROJECT_VERSION_SO})
+target_link_libraries (answer-module
 	${Boost_LIBRARIES}
 )
 
+target_include_directories (answer-module
+PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>  
+  $<INSTALL_INTERFACE:include/>  # <prefix>/include/mylib
+)
 
 #Library
-add_library (${PROJECT_NAME} SHARED ${ADAPTER_SRC_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
-target_link_libraries (${PROJECT_NAME}
+add_library (answer SHARED ${ADAPTER_SRC_FILES})
+set_target_properties(answer PROPERTIES
+VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION})
+target_link_libraries (answer
   "dl"
 	${Boost_LIBRARIES}
+)
+
+target_include_directories (answer
+PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>  
+  $<INSTALL_INTERFACE:include/>  # <prefix>/include/mylib
 )
 
 add_subdirectory(examples)
@@ -63,7 +74,7 @@ option(AXIS_ADAPTER "compile the axis2/C adapter" true)
 option(MONGOOSE_ADAPTER "compile the Mongoose adapter" false)
 
 if (APACHE_ADAPTER)
-	add_subdirectory(adapters/ApacheModule)
+  add_subdirectory(adapters/ApacheModule)
 endif()
 
 if (FCGI_ADAPTER)
@@ -78,11 +89,20 @@ if (MONGOOSE_ADAPTER)
   add_subdirectory(adapters/Mongoose)
 endif()
 
-install (TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT library)
-install (TARGETS ${PROJECT_NAME}-module DESTINATION lib COMPONENT library)
+include(GenerateExportHeader)
+generate_export_header(answer)
 
-install (FILES ${headersHH} DESTINATION include/answer COMPONENT headers)
-install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT headers)
+install (TARGETS answer EXPORT AnswerTargets
+LIBRARY DESTINATION lib
+INCLUDES DESTINATION include
+)
+
+install (TARGETS answer-module EXPORT AnswerTargets
+DESTINATION lib
+COMPONENT library)
+
+install (FILES ${headersHH} DESTINATION include/answer COMPONENT Devel)
+install (FILES ${headersArchiveHH} DESTINATION include/answer/archive COMPONENT Devel)
 
 option(CodeCoverage "Build support for code coverage (requires -DCMAKE_BUILD_TYPE=Debug)" OFF)
 
@@ -95,3 +115,41 @@ if (CodeCoverage)
 endif()
 
 add_subdirectory(tests)
+
+# Packaging
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/Answer/AnswerConfigVersion.cmake"
+  VERSION ${Upstream_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+export(EXPORT AnswerTargets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/Answer/AnswerTargets.cmake"
+#   NAMESPACE Answer::
+)
+
+set(INCLUDE_INSTALL_DIR "answer/include/")
+
+set(ConfigPackageLocation lib/cmake/answer)
+configure_package_config_file(cmake/AnswerConfig.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/Answer/AnswerConfig.cmake"
+  INSTALL_DESTINATION ${ConfigPackageLocation}
+  PATH_VARS INCLUDE_INSTALL_DIR
+)
+
+install(EXPORT AnswerTargets
+  FILE
+    AnswerTargets.cmake
+  DESTINATION
+    ${ConfigPackageLocation}
+)
+install(
+  FILES
+    cmake/AnswerConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/Answer/AnswerConfigVersion.cmake"
+  DESTINATION
+    ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)
