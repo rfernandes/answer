@@ -20,7 +20,7 @@ target_link_libraries (answer_mongoose
   ${PROJECT_NAME}
   ${PROJECT_NAME}-module
   ${Boost_LIBRARIES}
-  /home/c/RaspberryPi2/cambridge/usr/lib/libmongoose.so
+  mongoose
 #   ${MONGOOSE_LIBRARIES}
 )
 
