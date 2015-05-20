@@ -9,44 +9,58 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 #include <boost/serialization/set.hpp>
+#include <boost/serialization/list.hpp>
 #include <map>
-
 
 using namespace std;
 
-struct testInput
+struct complexData
 {
-  std::set<double> test;
+  std::multiset<double> set_collection;
+  std::vector<double> vector_collection;
+  std::list<std::vector<int>> nested_collection;
+  string str;
 
-  bool operator== (const testInput &t)
+  bool operator== (const complexData &t)
   {
-    return test == t.test;
+    return set_collection == t.set_collection &&
+            vector_collection == t.vector_collection &&
+//             nested_collection == t.nested_collection &&
+            str == t.str;
+    
   }
 
   template<class Archive>
   void serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar & BOOST_SERIALIZATION_NVP(test);
+    ar & BOOST_SERIALIZATION_NVP(set_collection);
+    ar & BOOST_SERIALIZATION_NVP(vector_collection);
+//     ar & BOOST_SERIALIZATION_NVP(nested_collection);
+    ar & BOOST_SERIALIZATION_NVP(str);
   }
 };
 
 BOOST_AUTO_TEST_CASE(serialization)
 {
-  testInput testIntSet1;
-  testIntSet1.test = {3.12, 400, -1234, 3e4, 3};
+  complexData data;
+  data.set_collection = {3.12, 400, -1234, 3e4, 3};
+  data.vector_collection = {3.12, 400, -1234, 3e4, 3};
+  // TODO: add support for nested collections
+  //   data.nested_collection = {{3, 12, 400}, {-1234, 3, 3}};
+  data.str = "string";
 
   stringstream ss;
   {
     answer::archive::ws_xml_oarchive oarchive(ss);
-    oarchive << boost::serialization::make_nvp("test", testIntSet1);
+    oarchive << boost::serialization::make_nvp("test", data);
   }
-  testInput testIntSet2;
+  complexData data_aux;
   {
     answer::archive::ws_xml_iarchive iarchive(ss);
-    iarchive >> boost::serialization::make_nvp("test", testIntSet2);
+    iarchive >> boost::serialization::make_nvp("test", data_aux);
   }
-
-  BOOST_CHECK(testIntSet1 == testIntSet2);
+  
+  BOOST_CHECK(data == data_aux);
 }
 
 BOOST_AUTO_TEST_CASE(xml_empty)

@@ -9,7 +9,7 @@ project (answer)
 set (PROJECT_VERSION 0.2)
 set (PROJECT_VERSION_SO 0)
 
-add_definitions("-std=c++11 -pedantic -Wall")
+add_definitions("-std=c++14 -pedantic -Wall")
 ######################	#####################################
 # INCLUDES, SOURCE FILES AND CMAKE MODULES
 ###########################################################
