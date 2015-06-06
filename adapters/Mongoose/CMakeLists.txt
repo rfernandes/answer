@@ -3,7 +3,7 @@ set (MONGOOSE_SRC_FILES
 "src/MongooseContext.cpp"
 )
 
-# find_package (Mongoose REQUIRED)
+find_package (Mongoose REQUIRED)
 find_package(Boost COMPONENTS filesystem program_options system REQUIRED QUIET)
 
 include_directories(
@@ -20,8 +20,7 @@ target_link_libraries (answer_mongoose
   ${PROJECT_NAME}
   ${PROJECT_NAME}-module
   ${Boost_LIBRARIES}
-  mongoose
-#   ${MONGOOSE_LIBRARIES}
+  ${MONGOOSE_LIBRARIES}
 )
 
 install (TARGETS answer_mongoose DESTINATION bin)
